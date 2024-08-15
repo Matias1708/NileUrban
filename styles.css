@@ -1,0 +1,389 @@
+@font-face {
+    font-family: 'Bank Gothic Light BT';
+    src: url('fuentes/bank-gothic-light-bt.ttf') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.modal {
+    display: none; /* Ocultar por defecto */
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo semitransparente */
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    text-align: center;
+}
+
+.close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-btn:hover,
+.close-btn:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: 'Bank Gothic Light BT', sans-serif;
+    display: flex;
+    flex-direction: column;
+    background-color: black;
+    background-size: cover; /* Ajusta la imagen para cubrir todo el fondo */
+    background-position: center; /* Centra la imagen */
+    background-repeat: no-repeat; /* Evita que la imagen se repita */
+}
+
+h2, h1, p {
+    color: white;
+}
+
+.container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box; 
+}
+
+.booking-form, .reservations {
+    border: 1px solid grey;
+    border-radius: 8px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
+    margin-bottom: 20px;
+}
+
+.reservations {
+    text-align: center;
+    background: transparent;
+    color: white;
+}
+
+.booking-form {
+    background: transparent;
+}
+
+.booking-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 16px;
+    color: white;
+}
+
+.booking-form input,
+.booking-form select {
+    display: block;
+    width: calc(100% - 16px);
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid grey;
+    border-radius: 4px;
+}
+
+.booking-form label[for="time"] {
+    font-size: 18px;
+}
+
+button {
+    padding: 13px 15px;
+    background-color: black;
+    font-family: 'Bank Gothic Light BT', sans-serif;
+    font-size: 20px;
+    border: solid 1px white;
+    color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+    display: block;
+    width: 200px;
+    margin: 0 auto;
+}
+
+button:hover {
+    background-color: grey;
+    border-bottom: solid 1px white;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+li:last-child {
+    border-bottom: none;
+}
+
+footer {
+    padding: 20px;
+    border-top: 1px solid grey;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: black;
+    font-size: 15px;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 800px;
+}
+
+.contact-info {
+    text-align: center;
+    flex: 1;
+}
+
+.contact-info p {
+    margin: 5px 0;
+}
+
+.social-media {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.social-media a {
+    font-size: 24px;
+    color: white;
+    text-decoration: none;
+    margin-left: 20px;
+}
+
+.social-media a:hover {
+    color: #007BFF;
+}
+
+header {
+    text-align: center;
+    padding: 20px;
+    background-color: black;
+    border-bottom: solid 1px grey;
+}
+
+.brand-image img {
+    max-width: 200px;
+    height: auto;
+}
+
+.form-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.form-group {
+    flex: 1;
+    min-width: 150px;
+}
+
+.booking-form select {
+    width: 100%;
+}
+
+/* Estilo para los modales */
+.modal {
+    display: none; /* Ocultar el modal por defecto */
+    position: fixed;
+    z-index: 1000;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    max-width: 600px;
+    background-color: rgba(0,0,0,0.4); /* Fondo oscuro para el modal */
+}
+
+.modal-content {
+    background-color: black;
+    margin: 0;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 100%;
+    max-width: 400px;
+    box-sizing: border-box;
+}
+
+.close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-btn:hover,
+.close-btn:focus {
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Estilo específico para los modales de confirmación y turnos reservados */
+/*#confirmation-modal {
+    left: calc(50% - 310px); /* Posición del primer modal */
+
+/*#reservations-modal {
+    left: calc(50% + 10px); /* Posición del segundo modal */
+
+/* Estilo para los div de reservas */
+.reservations-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    width: 100%;
+    max-width: 1200px;
+}
+
+.reservations {
+    flex: 1;
+    margin: 0;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: BLACK;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.booking-form input, .booking-form select {
+    display: block;
+    width: calc(100% - 16px);
+    font-family: 'Bank Gothic Light BT', sans-serif;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid grey;
+    border-radius: 4px;
+    background: #c6c6c6;
+    color: black;
+    font-weight: bold;
+}
+
+/* Estilos para el modal de autenticación */
+#admin-auth-modal {
+    display: none; /* Ocultar el modal por defecto */
+    position: fixed; /* Fijo en la pantalla */
+    z-index: 1; /* Encima de otros elementos */
+    left: 0;
+    top: 0;
+    width: 100%; /* Ancho completo */
+    height: 100%; /* Altura completa */
+    overflow: auto; /* Desplazamiento si es necesario */
+    background-color: rgb(0,0,0); /* Color de fondo */
+    background-color: rgba(0,0,0,0.4); /* Fondo con opacidad */
+}
+
+/* Estilos del contenido del modal */
+#admin-auth-modal .modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* Margen vertical centrado */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Ancho del modal */
+    max-width: 400px; /* Ancho máximo */
+    text-align: center; /* Texto centrado */
+}
+
+/* Estilos del botón de cerrar */
+#admin-auth-modal .close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+#admin-auth-modal .close-btn:hover,
+#admin-auth-modal .close-btn:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Estilo para el input y el botón */
+#admin-auth-modal input,
+#admin-auth-modal button {
+    margin: 10px 0;
+    padding: 10px;
+    width: calc(100% - 22px); /* Ancho del input y el botón */
+}
+
+/* Media Queries para dispositivos móviles */
+@media (max-width: 768px) {
+    .booking-form, .reservations {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+
+    button {
+        width: 100%;
+        font-size: 18px;
+    }
+
+    .modal-content {
+        width: 90%;
+    }
+
+    .reservations-container {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .reservations {
+        margin-bottom: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .booking-form input,
+    .booking-form select {
+        font-size: 14px;
+    }
+
+    .footer-content {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .social-media a {
+        margin-left: 10px;
+        font-size: 20px;
+    }
+
+    .brand-image img {
+        max-width: 150px;
+    }
+}
+
+

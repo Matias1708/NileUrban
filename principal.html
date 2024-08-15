@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turnero de Peluquería</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.2.0/dist/index.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.2.0/dist/index.global.min.js"></script>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
+        import { getFirestore, collection, addDoc, getDocs, query, where } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+        import { getAnalytics } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-analytics.js';
+
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyA_vfbPHFvTTg6HbsqPD4ym50Q2pfxnLYU",
+            authDomain: "nileurban-c9bd9.firebaseapp.com",
+            projectId: "nileurban-c9bd9",
+            storageBucket: "nileurban-c9bd9.appspot.com",
+            messagingSenderId: "798328145085",
+            appId: "1:798328145085:web:8ad8642e133fdd6fab63d4",
+            measurementId: "G-44H22X36PS"
+        };
+
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+
+        // Función para obtener la fecha actual en formato YYYY-MM-DD
+        function getCurrentDate() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0'); // Meses empiezan desde 0
+            const day = String(today.getDate()).padStart(2, '0');
+            return `${day}/${month}/${year}`;
+        }
+
+        // Función para obtener los documentos de la colección "Reserva" para la fecha actual
+        async function getRecords() {
+            const today = getCurrentDate();
+            console.log(`Obteniendo reservas para la fecha actual: ${today}`);
+
+            const reservationsCol = collection(db, 'Reserva');
+            const q = query(reservationsCol, where('fecha', '==', today));
+            const querySnapshot = await getDocs(q);
+            const appointmentList = document.getElementById('appointment-list');
+            appointmentList.innerHTML = ''; // Limpiar la lista antes de agregar los nuevos elementos
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                const listItem = document.createElement('li');
+                listItem.textContent = `${data.nombre} - ${data.fecha} - ${data.hora}hs - ${data.profesional} - ${data.servicio}`;
+                appointmentList.appendChild(listItem);
+            });
+        }
+
+        // Función para obtener las reservas para una fecha y profesional específicos
+        async function getReservationsForDateAndProfessional(date, professional) {
+            const querySnapshot = await getDocs(query(
+                collection(db, 'Reserva'),
+                where('fecha', '==', date),
+                where('profesional', '==', professional)
+            ));
+            const reservations = [];
+            querySnapshot.forEach((doc) => {
+                reservations.push(doc.data());
+            });
+            return reservations;
+        }
+
+        // Función para reservar una cita
+        async function bookAppointment() {
+            const name = document.getElementById('name').value;
+            const date = document.getElementById('calendar').value;
+            const time = document.getElementById('time').value;
+            const professional = document.getElementById('professional').value;
+            const service = document.getElementById('service').value; // Nuevo campo para el servicio
+            
+            if (name && date && time && professional && service) {
+                // Verificar si la hora está disponible
+                const reservations = await getReservationsForDateAndProfessional(date, professional);
+                const reservedTimes = reservations.map(reservation => reservation.hora);
+
+                if (reservedTimes.includes(time)) {
+                    alert('La hora seleccionada ya está reservada. Por favor, elige otra hora.');
+                    return;
+                }
+
+                // Guardar la reserva en Firebase
+                try {
+                    await addDoc(collection(db, 'Reserva'), {
+                        nombre: name,
+                        fecha: date,
+                        hora: time,
+                        profesional: professional,
+                        servicio: service
+                    });
+                    alert('Reserva realizada con éxito');
+
+                    // Actualizar la lista de reservas
+                    await getRecords();
+                    showConfirmationModal(); // Mostrar el modal de confirmación
+                } catch (error) {
+                    console.error('Error al añadir la reserva: ', error);
+                }
+            } else {
+                alert('Por favor, completa todos los campos.');
+            }
+        }
+
+        // Función para rellenar el select con horarios
+        async function populateTimeOptions() {
+            const timeSelect = document.getElementById('time');
+            const schedule = { startHour: 11, endHour: 18, interval: 30 }; // Ajusta el inicio de la hora a las 11 AM
+            const { startHour, endHour, interval } = schedule;
+            const date = document.getElementById('calendar').value;
+            const professional = document.getElementById('professional').value;
+
+            if (!date || !professional) return;
+
+            // Obtener las reservas del día seleccionado para el profesional elegido
+            const reservations = await getReservationsForDateAndProfessional(date, professional);
+
+            // Agregar todas las horas reservadas al array reservedTimes
+            const reservedTimesForDateAndProfessional = reservations.map(reservation => reservation.hora);
+
+            // Vacía el select antes de rellenarlo
+            timeSelect.innerHTML = '';
+
+            for (let hour = startHour; hour <= endHour; hour++) {
+                for (let minutes = 0; minutes < 60; minutes += interval) {
+                    if (hour === endHour && minutes > 60 - interval) break; // Limita el último turno
+                    const hourDisplay = hour < 10 ? `0${hour}` : hour;
+                    const minutesDisplay = minutes === 0 ? '00' : minutes;
+                    const optionValue = `${hourDisplay}:${minutesDisplay}`;
+                    const optionText = `${hourDisplay}:${minutesDisplay}hs`; // Muestra la hora en formato 24h con "hs"
+
+                    const option = document.createElement('option');
+                    option.value = optionValue;
+                    option.textContent = optionText;
+
+                    // Solo añade opciones que no están reservadas para la fecha actual y el profesional seleccionado
+                    if (!reservedTimesForDateAndProfessional.includes(option.value)) {
+                        timeSelect.appendChild(option);
+                    }
+                }
+            }
+        }
+
+        // Función para mostrar el modal de confirmación
+        // function showConfirmationModal() {
+        //     document.getElementById('confirmation-modal').style.display = 'block';
+        // }
+
+        // Función para cerrar el modal de confirmación
+        function closeConfirmationModal() {
+            document.getElementById('confirmation-modal').style.display = 'none';
+        }
+
+        // Inicializar Flatpickr en el campo de fecha
+        function initDatePicker() {
+            flatpickr("#calendar", {
+                dateFormat: "d/m/Y",
+                locale: "es"
+            });
+        }
+
+        // Obtener elementos del DOM
+const openModalButton = document.getElementById('open-modal-button');
+
+// Función para mostrar el modal de confirmación solo para el administrador
+function showConfirmationModal() {
+    const isAdmin = prompt('Ingresa la contraseña del administrador:'); // Solicita la contraseña
+    if (isAdmin === 'nico1234') { // Verifica la contraseña
+        document.querySelector('.reservations').style.display = 'block'; // Muestra la lista de reservas
+    } else {
+        alert('Contraseña incorrecta. No tienes permiso para ver las reservas.');
+    }
+}
+
+// Evento para abrir el modal y solicitar la contraseña
+openModalButton.addEventListener('click', showConfirmationModal);
+
+        // Llama a la función para obtener los documentos al cargar la página
+        window.onload = () => {
+            getRecords();
+            initDatePicker();
+
+            document.getElementById('book-button').addEventListener('click', bookAppointment);
+
+            // Actualizar opciones de hora cuando se seleccione la fecha o el profesional
+            document.getElementById('calendar').addEventListener('change', populateTimeOptions);
+            document.getElementById('professional').addEventListener('change', populateTimeOptions);
+        };
+    </script>
+</head>
+<body>
+    <header>
+        <div class="brand-image">
+            <img src="images/nile_header.jpg" alt="Marca">
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="booking-form">
+            <label for="name">NOMBRE COMPLETO:</label>
+            <input type="text" id="name" required>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="professional">PROFESIONAL:</label>
+                    <select id="professional" required>
+                        <option value="Nicolas">Nicolas</option>
+                        <option value="Lautaro">Lautaro</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="calendar">FECHA:</label>
+                    <input type="text" id="calendar" required>
+                </div>
+            </div>
+
+            <label for="time">HORA:</label>
+            <select id="time" required></select>
+
+            <!-- Nuevo campo para seleccionar servicio -->
+            <label for="service">SERVICIOS:</label>
+            <select id="service" required>
+                <option value="Corte">Corte $8.500</option>
+                <option value="Corte + Barba">Corte + Barba $10.000</option>
+                <!-- Agrega más opciones según sea necesario -->
+            </select>
+
+            <button id="book-button">RESERVAR</button>
+        </div>
+        
+        <div class="reservations" style="display: none;">
+            <h2>TURNOS RESERVADOS</h2>
+            <ul id="appointment-list"></ul>
+        </div>
+    </div>
+
+    <!-- Mensaje de confirmación -->
+    <div id="confirmation-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeConfirmationModal()">&times;</span>
+            <p>¡Tu turno ha sido reservado con éxito!</p>
+            <p>¿Deseas recibir un recordatorio en WhatsApp?</p>
+            <a id="whatsapp-link" href="#" target="_blank">Enviar recordatorio por WhatsApp</a>
+        </div>
+    </div>
+
+    <!-- Modal de autenticación del administrador -->
+    <div id="auth-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeAuthModal()">&times;</span>
+            <h2>Autenticación Administrador</h2>
+            <form id="auth-form">
+                <label for="admin-email">Email:</label>
+                <input type="email" id="admin-email" required>
+                <label for="admin-password">Contraseña:</label>
+                <input type="password" id="admin-password" required>
+                <button type="submit">Iniciar sesión</button>
+            </form>
+        </div>
+    </div>
+
+    <button id="open-modal-button">Panel Administración</button>
+
+
+
+    <div id="custom-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-btn" id="close-modal-button">&times;</span>
+            
+            <button id="confirm-button">Confirmar</button>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="footer-content">
+            <div class="contact-info">
+                <p><strong>Dirección: </strong>Av. De Mayo 702 - Ramos Mejia</p>
+                <p><strong>Horarios:</strong> Martes a Sábado: 10:30 - 20:00</p>
+            </div>
+            <div class="social-media">
+                <a href="https://www.instagram.com/nile.urbanlounge" target="_blank" title="Síguenos en Instagram">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://www.tiktok.com/@nile.urban" target="_blank" title="Síguenos en TikTok">
+                    <i class="fab fa-tiktok"></i>
+                </a>    
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/dist/date-fns.min.js"></script>
+</body>
+</html>
