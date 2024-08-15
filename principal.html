@@ -39,21 +39,51 @@
             return `${day}/${month}/${year}`;
         }
 
-        // Función para obtener los documentos de la colección "Reserva" para la fecha actual
-        async function getRecords() {
-            const today = getCurrentDate();
-            console.log(`Obteniendo reservas para la fecha actual: ${today}`);
+        // Función para convertir una fecha en formato DD/MM/YYYY a objeto Date
+        function parseDate(dateString) {
+            const [day, month, year] = dateString.split('/');
+            return new Date(`${year}-${month}-${day}`);
+        }
 
+        // Función para obtener todas las reservas
+        async function getRecords() {
             const reservationsCol = collection(db, 'Reserva');
-            const q = query(reservationsCol, where('fecha', '==', today));
-            const querySnapshot = await getDocs(q);
-            const appointmentList = document.getElementById('appointment-list');
-            appointmentList.innerHTML = ''; // Limpiar la lista antes de agregar los nuevos elementos
+            const querySnapshot = await getDocs(reservationsCol);
+            const reservations = [];
+
             querySnapshot.forEach((doc) => {
                 const data = doc.data();
-                const listItem = document.createElement('li');
-                listItem.textContent = `${data.nombre} - ${data.fecha} - ${data.hora}hs - ${data.profesional} - ${data.servicio}`;
-                appointmentList.appendChild(listItem);
+                reservations.push(data);
+            });
+
+            // Agrupar reservas por fecha
+            const groupedReservations = reservations.reduce((acc, reservation) => {
+                if (!acc[reservation.fecha]) {
+                    acc[reservation.fecha] = [];
+                }
+                acc[reservation.fecha].push(reservation);
+                return acc;
+            }, {});
+
+            // Ordenar las fechas
+            const sortedDates = Object.keys(groupedReservations).sort((a, b) => parseDate(a) - parseDate(b));
+
+            // Mostrar las reservas agrupadas por fecha
+            const appointmentList = document.getElementById('appointment-list');
+            appointmentList.innerHTML = ''; // Limpiar la lista antes de agregar los nuevos elementos
+
+            sortedDates.forEach(date => {
+                const dateHeader = document.createElement('h3');
+                dateHeader.textContent = `Fecha: ${date}`;
+                appointmentList.appendChild(dateHeader);
+
+                const list = document.createElement('ul');
+                groupedReservations[date].forEach(reservation => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `${reservation.nombre} - ${reservation.hora}hs - ${reservation.profesional} - ${reservation.servicio}`;
+                    list.appendChild(listItem);
+                });
+                appointmentList.appendChild(list);
             });
         }
 
@@ -160,11 +190,24 @@
             document.getElementById('confirmation-modal').style.display = 'none';
         }
 
-        // Inicializar Flatpickr en el campo de fecha
         function initDatePicker() {
             flatpickr("#calendar", {
                 dateFormat: "d/m/Y",
-                locale: "es"
+                locale: "es",
+                onDayCreate: function(dObj, dStr, fp, dayElem) {
+                    const dayOfWeek = dayElem.dateObj.getDay();
+                    // Deshabilitar días domingo (0) y lunes (1)
+                    if (dayOfWeek === 0 || dayOfWeek === 1) {
+                        dayElem.classList.add('disabled');
+                        dayElem.title = "Este día no está disponible";
+                    }
+                },
+                disable: [
+                    function(date) {
+                        // Deshabilitar fechas que no estén dentro del rango de martes a sábado
+                        return (date.getDay() === 0 || date.getDay() === 1); // Domingo y Lunes
+                    }
+                ]
             });
         }
 
@@ -181,20 +224,21 @@ function showConfirmationModal() {
     }
 }
 
-// Evento para abrir el modal y solicitar la contraseña
+// Evento para abrir el modal y solicitar autenticación del administrador
 openModalButton.addEventListener('click', showConfirmationModal);
 
-        // Llama a la función para obtener los documentos al cargar la página
-        window.onload = () => {
-            getRecords();
-            initDatePicker();
+// Configuración inicial
+window.onload = function() {
+    initDatePicker();
+    getRecords(); // Cargar las reservas al iniciar
 
-            document.getElementById('book-button').addEventListener('click', bookAppointment);
+    // Agregar evento al botón de reserva
+    document.getElementById('book-button').addEventListener('click', bookAppointment);
 
-            // Actualizar opciones de hora cuando se seleccione la fecha o el profesional
-            document.getElementById('calendar').addEventListener('change', populateTimeOptions);
-            document.getElementById('professional').addEventListener('change', populateTimeOptions);
-        };
+    // Actualizar opciones de hora cuando se seleccione la fecha o el profesional
+    document.getElementById('calendar').addEventListener('change', populateTimeOptions);
+    document.getElementById('professional').addEventListener('change', populateTimeOptions);
+};
     </script>
 </head>
 <body>
@@ -272,12 +316,9 @@ openModalButton.addEventListener('click', showConfirmationModal);
 
     <button id="open-modal-button">Panel Administración</button>
 
-
-
     <div id="custom-modal" class="modal" style="display: none;">
         <div class="modal-content">
             <span class="close-btn" id="close-modal-button">&times;</span>
-            
             <button id="confirm-button">Confirmar</button>
         </div>
     </div>

@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
             interval: 40
         },
         'Lautaro': {
-            startHour: 11,
+            startHour: 13,
             endHour: 19,
             interval: 40
         }
@@ -289,3 +289,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     document.addEventListener('DOMContentLoaded', loadGapi);
 });
+
+
