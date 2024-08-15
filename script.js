@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
             interval: 40
         },
         'Lautaro': {
-            startHour: 13,
+            startHour: 11,
             endHour: 19,
             interval: 40
         }
@@ -131,23 +131,27 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         };
     
-        gapi.client.calendar.events.insert({
+        return gapi.client.calendar.events.insert({
             'calendarId': 'primary',
             'resource': eventDetails
         }).then(function(response) {
             console.log('Evento creado: ' + response.result.htmlLink);
+            return response.result.id; // Devuelve el ID del evento
+        });
+    }
+
+    function deleteEventFromCalendar(eventId) {
+        gapi.client.calendar.events.delete({
+            'calendarId': 'primary',
+            'eventId': eventId
+        }).then(function() {
+            console.log('Evento eliminado: ' + eventId);
         });
     }
 
     function loadGapi() {
         gapi.load('client:auth2', initClient);
     }
-
-    // Inicializa el desplegable con todas las horas disponibles
-    updateAvailableTimes();
-
-    // Añade el evento de clic al botón
-    document.querySelector('#book-button').addEventListener('click', bookAppointment);
 
     // Función para reservar una cita
     function bookAppointment() {
@@ -163,6 +167,40 @@ document.addEventListener('DOMContentLoaded', function() {
             const formattedDate = formatDate(new Date(date.split('/').reverse().join('/')));
             const listItem = document.createElement('li');
             listItem.textContent = `${name} - ${formattedDate} - ${time}hs - ${professional} - ${service}`; // Incluye el servicio en la reserva
+
+            // Crear botón de eliminar (ícono de tacho de basura)
+            const deleteButton = document.createElement('button');
+            deleteButton.innerHTML = '&times;'; // Símbolo de cruz
+            deleteButton.className = 'delete-button'; // Agregar clase para estilo si es necesario
+            deleteButton.style.cursor = 'pointer';
+            deleteButton.style.background = 'transparent';
+            deleteButton.style.border = 'none';
+            deleteButton.style.color = 'red'; // Color del ícono
+            deleteButton.style.fontSize = '1.2em'; // Tamaño del ícono
+
+            // Añadir funcionalidad al botón de eliminar
+            deleteButton.onclick = function() {
+                if (confirm('¿Estás seguro de que deseas eliminar este turno?')) {
+                    // Eliminar el turno de la lista
+                    appointmentList.removeChild(listItem);
+
+                    // Eliminar el tiempo reservado para la fecha y el profesional seleccionado
+                    if (reservedTimes[date] && reservedTimes[date][professional]) {
+                        reservedTimes[date][professional] = reservedTimes[date][professional].filter(t => t !== time);
+                    }
+
+                    // Actualizar el desplegable de horas
+                    updateAvailableTimes();
+
+                    // Eliminar el evento del calendario de Google si es necesario
+                    const eventId = listItem.dataset.eventId;
+                    if (eventId) {
+                        deleteEventFromCalendar(eventId);
+                    }
+                }
+            };
+
+            listItem.appendChild(deleteButton);
             appointmentList.appendChild(listItem);
 
             // Añadir el tiempo reservado para la fecha y el profesional seleccionado
@@ -192,10 +230,10 @@ document.addEventListener('DOMContentLoaded', function() {
             addEventToCalendar({
                 start: startTime.toISOString(),
                 end: endTime.toISOString()
+            }).then((eventId) => {
+                // Guarda el ID del evento para eliminarlo en el futuro
+                listItem.dataset.eventId = eventId;
             });
-
-            // Actualiza el desplegable de horas
-            updateAvailableTimes();
 
             // Mostrar modal correspondiente
             let modalId = '';
@@ -288,6 +326,10 @@ document.addEventListener('DOMContentLoaded', function() {
         gapi.load('client:auth2', initClient);
     }
     document.addEventListener('DOMContentLoaded', loadGapi);
+
+    // Inicializa el desplegable con todas las horas disponibles
+    updateAvailableTimes();
+
+    // Añade el evento de clic al botón
+    document.querySelector('#book-button').addEventListener('click', bookAppointment);
 });
-
-
