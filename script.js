@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', function() {
             deleteButton.style.background = 'transparent';
             deleteButton.style.border = 'none';
             deleteButton.style.color = 'red'; // Color del ícono
-            deleteButton.style.fontSize = '1.2em'; // Tamaño del ícono
+            deleteButton.style.fontSize = '2em'; // Tamaño del ícono
 
             // Añadir funcionalidad al botón de eliminar
             deleteButton.onclick = function() {
