@@ -141,7 +141,7 @@
             }
         }
         
-        // Función para rellenar el select con horarios
+ // Función para rellenar el select con horarios
 async function populateTimeOptions() {
     const timeSelect = document.getElementById('time');
     const schedule = {
@@ -162,7 +162,7 @@ async function populateTimeOptions() {
     const dateObj = new Date(formattedDate);
 
     // Determinar el día de la semana (0 = Domingo, 1 = Lunes, ..., 6 = Sábado)
-    const dayOfWeek = dateObj.getDay(); 
+    const dayOfWeek = dateObj.getDay();
 
     console.log(`Fecha: ${date}, Profesional: ${professional}, Día de la semana: ${dayOfWeek}, Hora de inicio: ${professional === 'Lautaro' && (dayOfWeek >= 2 && dayOfWeek <= 4) ? specialStartHour : defaultStartHour}`);
 
@@ -177,6 +177,13 @@ async function populateTimeOptions() {
         ? specialStartHour
         : defaultStartHour;
 
+    // Horarios excluidos para Nicolas
+    const excludedTimes = {
+        3: ['15:40', '16:20', '17:00'], // Jueves
+        4: ['14:20'], // Viernes
+        5: ['11:00']  // Sábado
+    };
+
     // Generar horarios
     let currentHour = startHour;
     let currentMinutes = 0;
@@ -186,6 +193,19 @@ async function populateTimeOptions() {
         const minutesDisplay = currentMinutes < 10 ? `0${currentMinutes}` : currentMinutes;
         const optionValue = `${hourDisplay}:${minutesDisplay}`;
         const optionText = `${hourDisplay}:${minutesDisplay} hs`;
+
+        // Excluir horarios específicos para Nicolas
+        if (professional === 'Nicolas') {
+            if (excludedTimes[dayOfWeek] && excludedTimes[dayOfWeek].includes(optionValue)) {
+                // Incrementar el tiempo en 40 minutos y continuar al siguiente loop
+                currentMinutes += interval;
+                if (currentMinutes >= 60) {
+                    currentMinutes -= 60;
+                    currentHour++;
+                }
+                continue;
+            }
+        }
 
         // Excluir el turno de las 13:40
         if (optionValue !== '13:40') {
@@ -206,6 +226,7 @@ async function populateTimeOptions() {
         }
     }
 }
+
 
 //         // Función para rellenar el select con horarios
 // async function populateTimeOptions() {
