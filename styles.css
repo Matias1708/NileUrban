@@ -4,40 +4,88 @@
     font-weight: normal;
     font-style: normal;
 }
-/* 
-.delete-button {
-    background-color: red;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    margin-left: 10px;
-    cursor: pointer;
+/* Estilos para el contenedor de la lista de reservas */
+#appointment-list {
+    list-style-type: none; /* Quitar viñetas por defecto */
+    padding: 0; /* Eliminar el padding por defecto */
+    margin: 0; /* Eliminar el margen por defecto */
 }
 
-.delete-button:hover {
-    background-color: darkred;
-} */
+/* Estilos para los elementos de la lista */
+#appointment-list ul {
+    padding: 0; /* Eliminar el padding interno de las listas */
+    margin: 0; /* Eliminar el margen interno de las listas */
+}
 
+li {
+    border-bottom: none;
+}
+
+/* Estilos generales para la lista de reservas */
+#appointment-list {
+    list-style: none; /* Eliminar viñetas de la lista */
+    padding: 0; /* Quitar espaciado interno */
+    margin: 0; /* Quitar margen */
+}
+
+#appointment-list li {
+    background: #333; /* Color de fondo oscuro para los ítems */
+    padding: 10px; /* Espaciado interno de los ítems */
+    margin-bottom: 5px; /* Espaciado entre ítems */
+    border-radius: 5px; /* Bordes redondeados para un diseño más suave */
+    font-size: 14px; /* Tamaño de fuente adecuado */
+    color: #fff; /* Color de texto blanco */
+    display: flex; /* Usar flexbox para alinear los ítems */
+    align-items: center; /* Centrar verticalmente el contenido */
+    justify-content: space-between; /* Distribuir el contenido con espacio entre */
+}
+
+/* Estilos para los botones de eliminar */
+/* Estilos para los botones de eliminar */
+#appointment-list .delete-btn {
+    background: #e74c3c; /* Fondo rojo para el botón de eliminar */
+    border: none; /* Sin borde para el botón */
+    color: #fff; /* Color blanco para el texto del botón */
+    padding: 5px 10px; /* Espaciado interno del botón */
+    border-radius: 5px; /* Bordes redondeados para el botón */
+    cursor: pointer; /* Cambiar el cursor al pasar por encima */
+    font-size: 14px; /* Tamaño de fuente del botón */
+    width: 36px; /* Ancho fijo para el botón */
+    text-align: center; /* Alinear el texto del botón al centro */
+    display: flex; /* Usar flexbox para alinear el contenido del botón */
+    align-items: center; /* Centrar verticalmente el contenido del botón */
+    justify-content: center; /* Centrar horizontalmente el contenido del botón */
+    margin-left: auto; /* Empujar el botón a la derecha del contenedor */
+    margin-right: 20px;
+}
+
+#appointment-list .delete-btn i {
+    margin-right: 5px; /* Espaciado entre el ícono y el texto */
+}
+
+/* Estilos específicos para la lista de reservas */
 .reservation-list {
-    list-style: none;
-    padding: 0;
+    list-style: none; /* Eliminar viñetas de la lista */
+    padding: 0; /* Quitar espaciado interno */
+    margin: 0; /* Quitar margen */
 }
 
 .reservation-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
+    display: flex; /* Usar flexbox para alinear ítems */
+    align-items: center; /* Centrar verticalmente el contenido */
+    margin-bottom: 10px; /* Espaciado entre ítems */
 }
 
 .reservation-item button.delete-btn {
-    margin-left: 10px;
+    margin-left: 10px; /* Espaciado entre el ítem y el botón */
     background-color: #f44336; /* Rojo para el botón de eliminar */
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
-    display: none;
+    color: white; /* Color blanco para el texto del botón */
+    border: none; /* Sin borde para el botón */
+    padding: 5px 10px; /* Espaciado interno del botón */
+    cursor: pointer; /* Cambiar el cursor al pasar por encima */
+    display: none; /* Ocultar el botón por defecto, mostrar cuando sea necesario */
 }
+
 
 .reservation-item button.delete-btn:hover {
     background-color: #c62828; /* Rojo oscuro al pasar el ratón */

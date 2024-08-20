@@ -79,6 +79,26 @@ function getDayName(dateString) {
     return new Intl.DateTimeFormat('es-ES', options).format(date);
 }
 
+
+function isPastHour(reservationHour) {
+    const now = new Date();
+    const [reservationHourInt, reservationMinute] = reservationHour.split(':').map(Number);
+    const reservationTime = new Date();
+    reservationTime.setHours(reservationHourInt, reservationMinute);
+
+    return reservationTime < now;
+}
+
+// Función para ordenar las reservas por hora
+function sortReservationsByTime(reservations) {
+    return reservations.sort((a, b) => {
+        // Suponiendo que la hora está en formato "HH:mm"
+        const [aHour, aMinute] = a.hora.split(':').map(Number);
+        const [bHour, bMinute] = b.hora.split(':').map(Number);
+        return aHour - bHour || aMinute - bMinute;
+    });
+}
+
 // Mostrar las reservas agrupadas por fecha
 const appointmentList = document.getElementById('appointment-list');
 appointmentList.innerHTML = ''; // Limpiar la lista antes de agregar los nuevos elementos
@@ -90,13 +110,36 @@ sortedDates.forEach(date => {
     appointmentList.appendChild(dateHeader);
 
     const list = document.createElement('ul');
-    groupedReservations[date].forEach(reservation => {
+    
+    // Ordenar reservas por hora antes de agregarlas a la lista
+    const sortedReservations = sortReservationsByTime(groupedReservations[date]);
+
+    sortedReservations.forEach(reservation => {
         const listItem = document.createElement('li');
         listItem.innerHTML = `${reservation.nombre} - ${reservation.hora}hs - ${reservation.profesional} - ${reservation.servicio} <button class="delete-btn" data-id="${reservation.id}"><i class="fas fa-trash"></i></button>`;
         list.appendChild(listItem);
     });
     appointmentList.appendChild(list);
 });
+
+// // Mostrar las reservas agrupadas por fecha
+// const appointmentList = document.getElementById('appointment-list');
+// appointmentList.innerHTML = ''; // Limpiar la lista antes de agregar los nuevos elementos
+
+// sortedDates.forEach(date => {
+//     const dayName = getDayName(date);
+//     const dateHeader = document.createElement('h3');
+//     dateHeader.textContent = `${dayName} ${date}`; // Mostrar el nombre del día junto con la fecha
+//     appointmentList.appendChild(dateHeader);
+
+//     const list = document.createElement('ul');
+//     groupedReservations[date].forEach(reservation => {
+//         const listItem = document.createElement('li');
+//         listItem.innerHTML = `${reservation.nombre} - ${reservation.hora}hs - ${reservation.profesional} - ${reservation.servicio} <button class="delete-btn" data-id="${reservation.id}"><i class="fas fa-trash"></i></button>`;
+//         list.appendChild(listItem);
+//     });
+//     appointmentList.appendChild(list);
+// });
 
 
             // Agregar evento para eliminar turnos
