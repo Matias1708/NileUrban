@@ -53,23 +53,51 @@
             // Ordenar las fechas
             const sortedDates = Object.keys(groupedReservations).sort((a, b) => parseDate(a) - parseDate(b));
 
-            // Mostrar las reservas agrupadas por fecha
-            const appointmentList = document.getElementById('appointment-list');
-            appointmentList.innerHTML = ''; // Limpiar la lista antes de agregar los nuevos elementos
+            // // Mostrar las reservas agrupadas por fecha
+            // const appointmentList = document.getElementById('appointment-list');
+            // appointmentList.innerHTML = ''; // Limpiar la lista antes de agregar los nuevos elementos
 
-            sortedDates.forEach(date => {
-                const dateHeader = document.createElement('h3');
-                dateHeader.textContent = `Fecha: ${date}`;
-                appointmentList.appendChild(dateHeader);
+            // sortedDates.forEach(date => {
+            //     const dateHeader = document.createElement('h3');
+            //     dateHeader.textContent = `Fecha: ${date}`;
+            //     appointmentList.appendChild(dateHeader);
 
-                const list = document.createElement('ul');
-                groupedReservations[date].forEach(reservation => {
-                    const listItem = document.createElement('li');
-                    listItem.innerHTML = `${reservation.nombre} - ${reservation.hora}hs - ${reservation.profesional} - ${reservation.servicio} <button class="delete-btn" data-id="${reservation.id}"><i class="fas fa-trash"></i></button>`;
-                    list.appendChild(listItem);
-                });
-                appointmentList.appendChild(list);
-            });
+            //     const list = document.createElement('ul');
+            //     groupedReservations[date].forEach(reservation => {
+            //         const listItem = document.createElement('li');
+            //         listItem.innerHTML = `${reservation.nombre} - ${reservation.hora}hs - ${reservation.profesional} - ${reservation.servicio} <button class="delete-btn" data-id="${reservation.id}"><i class="fas fa-trash"></i></button>`;
+            //         list.appendChild(listItem);
+            //     });
+            //     appointmentList.appendChild(list);
+            // });
+
+            // Función para obtener el nombre del día de la semana
+function getDayName(dateString) {
+    const [day, month] = dateString.split('/');
+    const date = new Date(2024, month - 1, day); // Usa el año actual o uno fijo
+    const options = { weekday: 'long' };
+    return new Intl.DateTimeFormat('es-ES', options).format(date);
+}
+
+// Mostrar las reservas agrupadas por fecha
+const appointmentList = document.getElementById('appointment-list');
+appointmentList.innerHTML = ''; // Limpiar la lista antes de agregar los nuevos elementos
+
+sortedDates.forEach(date => {
+    const dayName = getDayName(date);
+    const dateHeader = document.createElement('h3');
+    dateHeader.textContent = `${dayName} ${date}`; // Mostrar el nombre del día junto con la fecha
+    appointmentList.appendChild(dateHeader);
+
+    const list = document.createElement('ul');
+    groupedReservations[date].forEach(reservation => {
+        const listItem = document.createElement('li');
+        listItem.innerHTML = `${reservation.nombre} - ${reservation.hora}hs - ${reservation.profesional} - ${reservation.servicio} <button class="delete-btn" data-id="${reservation.id}"><i class="fas fa-trash"></i></button>`;
+        list.appendChild(listItem);
+    });
+    appointmentList.appendChild(list);
+});
+
 
             // Agregar evento para eliminar turnos
             const deleteButtons = document.querySelectorAll('.delete-btn');
@@ -286,23 +314,25 @@ async function populateTimeOptions() {
         }
 
         function initDatePicker() {
-            flatpickr("#calendar", {
-                dateFormat: "d/m/Y",
-                locale: "es",
-                onDayCreate: function(dObj, dStr, fp, dayElem) {
-                    const dayOfWeek = dayElem.dateObj.getDay();
-                    if (dayOfWeek === 0 || dayOfWeek === 1) {
-                        dayElem.classList.add('disabled');
-                        dayElem.title = "Este día no está disponible";
-                    }
-                },
-                disable: [
-                    function(date) {
-                        return (date.getDay() === 0 || date.getDay() === 1);
-                    }
-                ]
-            });
-        }
+    flatpickr("#calendar", {
+        dateFormat: "d/m/Y",
+        locale: "es",
+        minDate: "today", // Restringe las fechas a partir de hoy
+        onDayCreate: function(dObj, dStr, fp, dayElem) {
+            const dayOfWeek = dayElem.dateObj.getDay();
+            if (dayOfWeek === 0 || dayOfWeek === 1) {
+                dayElem.classList.add('disabled');
+                dayElem.title = "Este día no está disponible";
+            }
+        },
+        disable: [
+            function(date) {
+                return (date.getDay() === 0 || date.getDay() === 1);
+            }
+        ]
+    });
+}
+
 
         // Obtener elementos del DOM
         const openModalButton = document.getElementById('open-modal-button');
