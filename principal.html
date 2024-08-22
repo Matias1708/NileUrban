@@ -179,6 +179,7 @@ sortedDates.forEach(date => {
             const time = document.getElementById('time').value;
             const professional = document.getElementById('professional').value;
             const service = document.getElementById('service').value;
+            const phone = document.getElementById('phone').value;
 
             if (name && date && time && professional && service) {
                 // Verificar si la hora está disponible
@@ -197,7 +198,8 @@ sortedDates.forEach(date => {
                         fecha: date,
                         hora: time,
                         profesional: professional,
-                        servicio: service
+                        servicio: service,
+                        contacto: phone
                     });
                     alert('Reserva realizada con éxito');
 
@@ -425,6 +427,8 @@ async function populateTimeOptions() {
             document.getElementById('calendar').addEventListener('change', populateTimeOptions);
             document.getElementById('professional').addEventListener('change', populateTimeOptions);
         };
+
+        
     </script>
 </head>
 <body>
@@ -438,6 +442,9 @@ async function populateTimeOptions() {
         <div class="booking-form">
             <label for="name">NOMBRE COMPLETO:</label>
             <input type="text" id="name" required>
+
+            <label for="phone">Teléfono:</label>
+            <input type="tel" id="phone" name="phone" required>
 
             <div class="form-row">
                 <div class="form-group">
