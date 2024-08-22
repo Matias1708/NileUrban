@@ -214,9 +214,9 @@ sortedDates.forEach(date => {
             }
         }
         
- // Función para rellenar el select con horarios
-async function populateTimeOptions() {
+        async function populateTimeOptions() {
     const timeSelect = document.getElementById('time');
+    const noAvailableMessage = document.getElementById('no-available-message');
     const schedule = {
         defaultStartHour: 11,  // Hora de inicio por defecto
         defaultEndHour: 19,    // Hora de fin por defecto
@@ -237,6 +237,12 @@ async function populateTimeOptions() {
     // Determinar el día de la semana (0 = Domingo, 1 = Lunes, ..., 6 = Sábado)
     const dayOfWeek = dateObj.getDay();
 
+    // Obtener la hora actual
+    const now = new Date();
+    const currentHourNow = now.getHours();
+    const currentMinutesNow = now.getMinutes();
+    const currentDate = `${now.getFullYear()}-${("0" + (now.getMonth() + 1)).slice(-2)}-${("0" + now.getDate()).slice(-2)}`;
+
     console.log(`Fecha: ${date}, Profesional: ${professional}, Día de la semana: ${dayOfWeek}, Hora de inicio: ${professional === 'Lautaro' && (dayOfWeek >= 2 && dayOfWeek <= 4) ? specialStartHour : defaultStartHour}`);
 
     // Obtén las reservas para la fecha y profesional seleccionados
@@ -256,6 +262,8 @@ async function populateTimeOptions() {
         4: ['14:20'], // Viernes
         5: ['11:00']  // Sábado
     };
+
+    let hasAvailableTimes = false;
 
     // Generar horarios
     let currentHour = startHour;
@@ -282,12 +290,20 @@ async function populateTimeOptions() {
 
         // Excluir el turno de las 13:40
         if (optionValue !== '13:40') {
-            // Crear y añadir la opción al select si no está reservada
-            if (!reservedTimesForDateAndProfessional.includes(optionValue)) {
+            // Crear una fecha y hora para la opción actual
+            const optionDateTime = new Date(`${formattedDate}T${optionValue}:00`);
+            
+            // Comprobar si la opción es para el pasado y estamos en el mismo día
+            const isPast = formattedDate === currentDate && 
+                (currentHourNow > optionDateTime.getHours() || 
+                (currentHourNow === optionDateTime.getHours() && currentMinutesNow > optionDateTime.getMinutes()));
+            
+            if (!isPast && !reservedTimesForDateAndProfessional.includes(optionValue)) {
                 const option = document.createElement('option');
                 option.value = optionValue;
                 option.textContent = optionText;
                 timeSelect.appendChild(option);
+                hasAvailableTimes = true; // Hay horarios disponibles
             }
         }
 
@@ -298,7 +314,96 @@ async function populateTimeOptions() {
             currentHour++;
         }
     }
+
+    // Mostrar u ocultar el mensaje según haya horarios disponibles
+    noAvailableMessage.style.display = hasAvailableTimes ? 'none' : 'block';
 }
+
+
+// async function populateTimeOptions() {
+//     const timeSelect = document.getElementById('time');
+//     const schedule = {
+//         defaultStartHour: 11,  // Hora de inicio por defecto
+//         defaultEndHour: 19,    // Hora de fin por defecto
+//         specialStartHour: 13,  // Hora de inicio especial para Lautaro
+//         interval: 40           // Intervalo de 40 minutos
+//     };
+//     const { defaultStartHour, defaultEndHour, specialStartHour, interval } = schedule;
+//     const date = document.getElementById('calendar').value;
+//     const professional = document.getElementById('professional').value;
+
+//     if (!date || !professional) return;
+
+//     // Convertir la fecha del formato DD/MM/YYYY al formato YYYY-MM-DD
+//     const [day, month, year] = date.split('/');
+//     const formattedDate = `${year}-${month}-${day}`;
+//     const dateObj = new Date(formattedDate);
+
+//     // Determinar el día de la semana (0 = Domingo, 1 = Lunes, ..., 6 = Sábado)
+//     const dayOfWeek = dateObj.getDay();
+
+//     console.log(`Fecha: ${date}, Profesional: ${professional}, Día de la semana: ${dayOfWeek}, Hora de inicio: ${professional === 'Lautaro' && (dayOfWeek >= 2 && dayOfWeek <= 4) ? specialStartHour : defaultStartHour}`);
+
+//     // Obtén las reservas para la fecha y profesional seleccionados
+//     const reservations = await getReservationsForDateAndProfessional(date, professional);
+//     const reservedTimesForDateAndProfessional = reservations.map(reservation => reservation.hora);
+
+//     timeSelect.innerHTML = '';
+
+//     // Determina la hora de inicio según el profesional y el día de la semana
+//     const startHour = professional === 'Lautaro' && (dayOfWeek >= 1 && dayOfWeek <= 3) // Martes a Jueves
+//         ? specialStartHour
+//         : defaultStartHour;
+
+//     // Horarios excluidos para Nicolas
+//     const excludedTimes = {
+//         3: ['15:40', '16:20', '17:00'], // Jueves
+//         4: ['14:20'], // Viernes
+//         5: ['11:00']  // Sábado
+//     };
+
+//     // Generar horarios
+//     let currentHour = startHour;
+//     let currentMinutes = 0;
+
+//     while (currentHour < defaultEndHour || (currentHour === defaultEndHour && currentMinutes <= 20)) { // Asegúrate de incluir hasta 19:20
+//         const hourDisplay = currentHour < 10 ? `0${currentHour}` : currentHour;
+//         const minutesDisplay = currentMinutes < 10 ? `0${currentMinutes}` : currentMinutes;
+//         const optionValue = `${hourDisplay}:${minutesDisplay}`;
+//         const optionText = `${hourDisplay}:${minutesDisplay} hs`;
+
+//         // Excluir horarios específicos para Nicolas
+//         if (professional === 'Nicolas') {
+//             if (excludedTimes[dayOfWeek] && excludedTimes[dayOfWeek].includes(optionValue)) {
+//                 // Incrementar el tiempo en 40 minutos y continuar al siguiente loop
+//                 currentMinutes += interval;
+//                 if (currentMinutes >= 60) {
+//                     currentMinutes -= 60;
+//                     currentHour++;
+//                 }
+//                 continue;
+//             }
+//         }
+
+//         // Excluir el turno de las 13:40
+//         if (optionValue !== '13:40') {
+//             // Crear y añadir la opción al select si no está reservada
+//             if (!reservedTimesForDateAndProfessional.includes(optionValue)) {
+//                 const option = document.createElement('option');
+//                 option.value = optionValue;
+//                 option.textContent = optionText;
+//                 timeSelect.appendChild(option);
+//             }
+//         }
+
+//         // Incrementar el tiempo en 40 minutos
+//         currentMinutes += interval;
+//         if (currentMinutes >= 60) {
+//             currentMinutes -= 60;
+//             currentHour++;
+//         }
+//     }
+// }
 
 
 //         // Función para rellenar el select con horarios
@@ -463,6 +568,8 @@ async function populateTimeOptions() {
 
             <label for="time">HORA:</label>
             <select id="time" required></select>
+            <p id="no-available-message" style="display: none; color: red;">No hay turnos disponibles para la fecha seleccionada.</p>
+
 
             <!-- Nuevo campo para seleccionar servicio -->
             <label for="service">SERVICIOS:</label>
