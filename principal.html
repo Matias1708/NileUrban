@@ -551,7 +551,7 @@ sortedDates.forEach(date => {
             console.log(`Hora extraída: ${hour}, Minutos: ${minutes}`);
 
             // Filtrar turnos antes de las 12:00 (mediodía)
-            if (hour < 12) {
+            if (hour < 19) {
                 reservations.push(data);
             }
         }
