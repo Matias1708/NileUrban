@@ -520,6 +520,70 @@ sortedDates.forEach(date => {
             return new Date(year, month - 1, day);
         }
 
+        document.getElementById('send-whatsapp').addEventListener('click', async () => {
+    const reservationsCol = collection(db, 'Reserva');
+    const querySnapshot = await getDocs(reservationsCol);
+    const reservations = [];
+    
+    // Obtener la fecha de mañana
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+
+    // Formatear la fecha de mañana a "dd/mm/yyyy"
+    const dd = String(tomorrow.getDate()).padStart(2, '0');
+    const mm = String(tomorrow.getMonth() + 1).padStart(2, '0'); // Enero es 0
+    const yyyy = tomorrow.getFullYear();
+    const formattedTomorrow = `${dd}/${mm}/${yyyy}`;
+
+    querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        
+        // Log para verificar los datos que se obtienen
+        console.log(`Reserva encontrada: ${JSON.stringify(data)}`);
+
+        // Filtrar por la fecha de mañana
+        if (data.fecha === formattedTomorrow) {
+            // Extraer hora y convertirla en número para comparación
+            const [hour, minutes] = data.hora.split(':').map(Number);
+
+            // Verificación del valor de hour para asegurarnos de que es correcto
+            console.log(`Hora extraída: ${hour}, Minutos: ${minutes}`);
+
+            // Filtrar turnos antes de las 12:00 (mediodía)
+            if (hour < 12) {
+                reservations.push(data);
+            }
+        }
+    });
+
+    // Verificación después de filtrar las reservas
+    console.log(`Reservas de mañana encontradas: ${reservations.length}`);
+
+    if (reservations.length === 0) {
+        alert('No hay turnos de mañana para enviar.');
+        return;
+    }
+
+    // Enviar mensaje por cada reserva
+    reservations.forEach(reservation => {
+        const phoneNumber = `549${reservation.contacto}`;
+        const message = `¡Hola ${reservation.nombre}! Te recordamos tu turno de mañana a las ${reservation.hora} con ${reservation.profesional} para ${reservation.servicio}. ¡Te esperamos!`;
+
+        // Log para verificar el teléfono y el mensaje antes de enviar
+        console.log(`Enviando mensaje a: ${phoneNumber}`);
+        console.log(`Mensaje: ${message}`);
+
+        // URL de WhatsApp con mensaje prellenado
+        const whatsappUrl = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
+
+        // Abrir el enlace de WhatsApp
+        window.open(whatsappUrl, '_blank');
+    });
+});
+
+
+
         // Inicializar al cargar la página
         window.onload = function() {
             initDatePicker();
@@ -586,6 +650,8 @@ sortedDates.forEach(date => {
         <div class="reservations" style="display: none;">
             <h2>TURNOS RESERVADOS</h2>
             <ul id="appointment-list"></ul>
+            <button id="send-whatsapp" class="btn">Enviar WhatsApp</button>
+
             
         </div>
     </div>
