@@ -11,7 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.2.0/dist/index.global.min.js"></script>
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
-        import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, query, where } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+        import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, query, where, updateDoc } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
         import { getAnalytics } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-analytics.js';
 
         // Configuración de Firebase
@@ -98,8 +98,6 @@ function sortReservationsByTime(reservations) {
         return aHour - bHour || aMinute - bMinute;
     });
 }
-
-// Mostrar las reservas agrupadas por fecha
 const appointmentList = document.getElementById('appointment-list');
 appointmentList.innerHTML = ''; // Limpiar la lista antes de agregar los nuevos elementos
 
@@ -110,39 +108,62 @@ sortedDates.forEach(date => {
     appointmentList.appendChild(dateHeader);
 
     const list = document.createElement('ul');
-    
+
     // Ordenar reservas por hora antes de agregarlas a la lista
     const sortedReservations = sortReservationsByTime(groupedReservations[date]);
 
     sortedReservations.forEach(reservation => {
         const listItem = document.createElement('li');
-        listItem.innerHTML = `${reservation.nombre} - ${reservation.hora}hs - ${reservation.profesional} - ${reservation.servicio} <button class="delete-btn" data-id="${reservation.id}"><i class="fas fa-trash"></i></button>`;
+
+        // Agregar el checkbox al inicio de cada item de la lista
+        listItem.innerHTML = 
+        `<input type="checkbox" class="whatsapp-checkbox" data-id="${reservation.id}" ${reservation.enviar === 'S' ? 'checked' : ''}>
+${reservation.nombre} - ${reservation.hora}hs - ${reservation.profesional} - ${reservation.servicio} - 
+<a href="https://wa.me/${reservation.contacto}?text=${encodeURIComponent(`¡Hola ${reservation.nombre}! Te recordamos tu turno de mañana a las ${reservation.hora} con ${reservation.profesional} para ${reservation.servicio}. ¡Te esperamos!`)}" target="_blank">
+    ${reservation.contacto}
+</a>
+<button class="delete-btn" data-id="${reservation.id}"><i class="fas fa-trash"></i></button>`;
+
+        // `
+        //     <input type="checkbox" class="whatsapp-checkbox" data-id="${reservation.id}" ${reservation.enviar === 'S' ? 'checked' : ''}>
+        //     ${reservation.nombre} - ${reservation.hora}hs - ${reservation.profesional} - ${reservation.servicio} - ${reservation.contacto} 
+        //     <button class="delete-btn" data-id="${reservation.id}"><i class="fas fa-trash"></i></button>
+        // `;
         list.appendChild(listItem);
+
+        // Agregar evento para actualizar Firestore cuando cambie el checkbox
+        const checkbox = listItem.querySelector('.whatsapp-checkbox');
+        checkbox.addEventListener('change', async (event) => {
+            const isChecked = event.target.checked;
+            const reservationId = event.target.getAttribute('data-id');
+            
+            // Llamar a la función para actualizar Firestore
+            await updateSendStatus(reservationId, isChecked);
+        });
     });
+
     appointmentList.appendChild(list);
 });
 
-// // Mostrar las reservas agrupadas por fecha
-// const appointmentList = document.getElementById('appointment-list');
-// appointmentList.innerHTML = ''; // Limpiar la lista antes de agregar los nuevos elementos
+// Función asíncrona para actualizar el estado de 'enviar' en Firestore
+async function updateSendStatus(reservationId, isChecked) {
+    try {
+        // Obtener la referencia al documento
+        const reservationRef = doc(db, 'Reserva', reservationId);
 
-// sortedDates.forEach(date => {
-//     const dayName = getDayName(date);
-//     const dateHeader = document.createElement('h3');
-//     dateHeader.textContent = `${dayName} ${date}`; // Mostrar el nombre del día junto con la fecha
-//     appointmentList.appendChild(dateHeader);
+        // Actualizar el campo 'enviar' en Firestore
+        await updateDoc(reservationRef, {
+            enviar: isChecked ? 'S' : 'N'
+        });
 
-//     const list = document.createElement('ul');
-//     groupedReservations[date].forEach(reservation => {
-//         const listItem = document.createElement('li');
-//         listItem.innerHTML = `${reservation.nombre} - ${reservation.hora}hs - ${reservation.profesional} - ${reservation.servicio} <button class="delete-btn" data-id="${reservation.id}"><i class="fas fa-trash"></i></button>`;
-//         list.appendChild(listItem);
-//     });
-//     appointmentList.appendChild(list);
-// });
+        console.log('Estado de envío actualizado en Firestore');
+    } catch (error) {
+        console.error('Error al actualizar el estado de envío:', error);
+    }
+}
 
 
-            // Agregar evento para eliminar turnos
+ // Agregar evento para eliminar turnos
             const deleteButtons = document.querySelectorAll('.delete-btn');
             deleteButtons.forEach(button => {
                 button.addEventListener('click', async (e) => {
@@ -199,7 +220,8 @@ sortedDates.forEach(date => {
                         hora: time,
                         profesional: professional,
                         servicio: service,
-                        contacto: phone
+                        contacto: phone,
+                        enviar: 'N'
                     });
                     alert('Reserva realizada con éxito');
 
@@ -320,139 +342,6 @@ sortedDates.forEach(date => {
 }
 
 
-// async function populateTimeOptions() {
-//     const timeSelect = document.getElementById('time');
-//     const schedule = {
-//         defaultStartHour: 11,  // Hora de inicio por defecto
-//         defaultEndHour: 19,    // Hora de fin por defecto
-//         specialStartHour: 13,  // Hora de inicio especial para Lautaro
-//         interval: 40           // Intervalo de 40 minutos
-//     };
-//     const { defaultStartHour, defaultEndHour, specialStartHour, interval } = schedule;
-//     const date = document.getElementById('calendar').value;
-//     const professional = document.getElementById('professional').value;
-
-//     if (!date || !professional) return;
-
-//     // Convertir la fecha del formato DD/MM/YYYY al formato YYYY-MM-DD
-//     const [day, month, year] = date.split('/');
-//     const formattedDate = `${year}-${month}-${day}`;
-//     const dateObj = new Date(formattedDate);
-
-//     // Determinar el día de la semana (0 = Domingo, 1 = Lunes, ..., 6 = Sábado)
-//     const dayOfWeek = dateObj.getDay();
-
-//     console.log(`Fecha: ${date}, Profesional: ${professional}, Día de la semana: ${dayOfWeek}, Hora de inicio: ${professional === 'Lautaro' && (dayOfWeek >= 2 && dayOfWeek <= 4) ? specialStartHour : defaultStartHour}`);
-
-//     // Obtén las reservas para la fecha y profesional seleccionados
-//     const reservations = await getReservationsForDateAndProfessional(date, professional);
-//     const reservedTimesForDateAndProfessional = reservations.map(reservation => reservation.hora);
-
-//     timeSelect.innerHTML = '';
-
-//     // Determina la hora de inicio según el profesional y el día de la semana
-//     const startHour = professional === 'Lautaro' && (dayOfWeek >= 1 && dayOfWeek <= 3) // Martes a Jueves
-//         ? specialStartHour
-//         : defaultStartHour;
-
-//     // Horarios excluidos para Nicolas
-//     const excludedTimes = {
-//         3: ['15:40', '16:20', '17:00'], // Jueves
-//         4: ['14:20'], // Viernes
-//         5: ['11:00']  // Sábado
-//     };
-
-//     // Generar horarios
-//     let currentHour = startHour;
-//     let currentMinutes = 0;
-
-//     while (currentHour < defaultEndHour || (currentHour === defaultEndHour && currentMinutes <= 20)) { // Asegúrate de incluir hasta 19:20
-//         const hourDisplay = currentHour < 10 ? `0${currentHour}` : currentHour;
-//         const minutesDisplay = currentMinutes < 10 ? `0${currentMinutes}` : currentMinutes;
-//         const optionValue = `${hourDisplay}:${minutesDisplay}`;
-//         const optionText = `${hourDisplay}:${minutesDisplay} hs`;
-
-//         // Excluir horarios específicos para Nicolas
-//         if (professional === 'Nicolas') {
-//             if (excludedTimes[dayOfWeek] && excludedTimes[dayOfWeek].includes(optionValue)) {
-//                 // Incrementar el tiempo en 40 minutos y continuar al siguiente loop
-//                 currentMinutes += interval;
-//                 if (currentMinutes >= 60) {
-//                     currentMinutes -= 60;
-//                     currentHour++;
-//                 }
-//                 continue;
-//             }
-//         }
-
-//         // Excluir el turno de las 13:40
-//         if (optionValue !== '13:40') {
-//             // Crear y añadir la opción al select si no está reservada
-//             if (!reservedTimesForDateAndProfessional.includes(optionValue)) {
-//                 const option = document.createElement('option');
-//                 option.value = optionValue;
-//                 option.textContent = optionText;
-//                 timeSelect.appendChild(option);
-//             }
-//         }
-
-//         // Incrementar el tiempo en 40 minutos
-//         currentMinutes += interval;
-//         if (currentMinutes >= 60) {
-//             currentMinutes -= 60;
-//             currentHour++;
-//         }
-//     }
-// }
-
-
-//         // Función para rellenar el select con horarios
-// async function populateTimeOptions() {
-//     const timeSelect = document.getElementById('time');
-//     const schedule = { startHour: 11, endHour: 19, interval: 40 }; // Intervalo de 40 minutos
-//     const { startHour, endHour, interval } = schedule;
-//     const date = document.getElementById('calendar').value;
-//     const professional = document.getElementById('professional').value;
-
-//     if (!date || !professional) return;
-
-//     // Obtén las reservas para la fecha y profesional seleccionados
-//     const reservations = await getReservationsForDateAndProfessional(date, professional);
-//     const reservedTimesForDateAndProfessional = reservations.map(reservation => reservation.hora);
-
-//     timeSelect.innerHTML = '';
-
-//     // Generar horarios
-//     let currentHour = startHour;
-//     let currentMinutes = 0;
-
-//     while (currentHour < endHour || (currentHour === endHour && currentMinutes <= 20)) { // Asegúrate de incluir hasta 19:20
-//         const hourDisplay = currentHour < 10 ? `0${currentHour}` : currentHour;
-//         const minutesDisplay = currentMinutes < 10 ? `0${currentMinutes}` : currentMinutes;
-//         const optionValue = `${hourDisplay}:${minutesDisplay}`;
-//         const optionText = `${hourDisplay}:${minutesDisplay} hs`;
-
-//         // Excluir el turno de las 13:40
-//         if (optionValue !== '13:40') {
-//             // Crear y añadir la opción al select si no está reservada
-//             if (!reservedTimesForDateAndProfessional.includes(optionValue)) {
-//                 const option = document.createElement('option');
-//                 option.value = optionValue;
-//                 option.textContent = optionText;
-//                 timeSelect.appendChild(option);
-//             }
-//         }
-
-//         // Incrementar el tiempo en 40 minutos
-//         currentMinutes += interval;
-//         if (currentMinutes >= 60) {
-//             currentMinutes -= 60;
-//             currentHour++;
-//         }
-//     }
-// }
-
-
         // Función para mostrar el modal de confirmación
         function showConfirmationModal() {
             document.getElementById('confirmation-modal').style.display = 'block';
@@ -539,25 +428,12 @@ sortedDates.forEach(date => {
     querySnapshot.forEach((doc) => {
         const data = doc.data();
         
-        // Log para verificar los datos que se obtienen
-        console.log(`Reserva encontrada: ${JSON.stringify(data)}`);
-
         // Filtrar por la fecha de mañana
         if (data.fecha === formattedTomorrow) {
-            // Extraer hora y convertirla en número para comparación
-            const [hour, minutes] = data.hora.split(':').map(Number);
-
-            // Verificación del valor de hour para asegurarnos de que es correcto
-            console.log(`Hora extraída: ${hour}, Minutos: ${minutes}`);
-
-            // Filtrar turnos antes de las 12:00 (mediodía)
-            if (hour < 19) {
-                reservations.push(data);
-            }
+            reservations.push(data);
         }
     });
 
-    // Verificación después de filtrar las reservas
     console.log(`Reservas de mañana encontradas: ${reservations.length}`);
 
     if (reservations.length === 0) {
@@ -565,22 +441,29 @@ sortedDates.forEach(date => {
         return;
     }
 
-    // Enviar mensaje por cada reserva
-    reservations.forEach(reservation => {
+    // Enviar mensajes con setTimeout para asegurar la apertura correcta de cada mensaje
+    reservations.forEach((reservation, index) => {
         const phoneNumber = `549${reservation.contacto}`;
         const message = `¡Hola ${reservation.nombre}! Te recordamos tu turno de mañana a las ${reservation.hora} con ${reservation.profesional} para ${reservation.servicio}. ¡Te esperamos!`;
 
-        // Log para verificar el teléfono y el mensaje antes de enviar
         console.log(`Enviando mensaje a: ${phoneNumber}`);
         console.log(`Mensaje: ${message}`);
 
-        // URL de WhatsApp con mensaje prellenado
-        const whatsappUrl = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
+        // URL de WhatsApp con mensaje prellenado y parámetro aleatorio
+        const randomParam = Math.random().toString(36).substring(7); // Generar una cadena aleatoria
+        const whatsappUrl = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}&random=${randomParam}`;
 
-        // Abrir el enlace de WhatsApp
-        window.open(whatsappUrl, '_blank');
+        // Abrir el enlace de WhatsApp con un pequeño retraso para cada mensaje
+        setTimeout(() => {
+            window.open(whatsappUrl, `_blank`);
+        }, index * 1500); // Incrementar el tiempo de espera para cada mensaje (1.5 segundos por mensaje)
     });
 });
+
+
+
+
+
 
 
 

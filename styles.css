@@ -156,6 +156,9 @@ h2, h1, p {
 
 /*prueba*/
 
+button#send-whatsapp {
+    display: none;
+}
 
 
 .booking-form, .reservations {
