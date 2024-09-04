@@ -119,7 +119,7 @@ sortedDates.forEach(date => {
         listItem.innerHTML = 
         `<input type="checkbox" class="whatsapp-checkbox" data-id="${reservation.id}" ${reservation.enviar === 'S' ? 'checked' : ''}>
 ${reservation.nombre} - ${reservation.hora}hs - ${reservation.profesional} - ${reservation.servicio} - 
-<a href="https://wa.me/${reservation.contacto}?text=${encodeURIComponent(`¡Hola ${reservation.nombre}! Te recordamos tu turno de mañana a las ${reservation.hora} con ${reservation.profesional} para ${reservation.servicio}. ¡Te esperamos!`)}" target="_blank">
+<a href="https://wa.me/${reservation.contacto}?text=${encodeURIComponent(`¡Hola ${reservation.nombre}! Te recordamos tu turno el dia ${reservation.fecha} a las ${reservation.hora} con ${reservation.profesional} para ${reservation.servicio}. En caso de no asistir, avisar por este medio. ¡Te esperamos!`)}" target="_blank">
     ${reservation.contacto}
 </a>
 <button class="delete-btn" data-id="${reservation.id}"><i class="fas fa-trash"></i></button>`;
