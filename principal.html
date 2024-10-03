@@ -53,23 +53,6 @@
             // Ordenar las fechas
             const sortedDates = Object.keys(groupedReservations).sort((a, b) => parseDate(a) - parseDate(b));
 
-            // // Mostrar las reservas agrupadas por fecha
-            // const appointmentList = document.getElementById('appointment-list');
-            // appointmentList.innerHTML = ''; // Limpiar la lista antes de agregar los nuevos elementos
-
-            // sortedDates.forEach(date => {
-            //     const dateHeader = document.createElement('h3');
-            //     dateHeader.textContent = `Fecha: ${date}`;
-            //     appointmentList.appendChild(dateHeader);
-
-            //     const list = document.createElement('ul');
-            //     groupedReservations[date].forEach(reservation => {
-            //         const listItem = document.createElement('li');
-            //         listItem.innerHTML = `${reservation.nombre} - ${reservation.hora}hs - ${reservation.profesional} - ${reservation.servicio} <button class="delete-btn" data-id="${reservation.id}"><i class="fas fa-trash"></i></button>`;
-            //         list.appendChild(listItem);
-            //     });
-            //     appointmentList.appendChild(list);
-            // });
 
             // Función para obtener el nombre del día de la semana
 function getDayName(dateString) {
@@ -276,6 +259,8 @@ async function updateSendStatus(reservationId, isChecked) {
     // Determina la hora de inicio según el profesional y el día de la semana
     const startHour = professional === 'Lautaro' && (dayOfWeek >= 1 && dayOfWeek <= 3) // Martes a Jueves
         ? specialStartHour
+        : professional === 'Pablo' && (dayOfWeek === 3 || dayOfWeek === 4) // Jueves y Viernes
+        ? 13
         : defaultStartHour;
 
     // Horarios excluidos para Nicolas
@@ -504,6 +489,7 @@ async function updateSendStatus(reservationId, isChecked) {
                     <select id="professional" required>
                         <option value="Lautaro">Lautaro</option>
                         <option value="Nicolas">Nicolas</option>
+                        <option value="Pablo">Pablo</option>
                     </select>
                 </div>
 

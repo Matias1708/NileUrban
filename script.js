@@ -21,6 +21,11 @@ document.addEventListener('DOMContentLoaded', function() {
             startHour: 11,
             endHour: 19,
             interval: 40
+        },
+        'Pablo': {
+            startHour: 11,
+            endHour: 19,
+            interval: 40
         }
     };
 
