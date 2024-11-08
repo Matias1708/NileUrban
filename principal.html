@@ -256,19 +256,13 @@ async function updateSendStatus(reservationId, isChecked) {
 
     timeSelect.innerHTML = '';
 
-    // Determina la hora de inicio según el profesional y el día de la semana
-    // const startHour = professional === 'Lautaro' && (dayOfWeek >= 1 && dayOfWeek <= 3) // Martes a Jueves
-    //     ? specialStartHour
-    //     : professional === 'Pablo' && (dayOfWeek === 3 || dayOfWeek === 4) // Jueves y Viernes
-    //     ? 13
-    //     : defaultStartHour;
-    const startHour = professional === 'Lautaro' && (dayOfWeek >= 1 && dayOfWeek <= 3) // Martes a Jueves
-    ? specialStartHour
-    : professional === 'Lautaro' && dayOfWeek === 3 // Jueves
-    ? 11  // Lautaro empieza a las 11 los jueves
-    : professional === 'Pablo' && (dayOfWeek === 3 || dayOfWeek === 4) // Miércoles y Jueves
-    ? 13
-    : defaultStartHour;
+    //Determina la hora de inicio según el profesional y el día de la semana
+    const startHour = professional === 'Lautaro' && (dayOfWeek >= 1 && dayOfWeek <= 2) // Martes a Jueves
+        ? specialStartHour
+        : professional === 'Pablo' && (dayOfWeek === 3 || dayOfWeek === 4) // Jueves y Viernes
+        ? 13
+        : defaultStartHour;
+   
 
     // Horarios excluidos para Nicolas
     const excludedTimes = {
