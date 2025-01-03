@@ -134,7 +134,7 @@ html, body {
     font-family: 'Bank Gothic Light BT', sans-serif;
     display: flex;
     flex-direction: column;
-    background-color: black;
+    /* background-color: black; */
     background-size: cover; /* Ajusta la imagen para cubrir todo el fondo */
     background-position: center; /* Centra la imagen */
     background-repeat: no-repeat; /* Evita que la imagen se repita */
@@ -284,13 +284,14 @@ footer {
 header {
     text-align: center;
     padding: 20px;
-    background-color: black;
+    /* background-color: black; */
     border-bottom: solid 1px grey;
 }
 
 .brand-image img {
     max-width: 200px;
     height: auto;
+    display: none;
 }
 
 .form-row {
@@ -481,3 +482,13 @@ header {
 }
 
 
+/* Imagen de fondo */
+.imagen-fondo {
+    position: absolute; /* Posición absoluta para que quede detrás */
+    top: 0;
+    left: 0;
+    width: 100%; /* Que ocupe todo el ancho */
+    height: 100%; /* Que ocupe todo el alto */
+    object-fit: cover; /* Ajusta la imagen sin deformarla */
+    z-index: -1; /* Envía la imagen al fondo */
+  }
