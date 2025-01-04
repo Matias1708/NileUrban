@@ -57,7 +57,7 @@
             // Función para obtener el nombre del día de la semana
 function getDayName(dateString) {
     const [day, month] = dateString.split('/');
-    const date = new Date(2024, month - 1, day); // Usa el año actual o uno fijo
+    const date = new Date(2025, month - 1, day); // Usa el año actual o uno fijo
     const options = { weekday: 'long' };
     return new Intl.DateTimeFormat('es-ES', options).format(date);
 }
@@ -206,7 +206,8 @@ async function updateSendStatus(reservationId, isChecked) {
                         contacto: phone,
                         enviar: 'N'
                     });
-                    alert('Reserva realizada con éxito');
+                    // alert('Reserva realizada con éxito');
+                    alert(`Se realizó la reserva para el dia ${date} a las ${time}hs con ${professional}, para realizarse el servicio de ${service}. No te olvides, te esperamos!`);
 
                     // Actualizar la lista de reservas
                     await getRecords();

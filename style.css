@@ -18,6 +18,8 @@ body {
     font-family: 'Bank Gothic Light BT', sans-serif;
     line-height: 1.6;
     color: #333;
+    
+    
 }
 
 .container {
@@ -165,7 +167,9 @@ img.gallery-img {
     width: 100%;
     height: auto;
     border-radius: 1px;
-    border: solid 1px grey;
+    object-fit: cover; /* Ajusta la imagen sin deformarla */
+    /* border: solid 1px grey; */
+   
 }
 
 /* Estilos de la galería 2 */
@@ -258,7 +262,7 @@ img.gallery-img {
     font-size: 18px;
     transform: translateX(-50%);
     left: 50%;
-    top: 105%;
+    top: 100%;
     z-index: 1;
     font-weight: bold;
     transition: background-color 0.3s, color 0.3s; /* Transición suave para el cambio de color */
