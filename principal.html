@@ -260,8 +260,8 @@ async function updateSendStatus(reservationId, isChecked) {
     //Determina la hora de inicio según el profesional y el día de la semana
     const startHour = professional === 'Lautaro' && (dayOfWeek >= 1 && dayOfWeek <= 2) // Martes a Jueves
         ? specialStartHour
-        : professional === 'Pablo' && (dayOfWeek === 3 || dayOfWeek === 4) // Jueves y Viernes
-        ? 13
+        : professional === 'Pablo' && (dayOfWeek >= 1 && dayOfWeek <= 2) // Jueves y Viernes
+        ? 11
         : defaultStartHour;
    
 
@@ -491,9 +491,10 @@ async function updateSendStatus(reservationId, isChecked) {
                 <div class="form-group">
                     <label for="professional">PROFESIONAL:</label>
                     <select id="professional" required>
+                        <option value="Pablo">Pablo</option>
                         <option value="Lautaro">Lautaro</option>
                         <option value="Nicolas">Nicolas</option>
-                        <option value="Pablo">Pablo</option>
+                        
                     </select>
                 </div>
 
