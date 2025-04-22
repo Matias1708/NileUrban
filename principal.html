@@ -261,23 +261,16 @@ async function updateSendStatus(reservationId, isChecked) {
     const startHour = professional === 'Lautaro' && (dayOfWeek >= 1 && dayOfWeek <= 2) // Martes a Jueves
         ? specialStartHour
         : professional === 'Pablo' && (dayOfWeek >= 1 && dayOfWeek <= 2) // Jueves y Viernes
-        ? 10 // aca tenia 11
+        ? 11 // aca tenia 11
         : defaultStartHour;
    
-        let startMinutes = 0;
-
-            // Si es el primer turno que queremos mostrar (10:15), ajustamos la hora de inicio
-            if (startHour === 10) {
-                startMinutes = 15;
-            }
-
-
     // Horarios excluidos para Nicolas
     const excludedTimes = {
         //3: ['15:40', '16:20', '17:00'], // Jueves
-        3: ['17:00','17:40','18:20'], // Jueves
-        4: ['14:20'], // Viernes
-        5: ['11:00']  // Sábado
+        1: ['12:30'],
+        3: ['17:15','18:00'], // Jueves
+        4: ['10:15','14:15'] // Viernes
+        //5: ['11:00']  // Sábado
     };
 
     let hasAvailableTimes = false;
@@ -291,6 +284,17 @@ async function updateSendStatus(reservationId, isChecked) {
         const minutesDisplay = currentMinutes < 10 ? `0${currentMinutes}` : currentMinutes;
         const optionValue = `${hourDisplay}:${minutesDisplay}`;
         const optionText = `${hourDisplay}:${minutesDisplay} hs`;
+
+          // Excluir la hora de las 13:00
+    if (optionValue.startsWith('13:')) {
+        currentMinutes += interval;
+        if (currentMinutes >= 60) {
+            currentMinutes -= 60;
+            currentHour++;
+        }
+        continue; // Saltar al siguiente ciclo del bucle
+    }
+
 
         // Excluir horarios específicos para Nicolas
         if (professional === 'Nicolas') {
