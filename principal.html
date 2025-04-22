@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -366,6 +366,386 @@ async function updateSendStatus(reservationId, isChecked) {
         ]
     });
 }
+
+
+        // Obtener elementos del DOM
+        const openModalButton = document.getElementById('open-modal-button');
+        const authModal = document.getElementById('auth-modal');
+        const authForm = document.getElementById('auth-form');
+
+        // Evento para mostrar el modal de autenticación
+        openModalButton.addEventListener('click', function() {
+            authModal.style.display = 'block';
+        });
+
+        // Evento para cerrar el modal de autenticación
+        function closeAuthModal() {
+            authModal.style.display = 'none';
+        }
+
+        authForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('admin-email').value;
+            const password = document.getElementById('admin-password').value; -->
+            <!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NileUrbanLounge</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.2.0/dist/index.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.2.0/dist/index.global.min.js"></script>
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
+        import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, query, where, updateDoc } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+        import { getAnalytics } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-analytics.js';
+
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyA_vfbPHFvTTg6HbsqPD4ym50Q2pfxnLYU",
+            authDomain: "nileurban-c9bd9.firebaseapp.com",
+            projectId: "nileurban-c9bd9",
+            storageBucket: "nileurban-c9bd9.appspot.com",
+            messagingSenderId: "798328145085",
+            appId: "1:798328145085:web:8ad8642e133fdd6fab63d4",
+            measurementId: "G-44H22X36PS"
+        };
+
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+
+        // Función para obtener todas las reservas
+        async function getRecords() {
+            const reservationsCol = collection(db, 'Reserva');
+            const querySnapshot = await getDocs(reservationsCol);
+            const reservations = [];
+
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                reservations.push({ id: doc.id, ...data });
+            });
+
+            // Agrupar reservas por fecha
+            const groupedReservations = reservations.reduce((acc, reservation) => {
+                if (!acc[reservation.fecha]) {
+                    acc[reservation.fecha] = [];
+                }
+                acc[reservation.fecha].push(reservation);
+                return acc;
+            }, {});
+
+            // Ordenar las fechas
+            const sortedDates = Object.keys(groupedReservations).sort((a, b) => parseDate(a) - parseDate(b));
+
+
+            // Función para obtener el nombre del día de la semana
+            function getDayName(dateString) {
+                const [day, month] = dateString.split('/');
+                const date = new Date(2025, month - 1, day); // Usa el año actual o uno fijo
+                const options = { weekday: 'long' };
+                return new Intl.DateTimeFormat('es-ES', options).format(date);
+            }
+
+
+            function isPastHour(reservationHour) {
+                const now = new Date();
+                const [reservationHourInt, reservationMinute] = reservationHour.split(':').map(Number);
+                const reservationTime = new Date();
+                reservationTime.setHours(reservationHourInt, reservationMinute);
+
+                return reservationTime < now;
+            }
+
+            // Función para ordenar las reservas por hora
+            function sortReservationsByTime(reservations) {
+                return reservations.sort((a, b) => {
+                    // Suponiendo que la hora está en formato "HH:mm"
+                    const [aHour, aMinute] = a.hora.split(':').map(Number);
+                    const [bHour, bMinute] = b.hora.split(':').map(Number);
+                    return aHour - bHour || aMinute - bMinute;
+                });
+            }
+            const appointmentList = document.getElementById('appointment-list');
+            appointmentList.innerHTML = ''; // Limpiar la lista antes de agregar los nuevos elementos
+
+            sortedDates.forEach(date => {
+                const dayName = getDayName(date);
+                const dateHeader = document.createElement('h3');
+                dateHeader.textContent = `${dayName} ${date}`; // Mostrar el nombre del día junto con la fecha
+                appointmentList.appendChild(dateHeader);
+
+                const list = document.createElement('ul');
+
+                // Ordenar reservas por hora antes de agregarlas a la lista
+                const sortedReservations = sortReservationsByTime(groupedReservations[date]);
+
+                sortedReservations.forEach(reservation => {
+                    const listItem = document.createElement('li');
+
+                    // Agregar el checkbox al inicio de cada item de la lista
+                    listItem.innerHTML =
+                    `<input type="checkbox" class="whatsapp-checkbox" data-id="${reservation.id}" ${reservation.enviar === 'S' ? 'checked' : ''}>
+${reservation.nombre} - ${reservation.hora}hs - ${reservation.profesional} - <span class="math-inline">\{reservation\.servicio\} \-
+<a href\="https\://wa\.me/</span>{reservation.contacto}?text=${encodeURIComponent(`¡Hola ${reservation.nombre}! Te recordamos tu turno el dia ${reservation.fecha} a las ${reservation.hora} con ${reservation.profesional} para ${reservation.servicio}. En caso de no asistir, avisar por este medio. ¡Te esperamos!`)}" target="_blank">
+    <span class="math-inline">\{reservation\.contacto\}
+</a\>
+<button class\="delete\-btn" data\-id\="</span>{reservation.id}"><i class="fas fa-trash"></i></button>`;
+
+                    list.appendChild(listItem);
+
+                    // Agregar evento para actualizar Firestore cuando cambie el checkbox
+                    const checkbox = listItem.querySelector('.whatsapp-checkbox');
+                    checkbox.addEventListener('change', async (event) => {
+                        const isChecked = event.target.checked;
+                        const reservationId = event.target.getAttribute('data-id');
+
+                        // Llamar a la función para actualizar Firestore
+                        await updateSendStatus(reservationId, isChecked);
+                    });
+                });
+
+                appointmentList.appendChild(list);
+            });
+
+            // Función asíncrona para actualizar el estado de 'enviar' en Firestore
+            async function updateSendStatus(reservationId, isChecked) {
+                try {
+                    // Obtener la referencia al documento
+                    const reservationRef = doc(db, 'Reserva', reservationId);
+
+                    // Actualizar el campo 'enviar' en Firestore
+                    await updateDoc(reservationRef, {
+                        enviar: isChecked ? 'S' : 'N'
+                    });
+
+                    console.log('Estado de envío actualizado en Firestore');
+                } catch (error) {
+                    console.error('Error al actualizar el estado de envío:', error);
+                }
+            }
+
+
+            // Agregar evento para eliminar turnos
+            const deleteButtons = document.querySelectorAll('.delete-btn');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', async (e) => {
+                    const id = e.target.dataset.id;
+                    try {
+                        await deleteDoc(doc(db, 'Reserva', id));
+                        alert('Turno eliminado con éxito');
+                        getRecords(); // Actualizar la lista de reservas
+                    } catch (error) {
+                        console.error('Error al eliminar el turno: ', error);
+                    }
+                });
+            });
+        }
+
+        // Función para obtener las reservas para una fecha y profesional específicos
+        async function getReservationsForDateAndProfessional(date, professional) {
+            const querySnapshot = await getDocs(query(
+                collection(db, 'Reserva'),
+                where('fecha', '==', date),
+                where('profesional', '==', professional)
+            ));
+            const reservations = [];
+            querySnapshot.forEach((doc) => {
+                reservations.push(doc.data());
+            });
+            return reservations;
+        }
+
+        // Función para reservar una cita
+        async function bookAppointment() {
+            const name = document.getElementById('name').value;
+            const date = document.getElementById('calendar').value;
+            const time = document.getElementById('time').value;
+            const professional = document.getElementById('professional').value;
+            const service = document.getElementById('service').value;
+            const phone = document.getElementById('phone').value;
+
+            if (name && date && time && professional && service) {
+                // Verificar si la hora está disponible
+                const reservations = await getReservationsForDateAndProfessional(date, professional);
+                const reservedTimes = reservations.map(reservation => reservation.hora);
+
+                if (reservedTimes.includes(time)) {
+                    alert('La hora seleccionada ya está reservada. Por favor, elige otra hora.');
+                    return;
+                }
+
+                // Guardar la reserva en Firebase
+                try {
+                    await addDoc(collection(db, 'Reserva'), {
+                        nombre: name,
+                        fecha: date,
+                        hora: time,
+                        profesional: professional,
+                        servicio: service,
+                        contacto: phone,
+                        enviar: 'N'
+                    });
+                    alert(`Se realizó la reserva para el dia ${date} a las ${time}hs con ${professional}, para realizarse el servicio de ${service}. No te olvides, te esperamos!`);
+
+                    // Actualizar la lista de reservas
+                    await getRecords();
+                    showConfirmationModal();
+                } catch (error) {
+                    console.error('Error al añadir la reserva: ', error);
+                }
+            } else {
+                alert('Por favor, completa todos los campos.');
+            }
+        }
+
+        async function populateTimeOptions() {
+            const timeSelect = document.getElementById('time');
+            const noAvailableMessage = document.getElementById('no-available-message');
+            const schedule = {
+                defaultStartHour: 10,   // Hora de inicio por defecto
+                defaultEndHour: 18,     // Hora de fin por defecto (ajustado para que el último termine a las 18:45)
+                specialStartHour: 13,   // Hora de inicio especial para Lautaro
+                interval: 45            // Intervalo de 45 minutos
+            };
+            const { defaultStartHour, defaultEndHour, specialStartHour, interval } = schedule;
+            const date = document.getElementById('calendar').value;
+            const professional = document.getElementById('professional').value;
+
+            if (!date || !professional) return;
+
+            // Convertir la fecha del formato DD/MM/YYYY al formato<ctrl98>-MM-DD
+            const [day, month, year] = date.split('/');
+            const formattedDate = `<span class="math-inline">\{year\}\-</span>{month}-${day}`;
+            const dateObj = new Date(formattedDate);
+
+            // Determinar el día de la semana (0 = Domingo, 1 = Lunes, ..., 6 = Sábado)
+            const dayOfWeek = dateObj.getDay();
+
+            // Obtener la hora actual
+            const now = new Date();
+            const currentHourNow = now.getHours();
+            const currentMinutesNow = now.getMinutes();
+            const currentDate = `<span class="math-inline">\{now\.getFullYear\(\)\}\-</span>{("0" + (now.getMonth() + 1)).slice(-2)}-${("0" + now.getDate()).slice(-2)}`;
+
+            console.log(`Fecha: ${date}, Profesional: ${professional}, Día de la semana: ${dayOfWeek}, Hora de inicio: ${professional === 'Lautaro' && (dayOfWeek >= 2 && dayOfWeek <= 4) ? specialStartHour : defaultStartHour}`);
+
+            // Obtén las reservas para la fecha y profesional seleccionados
+            const reservations = await getReservationsForDateAndProfessional(date, professional);
+            const reservedTimesForDateAndProfessional = reservations.map(reservation => reservation.hora);
+
+            timeSelect.innerHTML = '';
+
+            // Determina la hora de inicio según el profesional y el día de la semana
+            let startHour = professional === 'Lautaro' && (dayOfWeek >= 2 && dayOfWeek <= 4) // Martes a Jueves
+                ? specialStartHour
+                : professional === 'Pablo' && (dayOfWeek >= 2 && dayOfWeek <= 5) // Jueves y Viernes (corregido el día)
+                    ? 11
+                    : defaultStartHour;
+            let startMinutes = 0;
+
+            // Si es el primer turno que queremos mostrar (10:15), ajustamos la hora de inicio
+            if (startHour === 10) {
+                startMinutes = 15;
+            }
+
+            const excludedTimes = {
+                3: ['17:00','17:40','18:20'], // Jueves
+                4: ['14:20'], // Viernes
+                5: ['11:00']   // Sábado
+            };
+
+            let hasAvailableTimes = false;
+            let currentHour = startHour;
+            let currentMinutes = startMinutes;
+
+            while (currentHour < defaultEndHour || (currentHour === defaultEndHour && currentMinutes <= 0)) { // Ajustado para terminar a las 18:00 como inicio del último turno
+                const hourDisplay = currentHour < 10 ? `0${currentHour}` : currentHour;
+                const minutesDisplay = currentMinutes < 10 ? `0${currentMinutes}` : currentMinutes;
+                const optionValue = `<span class="math-inline">\{hourDisplay\}\:</span>{minutesDisplay}`;
+                const optionText = `<span class="math-inline">\{hourDisplay\}\:</span>{minutesDisplay} hs`;
+
+                // Excluir horarios específicos para Nicolas
+                if (professional === 'Nicolas') {
+                    if (excludedTimes[dayOfWeek] && excludedTimes[dayOfWeek].includes(optionValue)) {
+                        currentMinutes += interval;
+                        if (currentMinutes >= 60) {
+                            currentMinutes -= 60;
+                            currentHour++;
+                        }
+                        continue;
+                    }
+                }
+
+                // Excluir el turno de las 13:40
+                if (optionValue !== '13:40') {
+                    const optionDateTime = new Date(`<span class="math-inline">\{formattedDate\}T</span>{optionValue}:00`);
+                    const isPast = formattedDate === currentDate &&
+                        (currentHourNow > optionDateTime.getHours() ||
+                         (currentHourNow === optionDateTime.getHours() && currentMinutesNow > optionDateTime.getMinutes()));
+
+                    if (!isPast && !reservedTimesForDateAndProfessional.includes(optionValue)) {
+                        const option = document.createElement('option');
+                        option.value = optionValue;
+                        option.textContent = optionText;
+                        timeSelect.appendChild(option);
+                        hasAvailableTimes = true;
+                    }
+                }
+
+                currentMinutes += interval;
+                if (currentMinutes >= 60) {
+                    currentMinutes -= 60;
+                    currentHour++;
+                }
+            }
+
+            // Agregar la opción de las 18:00 si aún no se ha agregado (para el turno que termina 18:45)
+            if (defaultEndHour === 18 && !reservedTimesForDateAndProfessional.includes('18:00')) {
+                const optionLast = document.createElement('option');
+                optionLast.value = '18:00';
+                optionLast.textContent = '18:00 hs';
+                timeSelect.appendChild(optionLast);
+                hasAvailableTimes = true;
+            }
+
+            noAvailableMessage.style.display = hasAvailableTimes ? 'none' : 'block';
+        }
+
+
+        // Función para mostrar el modal de confirmación
+        function showConfirmationModal() {
+            document.getElementById('confirmation-modal').style.display = 'block';
+        }
+
+        // Función para cerrar el modal de confirmación
+        function closeConfirmationModal() {
+            document.getElementById('confirmation-modal').style.display = 'none';
+        }
+
+        function initDatePicker() {
+            flatpickr("#calendar", {
+                dateFormat: "d/m/Y",
+                locale: "es",
+                minDate: "today", // Restringe las fechas a partir de hoy
+                onDayCreate: function(dObj, dStr, fp, dayElem) {
+                    const dayOfWeek = dayElem.dateObj.getDay();
+                    if (dayOfWeek === 0 || dayOfWeek === 1) {
+                        dayElem.classList.add('disabled');
+                        dayElem.title = "Este día no está disponible";
+                    }
+                },
+                disable: [
+                    function(date) {
+                        return (date.getDay() === 0 || date.getDay() === 1);
+                    }
+                ]
+            });
+        }
 
 
         // Obtener elementos del DOM
