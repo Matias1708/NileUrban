@@ -224,7 +224,7 @@ async function updateSendStatus(reservationId, isChecked) {
     const timeSelect = document.getElementById('time');
     const noAvailableMessage = document.getElementById('no-available-message');
     const schedule = {
-        defaultStartHour: '10:15',  // Hora de inicio por defecto
+        defaultStartHour: 10,  // Hora de inicio por defecto
         defaultEndHour: 19,    // Hora de fin por defecto
         specialStartHour: 13,  // Hora de inicio especial para Lautaro
         interval: 45           // Intervalo de 40 minutos
@@ -264,6 +264,13 @@ async function updateSendStatus(reservationId, isChecked) {
         ? 11
         : defaultStartHour;
    
+        let startMinutes = 0;
+
+            // Si es el primer turno que queremos mostrar (10:15), ajustamos la hora de inicio
+            if (startHour === 10) {
+                startMinutes = 15;
+            }
+
 
     // Horarios excluidos para Nicolas
     const excludedTimes = {
