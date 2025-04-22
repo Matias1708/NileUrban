@@ -260,17 +260,24 @@ async function updateSendStatus(reservationId, isChecked) {
     timeSelect.innerHTML = ''; // Limpiar opciones anteriores
     let generatedTimes = []; // Array para almacenar horarios generados temporalmente
 
-    // --- FASE 1: Generar la secuencia base (10:15 inicio, 45min int, <=18:45 fin) ---
+    // --- FASE 1: Generar la secuencia base (10:15 inicio, 45min int, <=18:45 fin, OMITIR 13:15) ---
     let currentHour = 10;
     let currentMinutes = 15;
     const latestHour = 18;
     const latestMinute = 45;
+    const skipTimeStr = "13:15"; // Hora a omitir en la generación base
 
     while (currentHour < latestHour || (currentHour === latestHour && currentMinutes <= latestMinute)) {
         const hourDisplay = String(currentHour).padStart(2, '0');
         const minutesDisplay = String(currentMinutes).padStart(2, '0');
         const optionValue = `${hourDisplay}:${minutesDisplay}`;
-        generatedTimes.push(optionValue);
+
+        // Añadir a la lista temporal SOLO si NO es la hora a omitir (13:15)
+        if (optionValue !== skipTimeStr) {
+            generatedTimes.push(optionValue);
+        } else {
+            console.log("Omitiendo 13:15 de la generación base.");
+        }
 
         // Incrementar el tiempo en 45 minutos
         currentMinutes += interval;
@@ -278,6 +285,15 @@ async function updateSendStatus(reservationId, isChecked) {
             currentMinutes -= 60;
             currentHour++;
             if (currentHour >= 24) break;
+        }
+        // CORRECCIÓN IMPORTANTE: Asegurarse de que si la hora actual era justo antes de la omitida,
+        // el siguiente incremento se realice correctamente.
+        if (currentHour === 13 && currentMinutes === 15) {
+            currentMinutes += interval;
+            if (currentMinutes >= 60) {
+                currentMinutes -= 60;
+                currentHour++;
+            }
         }
     }
     console.log("Horarios generados base:", generatedTimes);
@@ -307,7 +323,7 @@ async function updateSendStatus(reservationId, isChecked) {
         const optionText = `${optionValue} hs`;
         let skipThisTime = false; // Resetear bandera para cada horario
 
-        // Aplicar filtros: Nicolas, 13:40 (si aplica), Pasado, Reservado, 13:15
+        // Aplicar filtros: Nicolas, 13:40 (si aplica), Pasado, Reservado
 
         // 1. Exclusión Nicolas
         if (professional === 'Nicolas') {
@@ -335,12 +351,6 @@ async function updateSendStatus(reservationId, isChecked) {
         // 4. Exclusión Hora Reservada
         if (!skipThisTime && reservedTimesForDateAndProfessional.includes(optionValue)) {
             skipThisTime = true;
-        }
-
-        // 5. Exclusión 13:15
-        if (!skipThisTime && optionValue === '13:15') {
-            skipThisTime = true;
-            console.log("Filtrando 13:15.");
         }
 
         // Si no se marcó para saltar, crear y añadir la opción
