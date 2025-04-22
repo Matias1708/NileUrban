@@ -261,7 +261,7 @@ async function updateSendStatus(reservationId, isChecked) {
     const startHour = professional === 'Lautaro' && (dayOfWeek >= 1 && dayOfWeek <= 2) // Martes a Jueves
         ? specialStartHour
         : professional === 'Pablo' && (dayOfWeek >= 1 && dayOfWeek <= 2) // Jueves y Viernes
-        ? 11
+        ? 10 // aca tenia 11
         : defaultStartHour;
    
         let startMinutes = 0;
