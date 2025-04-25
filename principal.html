@@ -189,8 +189,13 @@ async function updateSendStatus(reservationId, isChecked) {
         const maxDate = new Date(today);
         maxDate.setDate(today.getDate() + 7);
         
+        
+
+
         const [day, month, year] = date.split('/');
         const selectedDate = new Date(year, month - 1, day);
+
+        
         
         if (selectedDate > maxDate) {
             alert('Actualmente no estamos aceptando reservas para después de la semana próxima debido a actualizaciones en nuestro sistema. Por favor, intenta nuevamente más tarde.');
@@ -402,20 +407,18 @@ async function updateSendStatus(reservationId, isChecked) {
         function closeConfirmationModal() {
             document.getElementById('confirmation-modal').style.display = 'none';
         }
-
         function initDatePicker() {
     // Obtener la fecha de hoy
     const today = new Date();
-    
-    // Calcular la fecha de finalización del bloqueo (7 días a partir de hoy)
-    const blockEndDate = new Date(today);
-    blockEndDate.setDate(today.getDate() + 7);
-    
+
+    // Establecer el 30 de abril como la fecha máxima permitida (abril es mes 3 porque empieza en 0)
+    const endOfApril = new Date(2025, 3, 30);
+
     flatpickr("#calendar", {
         dateFormat: "d/m/Y",
         locale: "es",
-        minDate: "today", // Restringe las fechas a partir de hoy
-        maxDate: blockEndDate, // Bloquear fechas después de una semana
+        minDate: today, // Desde hoy
+        maxDate: endOfApril, // Hasta el 30 de abril
         onDayCreate: function(dObj, dStr, fp, dayElem) {
             const dayOfWeek = dayElem.dateObj.getDay();
             if (dayOfWeek === 0 || dayOfWeek === 1) {
@@ -425,11 +428,41 @@ async function updateSendStatus(reservationId, isChecked) {
         },
         disable: [
             function(date) {
+                // Deshabilita domingos (0) y lunes (1)
                 return (date.getDay() === 0 || date.getDay() === 1);
             }
         ]
     });
 }
+
+
+//         function initDatePicker() {
+//     // Obtener la fecha de hoy
+//     const today = new Date();
+    
+//     // Calcular la fecha de finalización del bloqueo (7 días a partir de hoy)
+//     const blockEndDate = new Date(today);
+//     blockEndDate.setDate(today.getDate() + 7);
+    
+//     flatpickr("#calendar", {
+//         dateFormat: "d/m/Y",
+//         locale: "es",
+//         minDate: "today", // Restringe las fechas a partir de hoy
+//         maxDate: blockEndDate, // Bloquear fechas después de una semana
+//         onDayCreate: function(dObj, dStr, fp, dayElem) {
+//             const dayOfWeek = dayElem.dateObj.getDay();
+//             if (dayOfWeek === 0 || dayOfWeek === 1) {
+//                 dayElem.classList.add('disabled');
+//                 dayElem.title = "Este día no está disponible";
+//             }
+//         },
+//         disable: [
+//             function(date) {
+//                 return (date.getDay() === 0 || date.getDay() === 1);
+//             }
+//         ]
+//     });
+// }
 
 //         function initDatePicker() {
 //     flatpickr("#calendar", {
