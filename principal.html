@@ -187,7 +187,7 @@ async function updateSendStatus(reservationId, isChecked) {
         // Validar que la fecha no sea posterior a una semana desde hoy
         const today = new Date();
         const maxDate = new Date(today);
-        maxDate.setDate(today.getDate() + 7);
+        maxDate.setDate(today.getDate() + 90);
         
         
 
@@ -233,49 +233,6 @@ async function updateSendStatus(reservationId, isChecked) {
         alert('Por favor, completa todos los campos.');
     }
 }
-        // // Función para reservar una cita
-        // async function bookAppointment() {
-        //     const name = document.getElementById('name').value;
-        //     const date = document.getElementById('calendar').value;
-        //     const time = document.getElementById('time').value;
-        //     const professional = document.getElementById('professional').value;
-        //     const service = document.getElementById('service').value;
-        //     const phone = document.getElementById('phone').value;
-
-        //     if (name && date && time && professional && service) {
-        //         // Verificar si la hora está disponible
-        //         const reservations = await getReservationsForDateAndProfessional(date, professional);
-        //         const reservedTimes = reservations.map(reservation => reservation.hora);
-
-        //         if (reservedTimes.includes(time)) {
-        //             alert('La hora seleccionada ya está reservada. Por favor, elige otra hora.');
-        //             return;
-        //         }
-
-        //         // Guardar la reserva en Firebase
-        //         try {
-        //             await addDoc(collection(db, 'Reserva'), {
-        //                 nombre: name,
-        //                 fecha: date,
-        //                 hora: time,
-        //                 profesional: professional,
-        //                 servicio: service,
-        //                 contacto: phone,
-        //                 enviar: 'N'
-        //             });
-        //             // alert('Reserva realizada con éxito');
-        //             alert(`Se realizó la reserva para el dia ${date} a las ${time}hs con ${professional}, para realizarse el servicio de ${service}. No te olvides, te esperamos!`);
-
-        //             // Actualizar la lista de reservas
-        //             await getRecords();
-        //             showConfirmationModal();
-        //         } catch (error) {
-        //             console.error('Error al añadir la reserva: ', error);
-        //         }
-        //     } else {
-        //         alert('Por favor, completa todos los campos.');
-        //     }
-        // }
         // === START MODIFIED populateTimeOptions Function (with updated rules and console.log for debugging) ===
         async function populateTimeOptions() {
             const timeSelect = document.getElementById('time');
