@@ -272,7 +272,7 @@ async function updateSendStatus(reservationId, isChecked) {
 
 
             // Define horarios específicos excluidos por profesional y día
-            // Las claves numéricas son los días de la semana (0=Domingo, 1=Lunes, 2=Martes, 3=Miércoles, 4=Jueves, 5=Viernes, 6=Sábado)
+            // Las claves numéricas son los días de la semana (1=Martes, 2=Miércoles, 3=Jueves, 4=Viernes, 6=Sábado)
             // Estas son exclusiones de turnos *fijos* que no están disponibles, *además* de los filtros por horario de inicio
             const professionalSpecificExclusions = {
                 'Nicolas': {
@@ -281,12 +281,12 @@ async function updateSendStatus(reservationId, isChecked) {
                     4: ['10:15','11:00', '14:15'] // Viernes (5): 10:15 y 14:15 excluidos
                 },
                 'Lautaro': {
-                    3: ['13:30'],
+                    3: ['12:30','13:30'],
                     5: ['17:15']// Jueves (4): 13:30 excluido
                     // Añadir otras exclusiones fijas si las hay para otros días o horarios
                 },
                  'Pablo': {
-                    // Define aquí las exclusiones fijas de Pablo si las hay
+                    5: ['18:45']// Define aquí las exclusiones fijas de Pablo si las hay
                  }
                 // Añadir otros profesionales si tienes más
             };
