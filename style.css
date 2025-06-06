@@ -361,10 +361,11 @@ i.fas.fa-external-link-alt {
         top: 100%;
         left: 0;
         width: 100%;
-        background-color: var(--primary-color);
+        /* background-color: var(--primary-color); */
         padding: 1rem;
         flex-direction: column;
         align-items: center;
+        text-decoration: underline;
     }
 
     .nav-links.active {
