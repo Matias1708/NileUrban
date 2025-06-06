@@ -47,11 +47,22 @@
             <h2 class="section-title">Nosotros</h2>
             <div class="nosotros-content">
                 <div class="nosotros-text">
-                    <p>En nuestro salón te ofrecemos una experiencia con personal perfectamente capacitado, productos de alta gama y un ambiente sofisticado.</p>
-                    <p>Cada visita es un momento de relajación y belleza, diseñado para resaltar lo mejor de vos.</p>
+                    <!-- <p>En nuestro salón te ofrecemos una experiencia con personal perfectamente capacitado, productos de alta gama y un ambiente sofisticado.</p>
+                    <p>Cada visita es un momento de relajación y belleza, diseñado para resaltar lo mejor de vos.</p> -->
                 </div>
-                <div class="nosotros-image">
-                    <img src="images/EQUIPO2.jpg" alt="Equipo Nile Urban Lounge">
+                <div class="cards-container">
+                    <div class="card">
+                        <img src="images/IMG_6718.jpeg" alt="Equipo Nile Urban Lounge">
+                        <p class="nombre-card">Pablo</p>
+                    </div>
+                    <div class="card">
+                        <img src="images/IMG_6710.jpeg" alt="Nile Urban Lounge">
+                        <p class="nombre-card">Nicolas</p>
+                    </div>
+                    <div class="card">
+                        <img src="images/IMG_6728.jpeg" alt="Nile Urban Lounge">
+                        <p class="nombre-card">Lautaro</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -129,6 +140,125 @@
         document.querySelector('.mobile-menu').addEventListener('click', function() {
             document.querySelector('.nav-links').classList.toggle('active');
         });
+
+        (function() {
+            let intervalId = null;
+            let current = 0;
+            const mediaQuery = window.matchMedia('(max-width: 768px)');
+            const cardsContainer = document.querySelector('.cards-container');
+            const cards = cardsContainer ? Array.from(cardsContainer.children) : [];
+
+            function showOnly(index) {
+                cards.forEach((card, i) => {
+                    card.style.display = (i === index) ? 'block' : 'none';
+                });
+            }
+
+            function showAll() {
+                cards.forEach(card => card.style.display = 'block');
+            }
+
+            function startCarousel() {
+                if (intervalId) clearInterval(intervalId);
+                showOnly(current);
+                intervalId = setInterval(() => {
+                    current = (current + 1) % cards.length;
+                    showOnly(current);
+                }, 3000);
+            }
+
+            function stopCarousel() {
+                if (intervalId) clearInterval(intervalId);
+                intervalId = null;
+                showAll();
+            }
+
+            function checkMode() {
+                if (mediaQuery.matches) {
+                    current = 0;
+                    startCarousel();
+                } else {
+                    stopCarousel();
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+                if (!cards.length) return;
+                checkMode();
+                mediaQuery.addEventListener('change', checkMode);
+            });
+        })();
     </script>
+
+    <style>
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+        .cards-container {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            align-items: stretch;
+            width: 100%;
+            margin-top: 30px;
+        }
+
+        .card {
+            flex: 1 1 0;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            background: none;
+            min-width: 0;
+            display: block;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card img {
+            width: 100%;
+            height: 60vh;
+            object-fit: cover;
+            display: block;
+        }
+
+        @media (max-width: 900px) {
+            .card img {
+                height: 40vh;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .cards-container {
+                display: block;
+                width: 100%;
+                margin-top: 30px;
+            }
+            .card {
+                width: 100%;
+                max-width: 100%;
+                margin: 0 auto;
+                display: block;
+            }
+            .card img {
+                height: 340px;
+            }
+        }
+
+        .nombre-card {
+            text-align: center;
+            margin: 12px 0 0 0;
+            font-size: 1.1em;
+            color: #fff; /* O el color que prefieras */
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+    </style>
 </body>
 </html>
