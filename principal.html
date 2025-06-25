@@ -326,13 +326,24 @@ async function updateSendStatus(reservationId, isChecked) {
 
              // === Lógica de Horario de Inicio por Profesional y Día ===
              // Filtra la lista base de horarios para que empiece desde el horario correcto
-             if (professional === 'Nicolas' && dayOfWeek === 2) { // Nicolas los Miércoles (3) empieza a las 14:15
-                 console.log('Nicolas: aplicando filtro de inicio (>= 14:15) para Miércoles.');
-                 timesToIterate = timesToIterate.filter(time => time >= '14:15');
-             } else if (professional === 'Lautaro' && (dayOfWeek === 1 || dayOfWeek === 3)) { // Lautaro los Martes (2) y Jueves (4) empieza a las 13:30
-                 console.log('Lautaro: aplicando filtro de inicio (>= 13:30) para Martes/Jueves.');
-                 timesToIterate = timesToIterate.filter(time => time >= '13:30');
-             }
+            //  if (professional === 'Nicolas' && dayOfWeek === 2) { // Nicolas los Miércoles (3) empieza a las 14:15
+            //      console.log('Nicolas: aplicando filtro de inicio (>= 14:15) para Miércoles.');
+            //      timesToIterate = timesToIterate.filter(time => time >= '14:15');
+            //  } else if (professional === 'Lautaro' && (dayOfWeek === 1 || dayOfWeek === 3)) { // Lautaro los Martes (2) y Jueves (4) empieza a las 13:30
+            //      console.log('Lautaro: aplicando filtro de inicio (>= 13:30) para Martes/Jueves.');
+            //      timesToIterate = timesToIterate.filter(time => time >= '13:30');
+            //  }
+
+            if (professional === 'Nicolas' && dayOfWeek === 2) { // Nicolas los Miércoles (3) empieza a las 14:15
+    console.log('Nicolas: aplicando filtro de inicio (>= 14:15) para Miércoles.');
+    timesToIterate = timesToIterate.filter(time => time >= '14:15');
+} else if (professional === 'Lautaro' && dayOfWeek === 1) { // Lautaro los Martes (2) empieza a las 13:30
+    console.log('Lautaro: aplicando filtro de inicio (>= 13:30) para Martes.');
+    timesToIterate = timesToIterate.filter(time => time >= '13:30');
+} else if (professional === 'Lautaro' && dayOfWeek === 3) { // Lautaro los Jueves (4) empieza a las 12:30
+    console.log('Lautaro: aplicando filtro de inicio (>= 12:30) para Jueves.');
+    timesToIterate = timesToIterate.filter(time => time >= '12:30');
+}
              // Añadir lógica similar para otros profesionales si tienen horarios de inicio diferentes en días específicos
              // Por ejemplo, si Pablo empieza a las 11:00 los Jueves/Viernes:
              // else if (professional === 'Pablo' && (dayOfWeek === 4 || dayOfWeek === 5)) {
