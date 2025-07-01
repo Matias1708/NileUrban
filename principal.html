@@ -727,5 +727,60 @@ async function updateSendStatus(reservationId, isChecked) {
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/dist/date-fns.min.js"></script>
+    <script>
+    // Script para actualizar precios según la fecha seleccionada
+    function actualizarPreciosPorFecha(fechaStr) {
+        const serviceSelect = document.getElementById('service');
+        if (!serviceSelect) return;
+
+        // Si no hay fecha, usar precios base (martes/miércoles)
+        let corte = 14000;
+        let corteBarba = 16000;
+        if (fechaStr) {
+            // Detectar formato: DD/MM/YYYY
+            let partes = fechaStr.split('/');
+            let dateObj;
+            if (partes.length === 3) {
+                // Asume formato DD/MM/YYYY
+                dateObj = new Date(partes[2], partes[1] - 1, partes[0]);
+            } else {
+                // Si el formato es YYYY-MM-DD (por flatpickr u otro)
+                partes = fechaStr.split('-');
+                if (partes.length === 3) {
+                    dateObj = new Date(partes[0], partes[1] - 1, partes[2]);
+                }
+            }
+            if (dateObj && !isNaN(dateObj)) {
+                const dia = dateObj.getDay(); // 0=Dom, 1=Lun, 2=Mar, 3=Mié, 4=Jue, 5=Vie, 6=Sáb
+                if (dia === 2 || dia === 3) { // Martes o Miércoles
+                    corte = 14000;
+                    corteBarba = 16000;
+                } else if (dia >= 4 && dia <= 6) { // Jueves, Viernes, Sábado
+                    corte = 16000;
+                    corteBarba = 18000;
+                }
+            }
+        }
+        serviceSelect.innerHTML = `
+            <option value="Corte">Corte $${corte.toLocaleString('es-AR')}</option>
+            <option value="Corte + Barba">Corte + Barba $${corteBarba.toLocaleString('es-AR')}</option>
+            <option value="Barba">Barba $10.000</option>
+        `;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const calendar = document.getElementById('calendar');
+        if (calendar) {
+            // Inicializa precios según la fecha actual (si hay valor)
+            actualizarPreciosPorFecha(calendar.value);
+            calendar.addEventListener('change', function() {
+                actualizarPreciosPorFecha(this.value);
+            });
+        } else {
+            // Si no hay calendario, usa el día de hoy
+            actualizarPreciosPorFecha();
+        }
+    });
+    </script>
 </body>
 </html>
