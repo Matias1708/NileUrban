@@ -356,6 +356,13 @@ async function updateSendStatus(reservationId, isChecked) {
 
             // Obtener las exclusiones específicas para el profesional seleccionado y el día de la semana
             // Usa el operador ?. para evitar errores si el profesional o el día no tienen exclusiones definidas
+
+             // Aquí se agrega el nuevo horario solo para viernes y sábado
+                        if (dayOfWeek === 5 || dayOfWeek === 4) { // 5=Viernes, 6=Sábado
+                timesToIterate.push('19:30');
+                timesToIterate.sort(); // Opcional: para mantener el orden de los horarios
+                console.log('Agregado el horario 19:30 para Viernes/Sábado.');
+            }
             const currentExclusions = professionalSpecificExclusions[professional]?.[dayOfWeek] || [];
             console.log(`Exclusiones específicas fijas para ${professional} el día ${dayOfWeek}:`, currentExclusions);
 
