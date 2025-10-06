@@ -53,80 +53,249 @@
             // Ordenar las fechas
             const sortedDates = Object.keys(groupedReservations).sort((a, b) => parseDate(a) - parseDate(b));
 
-
             // Función para obtener el nombre del día de la semana
-function getDayName(dateString) {
-    const [day, month] = dateString.split('/');
-    const date = new Date(2025, month - 1, day); // Usa el año actual o uno fijo
-    const options = { weekday: 'long' };
-    return new Intl.DateTimeFormat('es-ES', options).format(date);
-}
+            function getDayName(dateString) {
+                const [day, month] = dateString.split('/');
+                const date = new Date(2025, month - 1, day); // Usa el año actual o uno fijo
+                const options = { weekday: 'long' };
+                return new Intl.DateTimeFormat('es-ES', options).format(date);
+            }
 
+            // Función para verificar si una fecha es pasada
+            function isPastDate(dateString) {
+                const [day, month, year] = dateString.split('/');
+                const date = new Date(year, month - 1, day);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0); // Resetear horas para comparar solo fechas
+                return date < today;
+            }
 
-function isPastHour(reservationHour) {
-    const now = new Date();
-    const [reservationHourInt, reservationMinute] = reservationHour.split(':').map(Number);
-    const reservationTime = new Date();
-    reservationTime.setHours(reservationHourInt, reservationMinute);
+            function isPastHour(reservationHour) {
+                const now = new Date();
+                const [reservationHourInt, reservationMinute] = reservationHour.split(':').map(Number);
+                const reservationTime = new Date();
+                reservationTime.setHours(reservationHourInt, reservationMinute);
 
-    return reservationTime < now;
-}
+                return reservationTime < now;
+            }
 
-// Función para ordenar las reservas por hora
-function sortReservationsByTime(reservations) {
-    return reservations.sort((a, b) => {
-        // Suponiendo que la hora está en formato "HH:mm"
-        const [aHour, aMinute] = a.hora.split(':').map(Number);
-        const [bHour, bMinute] = b.hora.split(':').map(Number);
-        return aHour - bHour || aMinute - bMinute;
-    });
-}
-const appointmentList = document.getElementById('appointment-list');
-appointmentList.innerHTML = ''; // Limpiar la lista antes de agregar los nuevos elementos
+            // Función para ordenar las reservas por hora
+            function sortReservationsByTime(reservations) {
+                return reservations.sort((a, b) => {
+                    // Suponiendo que la hora está en formato "HH:mm"
+                    const [aHour, aMinute] = a.hora.split(':').map(Number);
+                    const [bHour, bMinute] = b.hora.split(':').map(Number);
+                    return aHour - bHour || aMinute - bMinute;
+                });
+            }
 
-sortedDates.forEach(date => {
-    const dayName = getDayName(date);
-    const dateHeader = document.createElement('h3');
-    dateHeader.textContent = `${dayName} ${date}`; // Mostrar el nombre del día junto con la fecha
-    appointmentList.appendChild(dateHeader);
+            // Función para agrupar reservas por barbero
+            function groupReservationsByBarber(reservations) {
+                return reservations.reduce((acc, reservation) => {
+                    if (!acc[reservation.profesional]) {
+                        acc[reservation.profesional] = [];
+                    }
+                    acc[reservation.profesional].push(reservation);
+                    return acc;
+                }, {});
+            }
 
-    const list = document.createElement('ul');
+            const appointmentList = document.getElementById('appointment-list');
+            appointmentList.innerHTML = ''; // Limpiar la lista antes de agregar los nuevos elementos
 
-    // Ordenar reservas por hora antes de agregarlas a la lista
-    const sortedReservations = sortReservationsByTime(groupedReservations[date]);
+            // Crear contenedor principal para las columnas de barberos
+            const barberContainer = document.createElement('div');
+            barberContainer.className = 'barber-columns-container';
+            barberContainer.innerHTML = `
+                <div class="view-controls">
+                    <button id="column-view-btn" class="view-btn active">Vista por Columnas</button>
+                    <button id="filter-view-btn" class="view-btn">Vista con Filtro</button>
+                </div>
+                <div id="column-view" class="view-content">
+                    <div class="barber-columns" id="barber-columns"></div>
+                </div>
+                <div id="filter-view" class="view-content" style="display: none;">
+                    <div class="filter-controls">
+                        <label for="barber-filter" style="color: white; margin-right: 10px;">Filtrar por barbero:</label>
+                        <select id="barber-filter">
+                            <option value="">Todos los barberos</option>
+                            <option value="Pablo">Pablo</option>
+                            <option value="Lautaro">Lautaro</option>
+                            <option value="Nicolas">Nicolas</option>
+                        </select>
+                    </div>
+                    <div id="filtered-appointments"></div>
+                </div>
+            `;
+            appointmentList.appendChild(barberContainer);
 
-    sortedReservations.forEach(reservation => {
-        const listItem = document.createElement('li');
+            // Función para renderizar vista por columnas
+            function renderColumnView() {
+                const barberColumns = document.getElementById('barber-columns');
+                barberColumns.innerHTML = '';
 
-        // Agregar el checkbox al inicio de cada item de la lista
-        listItem.innerHTML = 
-        `<input type="checkbox" class="whatsapp-checkbox" data-id="${reservation.id}" ${reservation.enviar === 'S' ? 'checked' : ''}>
-${reservation.nombre} - ${reservation.hora}hs - ${reservation.profesional} - ${reservation.servicio} - 
-<a href="https://wa.me/${reservation.contacto}?text=${encodeURIComponent(`¡Hola ${reservation.nombre}! Te recordamos tu turno el dia ${reservation.fecha} a las ${reservation.hora} con ${reservation.profesional} para ${reservation.servicio}. En caso de no asistir, avisar por este medio. ¡Te esperamos!`)}" target="_blank">
-    ${reservation.contacto}
-</a>
-<button class="delete-btn" data-id="${reservation.id}"><i class="fas fa-trash"></i></button>`;
+                // Obtener todos los barberos únicos
+                const allBarbers = [...new Set(reservations.map(r => r.profesional))];
+                
+                // Si no hay barberos, mostrar mensaje
+                if (allBarbers.length === 0) {
+                    barberColumns.innerHTML = '<p style="text-align: center; color: #ccc;">No hay turnos reservados</p>';
+                    return;
+                }
+                
+                allBarbers.forEach(barber => {
+                    const barberColumn = document.createElement('div');
+                    barberColumn.className = 'barber-column';
+                    barberColumn.innerHTML = `<h3>${barber}</h3>`;
+                    
+                    // Filtrar reservas por barbero
+                    const barberReservations = reservations.filter(r => r.profesional === barber);
+                    
+                    // Si no hay reservas para este barbero, mostrar mensaje
+                    if (barberReservations.length === 0) {
+                        const noReservationsMsg = document.createElement('p');
+                        noReservationsMsg.textContent = 'Sin turnos';
+                        noReservationsMsg.style.color = '#888';
+                        noReservationsMsg.style.textAlign = 'center';
+                        noReservationsMsg.style.fontStyle = 'italic';
+                        barberColumn.appendChild(noReservationsMsg);
+                    } else {
+                        // Agrupar por fecha
+                        const barberGroupedByDate = barberReservations.reduce((acc, reservation) => {
+                            if (!acc[reservation.fecha]) {
+                                acc[reservation.fecha] = [];
+                            }
+                            acc[reservation.fecha].push(reservation);
+                            return acc;
+                        }, {});
 
-        // `
-        //     <input type="checkbox" class="whatsapp-checkbox" data-id="${reservation.id}" ${reservation.enviar === 'S' ? 'checked' : ''}>
-        //     ${reservation.nombre} - ${reservation.hora}hs - ${reservation.profesional} - ${reservation.servicio} - ${reservation.contacto} 
-        //     <button class="delete-btn" data-id="${reservation.id}"><i class="fas fa-trash"></i></button>
-        // `;
-        list.appendChild(listItem);
+                        // Ordenar fechas para este barbero y filtrar fechas pasadas
+                        const barberSortedDates = Object.keys(barberGroupedByDate)
+                            .filter(date => !isPastDate(date))
+                            .sort((a, b) => parseDate(a) - parseDate(b));
 
-        // Agregar evento para actualizar Firestore cuando cambie el checkbox
-        const checkbox = listItem.querySelector('.whatsapp-checkbox');
-        checkbox.addEventListener('change', async (event) => {
-            const isChecked = event.target.checked;
-            const reservationId = event.target.getAttribute('data-id');
-            
-            // Llamar a la función para actualizar Firestore
-            await updateSendStatus(reservationId, isChecked);
-        });
-    });
+                        barberSortedDates.forEach(date => {
+                            const dayName = getDayName(date);
+                            const dateHeader = document.createElement('h4');
+                            dateHeader.textContent = `${dayName} ${date}`;
+                            barberColumn.appendChild(dateHeader);
 
-    appointmentList.appendChild(list);
-});
+                            const list = document.createElement('ul');
+                            const sortedReservations = sortReservationsByTime(barberGroupedByDate[date]);
+
+                            sortedReservations.forEach(reservation => {
+                                const listItem = document.createElement('li');
+                                listItem.innerHTML = 
+                                `<input type="checkbox" class="whatsapp-checkbox" data-id="${reservation.id}" ${reservation.enviar === 'S' ? 'checked' : ''}>
+                                <span class="appointment-details">
+                                    ${reservation.nombre} - ${reservation.hora}hs - ${reservation.servicio} - 
+                                    <a href="https://wa.me/${reservation.contacto}?text=${encodeURIComponent(`¡Hola ${reservation.nombre}! Te recordamos tu turno el dia ${reservation.fecha} a las ${reservation.hora} con ${reservation.profesional} para ${reservation.servicio}. En caso de no asistir, avisar por este medio. ¡Te esperamos!`)}" target="_blank">
+                                        ${reservation.contacto}
+                                    </a>
+                                </span>
+                                <button class="delete-btn" data-id="${reservation.id}"><i class="fas fa-trash"></i></button>`;
+
+                                list.appendChild(listItem);
+
+                                // Agregar evento para actualizar Firestore cuando cambie el checkbox
+                                const checkbox = listItem.querySelector('.whatsapp-checkbox');
+                                checkbox.addEventListener('change', async (event) => {
+                                    const isChecked = event.target.checked;
+                                    const reservationId = event.target.getAttribute('data-id');
+                                    
+                                    // Llamar a la función para actualizar Firestore
+                                    await updateSendStatus(reservationId, isChecked);
+                                });
+                            });
+
+                            barberColumn.appendChild(list);
+                        });
+                    }
+
+                    barberColumns.appendChild(barberColumn);
+                });
+            }
+
+            // Función para renderizar vista con filtro
+            function renderFilterView() {
+                const filteredAppointments = document.getElementById('filtered-appointments');
+                filteredAppointments.innerHTML = '';
+
+                // Filtrar fechas pasadas
+                const futureDates = sortedDates.filter(date => !isPastDate(date));
+
+                futureDates.forEach(date => {
+                    const dayName = getDayName(date);
+                    const dateHeader = document.createElement('h3');
+                    dateHeader.textContent = `${dayName} ${date}`;
+                    dateHeader.className = `date-header date-${date}`;
+                    filteredAppointments.appendChild(dateHeader);
+
+                    const list = document.createElement('ul');
+                    const sortedReservations = sortReservationsByTime(groupedReservations[date]);
+
+                    sortedReservations.forEach(reservation => {
+                        const listItem = document.createElement('li');
+                        listItem.className = `appointment-item barber-${reservation.profesional.toLowerCase()} date-${reservation.fecha}`;
+                        listItem.innerHTML = 
+                        `<input type="checkbox" class="whatsapp-checkbox" data-id="${reservation.id}" ${reservation.enviar === 'S' ? 'checked' : ''}>
+                        <span class="appointment-details">
+                            <strong>${reservation.profesional}:</strong> ${reservation.nombre} - ${reservation.hora}hs - ${reservation.servicio} - 
+                            <a href="https://wa.me/${reservation.contacto}?text=${encodeURIComponent(`¡Hola ${reservation.nombre}! Te recordamos tu turno el dia ${reservation.fecha} a las ${reservation.hora} con ${reservation.profesional} para ${reservation.servicio}. En caso de no asistir, avisar por este medio. ¡Te esperamos!`)}" target="_blank">
+                                ${reservation.contacto}
+                            </a>
+                        </span>
+                        <button class="delete-btn" data-id="${reservation.id}"><i class="fas fa-trash"></i></button>`;
+
+                        list.appendChild(listItem);
+
+                        // Agregar evento para actualizar Firestore cuando cambie el checkbox
+                        const checkbox = listItem.querySelector('.whatsapp-checkbox');
+                        checkbox.addEventListener('change', async (event) => {
+                            const isChecked = event.target.checked;
+                            const reservationId = event.target.getAttribute('data-id');
+                            
+                            // Llamar a la función para actualizar Firestore
+                            await updateSendStatus(reservationId, isChecked);
+                        });
+                    });
+
+                    filteredAppointments.appendChild(list);
+                });
+            }
+
+            // Renderizar vista inicial (columnas)
+            renderColumnView();
+
+            // Event listeners para cambiar entre vistas
+            document.getElementById('column-view-btn').addEventListener('click', function() {
+                document.getElementById('column-view').style.display = 'block';
+                document.getElementById('filter-view').style.display = 'none';
+                this.classList.add('active');
+                document.getElementById('filter-view-btn').classList.remove('active');
+            });
+
+            document.getElementById('filter-view-btn').addEventListener('click', function() {
+                document.getElementById('column-view').style.display = 'none';
+                document.getElementById('filter-view').style.display = 'block';
+                this.classList.add('active');
+                document.getElementById('column-view-btn').classList.remove('active');
+                renderFilterView();
+            });
+
+            // Event listener para el filtro de barbero
+            document.getElementById('barber-filter').addEventListener('change', function() {
+                const selectedBarber = this.value;
+                const appointmentItems = document.querySelectorAll('.appointment-item');
+                
+                appointmentItems.forEach(item => {
+                    if (selectedBarber === '' || item.classList.contains(`barber-${selectedBarber.toLowerCase()}`)) {
+                        item.style.display = 'flex';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
 
 // Función asíncrona para actualizar el estado de 'enviar' en Firestore
 async function updateSendStatus(reservationId, isChecked) {
@@ -676,6 +845,7 @@ async function updateSendStatus(reservationId, isChecked) {
         <div class="reservations" style="display: none;">
             <h2>TURNOS RESERVADOS</h2>
             <ul id="appointment-list"></ul>
+            <!-- <div class="reservations-grid" id="appointment-list"></div> -->
             <button id="send-whatsapp" class="btn">Enviar WhatsApp</button>
 
             

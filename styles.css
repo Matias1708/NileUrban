@@ -154,7 +154,9 @@ h2, h1, p {
     justify-content: center;
     align-items: center;
     padding: 20px;
-    box-sizing: border-box; 
+    box-sizing: border-box;
+    width: 100%;
+    max-width: none;
 }
 
 /*prueba*/
@@ -171,8 +173,16 @@ button#send-whatsapp {
     background-color: #f9f9f9;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 600px;
     margin-bottom: 20px;
+}
+
+.booking-form {
+    max-width: 600px;
+}
+
+.reservations {
+    max-width: none;
+    width: 100%;
 }
 
 .reservations {
@@ -496,3 +506,528 @@ header {
     object-fit: cover; /* Ajusta la imagen sin deformarla */
     z-index: -1; /* Envía la imagen al fondo */
   }
+
+  /* Estilos para la grilla de turnos */
+.reservations-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Crea columnas flexibles */
+    gap: 20px;
+    padding: 20px;
+    background-color: #2c2c2c; /* Color de fondo */
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+.professional-column {
+    background-color: #3a3a3a;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+}
+
+.professional-column h3 {
+    text-align: center;
+    color: #fff;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #555;
+    padding-bottom: 8px;
+    font-size: 1.5em;
+}
+
+.professional-column h4 {
+    color: #bbb;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    font-size: 1.1em;
+}
+
+.professional-column ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.professional-column ul li {
+    background-color: #444;
+    color: #fff;
+    padding: 12px;
+    margin-bottom: 8px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9em;
+}
+
+.professional-column ul li .appointment-details {
+    flex-grow: 1;
+    margin-right: 10px;
+}
+
+.professional-column ul li .appointment-details a {
+    color: #00e676; /* WhatsApp green */
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.professional-column ul li .appointment-details a:hover {
+    text-decoration: underline;
+}
+
+.delete-btn {
+    background: none;
+    border: none;
+    color: #ff5555;
+    cursor: pointer;
+    font-size: 1.2em;
+    transition: color 0.2s;
+}
+
+.delete-btn:hover {
+    color: #ff0000;
+}
+
+.whatsapp-checkbox {
+    margin-right: 10px;
+}
+
+/* Estilos para la nueva visualización de turnos por barbero */
+.barber-columns-container {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.8);
+    border-radius: 10px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.view-controls {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.view-btn {
+    padding: 12px 25px;
+    background-color: #333;
+    color: white;
+    border: 2px solid #555;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Bank Gothic Light BT', sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.view-btn:hover {
+    background-color: #555;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.view-btn.active {
+    background-color: #c8a97e;
+    border-color: #c8a97e;
+    color: #000;
+    box-shadow: 0 4px 12px rgba(200, 169, 126, 0.4);
+}
+
+.barber-columns {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    margin: 20px auto;
+    width: 100%;
+    max-width: 1400px;
+    padding: 0 12px;
+    justify-items: center;
+}
+
+.barber-column {
+    width: 100%;
+    min-height: 400px;
+}
+
+.barber-column {
+    background: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    border: 2px solid #333;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.barber-column::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #c8a97e, #d4b896, #c8a97e);
+}
+
+.barber-column:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
+    border-color: #c8a97e;
+}
+
+.barber-column h3 {
+    text-align: center;
+    color: #c8a97e;
+    margin-bottom: 30px;
+    border-bottom: 3px solid #c8a97e;
+    padding-bottom: 15px;
+    font-size: 1.6em;
+    font-family: 'Bank Gothic Light BT', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    text-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
+    position: relative;
+    background: linear-gradient(45deg, #c8a97e, #d4b896);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.barber-column h4 {
+    color: #fff;
+    margin-top: 25px;
+    margin-bottom: 15px;
+    font-size: 1.1em;
+    border-left: 4px solid #c8a97e;
+    padding: 12px 20px;
+    background: linear-gradient(90deg, rgba(200, 169, 126, 0.15), rgba(200, 169, 126, 0.05));
+    border-radius: 8px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.barber-column ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.barber-column ul li {
+    background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+    color: #fff;
+    padding: 18px;
+    margin-bottom: 12px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9em;
+    transition: all 0.3s ease;
+    border: 1px solid #444;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    position: relative;
+    overflow: hidden;
+}
+
+.barber-column ul li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, #c8a97e, #d4b896);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.barber-column ul li:hover {
+    background: linear-gradient(135deg, #3a3a3a 0%, #2a2a2a 100%);
+    transform: translateX(8px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+    border-color: #c8a97e;
+}
+
+.barber-column ul li:hover::before {
+    opacity: 1;
+}
+
+.barber-column ul li .appointment-details {
+    flex-grow: 1;
+    margin-right: 15px;
+    line-height: 1.4;
+}
+
+.barber-column ul li .appointment-details a {
+    color: #00e676; /* WhatsApp green */
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.barber-column ul li .appointment-details a:hover {
+    color: #00ff88;
+    text-decoration: underline;
+}
+
+/* Estilos para la vista con filtro */
+.filter-controls {
+    margin-bottom: 25px;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #444;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.filter-controls label {
+    color: #c8a97e;
+    font-family: 'Bank Gothic Light BT', sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    margin-right: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.filter-controls select {
+    padding: 12px 20px;
+    border: 2px solid #555;
+    border-radius: 8px;
+    background: #333;
+    color: white;
+    font-family: 'Bank Gothic Light BT', sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    min-width: 200px;
+}
+
+.filter-controls select option {
+    background: #333;
+    color: white;
+    padding: 10px;
+}
+
+.filter-controls select:focus {
+    outline: none;
+    border-color: #c8a97e;
+    box-shadow: 0 0 10px rgba(200, 169, 126, 0.3);
+    transform: translateY(-2px);
+}
+
+#filtered-appointments h3 {
+    color: #c8a97e;
+    margin-top: 25px;
+    margin-bottom: 20px;
+    border-bottom: 3px solid #c8a97e;
+    padding-bottom: 12px;
+    font-family: 'Bank Gothic Light BT', sans-serif;
+    font-size: 1.5em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.appointment-item {
+    background: linear-gradient(145deg, #3a3a3a, #2a2a2a);
+    color: #fff;
+    padding: 15px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.95em;
+    transition: all 0.3s ease;
+    border: 1px solid #555;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.appointment-item:hover {
+    background: linear-gradient(145deg, #4a4a4a, #3a3a3a);
+    transform: translateX(5px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.appointment-item .appointment-details {
+    flex-grow: 1;
+    margin-right: 15px;
+    line-height: 1.4;
+}
+
+.appointment-item .appointment-details a {
+    color: #00e676; /* WhatsApp green */
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.appointment-item .appointment-details a:hover {
+    color: #00ff88;
+    text-decoration: underline;
+}
+
+/* Estilos para checkboxes de WhatsApp */
+.whatsapp-checkbox {
+    margin-right: 15px;
+    transform: scale(1.3);
+    accent-color: #c8a97e;
+    cursor: pointer;
+}
+
+.whatsapp-checkbox:hover {
+    transform: scale(1.4);
+}
+
+/* Estilos para botones de eliminar */
+.delete-btn {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    border: none;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+}
+
+.delete-btn:hover {
+    background: linear-gradient(135deg, #c0392b, #a93226);
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.5);
+}
+
+.delete-btn i {
+    font-size: 12px;
+}
+
+/* Media Queries para responsividad */
+@media (max-width: 1200px) {
+    .barber-columns {
+        grid-template-columns: repeat(3, 1fr);
+        max-width: 1200px;
+        gap: 30px;
+    }
+}
+
+@media (max-width: 900px) {
+    .barber-columns {
+        grid-template-columns: repeat(2, 1fr);
+        max-width: 900px;
+        gap: 25px;
+    }
+}
+
+@media (max-width: 768px) {
+    .reservations-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .barber-columns {
+        grid-template-columns: 1fr;
+        max-width: 100%;
+        gap: 20px;
+        padding: 0 8px;
+        margin: 10px auto;
+    }
+    
+    .barber-column {
+        min-height: auto;
+        width: 100%;
+        max-width: 100%;
+        padding: 15px;
+        box-sizing: border-box;
+    }
+    
+    .view-controls {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .view-btn {
+        width: 200px;
+        margin-bottom: 10px;
+    }
+    
+    .barber-column ul li {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 12px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+    
+    .appointment-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .barber-column h3 {
+        font-size: 1.4em;
+        letter-spacing: 2px;
+    }
+    
+    .barber-column h4 {
+        font-size: 1em;
+        padding: 8px 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .barber-columns-container {
+        padding: 5px;
+    }
+    
+    .barber-columns {
+        padding: 0 5px;
+        gap: 15px;
+    }
+    
+    .barber-column {
+        padding: 10px;
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    .barber-column h3 {
+        font-size: 1.2em;
+        letter-spacing: 1px;
+    }
+    
+    .barber-column h4 {
+        font-size: 0.9em;
+        padding: 6px 10px;
+    }
+    
+    .barber-column ul li {
+        padding: 10px;
+        font-size: 0.85em;
+    }
+    
+    .appointment-details {
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+}
