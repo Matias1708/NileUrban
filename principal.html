@@ -445,8 +445,8 @@ async function updateSendStatus(reservationId, isChecked) {
             // Estas son exclusiones de turnos *fijos* que no están disponibles, *además* de los filtros por horario de inicio
             const professionalSpecificExclusions = {
                 'Nicolas': {
-                    1: ['10:15','11:00','16:30'], // Martes (2): 12:30 excluido
-                    2: ['18:00'],
+                    1: ['10:15','11:00'], // Martes (2): 12:30 excluido
+                    2: ['18:00','18:45'],
                     3: ['17:15','18:00'], // Jueves (4): 17:15 y 18:00 excluidos
                     4: ['10:15', '14:15','17:15'] // Viernes (5): 10:15 y 14:15 excluidos
                 },
