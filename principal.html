@@ -372,13 +372,16 @@ async function updateSendStatus(reservationId, isChecked) {
             return;
         }
 
-        if (professional === 'Matias') {
-            const dayOfWeek = selectedDate.getDay();
-            if (dayOfWeek !== 4 && dayOfWeek !== 5) {
-                alert('Matias solo ofrece turnos los viernes y sábados.');
-                return;
-            }
-        }
+       // POR ESTA (convertir a día laboral):
+if (professional === 'Matias') {
+    const dayOfWeek = selectedDate.getDay();
+    // Convertir: Martes=2→1, Miércoles=3→2, Jueves=4→3, Viernes=5→4, Sábado=6→5
+    const diaLaboral = dayOfWeek >= 2 ? dayOfWeek - 1 : null;
+    if (diaLaboral !== 4 && diaLaboral !== 5) {
+        alert('Matias solo ofrece turnos los viernes y sábados.');
+        return;
+    }
+}
 
         // Resto del código de validación y reserva...
         // Verificar si la hora está disponible
@@ -481,16 +484,16 @@ async function updateSendStatus(reservationId, isChecked) {
             const dayOfWeek = dateObj.getDay();
             console.log('Día de la semana (0=Dom, 1=Lun, etc.):', dayOfWeek);
 
-            if (professional === 'Matias' && dayOfWeek !== 4 && dayOfWeek !== 5) {
-                console.log('Matias solo atiende viernes y sábados. Fecha seleccionada inválida.');
+            if (professional === 'Matias' && dayOfWeek !== 4 && dayOfWeek !== 5) { 
+                //console.log('Matias solo atiende viernes y sábados. Fecha seleccionada inválida.');
                 timeSelect.innerHTML = '';
                 const defaultOption = document.createElement('option');
                 defaultOption.value = '';
-                defaultOption.textContent = 'Seleccione un viernes o sábado';
+                //defaultOption.textContent = 'Seleccione un viernes o sábado';
                 defaultOption.disabled = true;
                 defaultOption.selected = true;
                 timeSelect.appendChild(defaultOption);
-                noAvailableMessage.textContent = 'Matias solo atiende viernes y sábados.';
+                //noAvailableMessage.textContent = 'Matias solo atiende viernes y sábados.';
                 noAvailableMessage.style.display = 'block';
                 console.log('--- populateTimeOptions FINALIZADA (día inválido para Matias) ---');
                 return;
