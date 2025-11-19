@@ -371,6 +371,14 @@ async function updateSendStatus(reservationId, isChecked) {
             return;
         }
 
+        if (professional === 'Matias') {
+            const dayOfWeek = selectedDate.getDay();
+            if (dayOfWeek !== 4 && dayOfWeek !== 5) {
+                alert('Matias solo ofrece turnos los viernes y sábados.');
+                return;
+            }
+        }
+
         // Resto del código de validación y reserva...
         // Verificar si la hora está disponible
         const reservations = await getReservationsForDateAndProfessional(date, professional);
@@ -417,6 +425,7 @@ async function updateSendStatus(reservationId, isChecked) {
             if (!date || !professional) {
                 console.log('Fecha o profesional no seleccionados. Limpiando selector de hora.');
                 timeSelect.innerHTML = '<option value="">Seleccione fecha y profesional</option>'; // Reset message
+                noAvailableMessage.textContent = 'No hay turnos disponibles para la fecha seleccionada.';
                 noAvailableMessage.style.display = 'none';
                 console.log('--- populateTimeOptions FINALIZADA (sin fecha/profesional) ---');
                 return;
@@ -470,6 +479,22 @@ async function updateSendStatus(reservationId, isChecked) {
             // Determinar el día de la semana (0 = Domingo, 1 = Lunes, ..., 6 = Sábado)
             const dayOfWeek = dateObj.getDay();
             console.log('Día de la semana (0=Dom, 1=Lun, etc.):', dayOfWeek);
+
+            if (professional === 'Matias' && dayOfWeek !== 4 && dayOfWeek !== 5) {
+                console.log('Matias solo atiende viernes y sábados. Fecha seleccionada inválida.');
+                timeSelect.innerHTML = '';
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.textContent = 'Seleccione un viernes o sábado';
+                defaultOption.disabled = true;
+                defaultOption.selected = true;
+                timeSelect.appendChild(defaultOption);
+                noAvailableMessage.textContent = 'Matias solo atiende viernes y sábados.';
+                noAvailableMessage.style.display = 'block';
+                console.log('--- populateTimeOptions FINALIZADA (día inválido para Matias) ---');
+                return;
+            }
+            noAvailableMessage.textContent = 'No hay turnos disponibles para la fecha seleccionada.';
 
 
             // Obtener la hora actual
@@ -812,6 +837,7 @@ async function updateSendStatus(reservationId, isChecked) {
                 <div class="form-group">
                     <label for="professional">PROFESIONAL:</label>
                     <select id="professional" required>
+                        <option value="Matias">Matias</option>
                         <option value="Pablo">Pablo</option>
                         <option value="Lautaro">Lautaro</option>
                         <option value="Nicolas">Nicolas</option>
