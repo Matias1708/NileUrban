@@ -345,7 +345,11 @@ async function updateSendStatus(reservationId, isChecked) {
             });
             return reservations;
         }
+        let isBooking = false;
+
         async function bookAppointment() {
+    if (isBooking) return;
+
     const name = document.getElementById('name').value;
     const date = document.getElementById('calendar').value;
     const time = document.getElementById('time').value;
@@ -384,17 +388,28 @@ if (professional === 'Matias') {
 }
 
         // Resto del código de validación y reserva...
-        // Verificar si la hora está disponible
-        const reservations = await getReservationsForDateAndProfessional(date, professional);
-        const reservedTimes = reservations.map(reservation => reservation.hora);
+        const bookBtn = document.getElementById('book-button');
+        const setBookingState = (active) => {
+            isBooking = active;
+            if (bookBtn) {
+                bookBtn.disabled = active;
+                bookBtn.textContent = active ? 'Reservando...' : 'RESERVAR';
+            }
+        };
 
-        if (reservedTimes.includes(time)) {
-            alert('La hora seleccionada ya está reservada. Por favor, elige otra hora.');
-            return;
-        }
+        setBookingState(true);
 
-        // Guardar la reserva en Firebase
         try {
+            // Verificar si la hora está disponible
+            const reservations = await getReservationsForDateAndProfessional(date, professional);
+            const reservedTimes = reservations.map(reservation => reservation.hora);
+
+            if (reservedTimes.includes(time)) {
+                alert('La hora seleccionada ya está reservada. Por favor, elige otra hora.');
+                return;
+            }
+
+            // Guardar la reserva en Firebase
             await addDoc(collection(db, 'Reserva'), {
                 nombre: name,
                 fecha: date,
@@ -409,6 +424,8 @@ if (professional === 'Matias') {
             showConfirmationModal();
         } catch (error) {
             console.error('Error al añadir la reserva: ', error);
+        } finally {
+            setBookingState(false);
         }
     } else {
         alert('Por favor, completa todos los campos.');
