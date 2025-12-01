@@ -962,8 +962,8 @@ if (professional === 'Matias') {
         if (!serviceSelect) return;
 
         // Si no hay fecha, usar precios base (martes/miércoles)
-        let corte = 16000;
-        let corteBarba = 18000;
+        let corte = 18000;
+        let corteBarba = 20000;
         if (fechaStr) {
             // Detectar formato: DD/MM/YYYY
             let partes = fechaStr.split('/');
@@ -981,18 +981,18 @@ if (professional === 'Matias') {
             if (dateObj && !isNaN(dateObj)) {
                 const dia = dateObj.getDay(); // 0=Dom, 1=Lun, 2=Mar, 3=Mié, 4=Jue, 5=Vie, 6=Sáb
                 if (dia === 2 || dia === 3) { // Martes o Miércoles
-                    corte = 16000;
-                    corteBarba = 18000;
-                } else if (dia >= 4 && dia <= 6) { // Jueves, Viernes, Sábado
                     corte = 18000;
                     corteBarba = 20000;
+                } else if (dia >= 4 && dia <= 6) { // Jueves, Viernes, Sábado
+                    corte = 20000;
+                    corteBarba = 22000;
                 }
             }
         }
         serviceSelect.innerHTML = `
             <option value="Corte">Corte $${corte.toLocaleString('es-AR')}</option>
             <option value="Corte + Barba">Corte + Barba $${corteBarba.toLocaleString('es-AR')}</option>
-            <option value="Barba">Barba $12.000</option>
+            <option value="Barba">Barba $14.000</option>
         `;
     }
 
