@@ -381,10 +381,10 @@ if (professional === 'Matias') {
     const dayOfWeek = selectedDate.getDay();
     // Convertir: Martes=2→1, Miércoles=3→2, Jueves=4→3, Viernes=5→4, Sábado=6→5
     const diaLaboral = dayOfWeek >= 2 ? dayOfWeek - 1 : null;
-    if (diaLaboral !== 4 && diaLaboral !== 5) {
-        alert('Matias solo ofrece turnos los viernes y sábados.');
-        return;
-    }
+    if (diaLaboral !== 3 && diaLaboral !== 4 && diaLaboral !== 5) {
+    alert('Matias solo ofrece turnos los jueves, viernes y sábados.');
+    return;
+}
 }
 
         // Resto del código de validación y reserva...
@@ -501,7 +501,7 @@ if (professional === 'Matias') {
             const dayOfWeek = dateObj.getDay();
             console.log('Día de la semana (0=Dom, 1=Lun, etc.):', dayOfWeek);
 
-            if (professional === 'Matias' && dayOfWeek !== 4 && dayOfWeek !== 5) { 
+            if (professional === 'Matias' && dayOfWeek !== 3 && dayOfWeek !== 4 && dayOfWeek !== 5) { 
                 //console.log('Matias solo atiende viernes y sábados. Fecha seleccionada inválida.');
                 timeSelect.innerHTML = '';
                 const defaultOption = document.createElement('option');
@@ -550,7 +550,10 @@ if (professional === 'Matias') {
             //      timesToIterate = timesToIterate.filter(time => time >= '13:30');
             //  }
 
-            if (professional === 'Nicolas' && dayOfWeek === 2) { // Nicolas los Miércoles (3) empieza a las 14:15
+            if (professional === 'Matias' && dayOfWeek === 3) { // Matias los Jueves (4) empieza a las 12:30
+    console.log('Matias: aplicando filtro de inicio (>= 12:30) para Jueves.');
+    timesToIterate = timesToIterate.filter(time => time >= '12:30');
+} else if (professional === 'Nicolas' && dayOfWeek === 2) { // Nicolas los Miércoles (3) empieza a las 14:15
     console.log('Nicolas: aplicando filtro de inicio (>= 14:15) para Miércoles.');
     timesToIterate = timesToIterate.filter(time => time >= '14:15');
 } else if (professional === 'Lautaro' && dayOfWeek === 1) { // Lautaro los Martes (2) empieza a las 13:30
