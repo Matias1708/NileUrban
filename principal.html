@@ -425,13 +425,42 @@ async function updateSendStatus(reservationId, isChecked) {
 // }
 // }
 // Validación de disponibilidad de Matías, con excepción para Lunes 22 y 29
+// if (professional === 'Matias') {
+    
+//     // 🟢 EXCEPCIÓN PARA LUNES ESPECIALES 🟢
+//     // La variable 'date' (DD/MM/YYYY) está disponible en la función.
+//     if (date === '22/12/2025' || date === '29/12/2025') {
+//         console.log('Matias: Lunes especial habilitado para reserva.');
+//         // Si es un lunes especial, la función continúa sin mostrar la alerta.
+//     } else {
+//         // Validación normal de días (Jueves, Viernes, Sábado)
+//         const dayOfWeek = selectedDate.getDay();
+//         // Convertir: Martes=2→1, Miércoles=3→2, Jueves=4→3, Viernes=5→4, Sábado=6→5
+//         const diaLaboral = dayOfWeek >= 2 ? dayOfWeek - 1 : null;
+        
+//         if (diaLaboral !== 3 && diaLaboral !== 4 && diaLaboral !== 5) {
+//             alert('Matias solo ofrece turnos los jueves, viernes y sábados.');
+//             return;
+//         }
+//     }
+// }
+
 if (professional === 'Matias') {
     
-    // 🟢 EXCEPCIÓN PARA LUNES ESPECIALES 🟢
+    // 🟢 EXCEPCIÓN PARA DÍAS ESPECIALES 🟢
     // La variable 'date' (DD/MM/YYYY) está disponible en la función.
-    if (date === '22/12/2025' || date === '29/12/2025') {
-        console.log('Matias: Lunes especial habilitado para reserva.');
-        // Si es un lunes especial, la función continúa sin mostrar la alerta.
+    const specialDates = [
+        '22/12/2025', 
+        '23/12/2025', // 👈 ¡Nuevo! Martes 23
+        '24/12/2025', // 👈 ¡Nuevo! Miércoles 24
+        '29/12/2025', 
+        '30/12/2025', // 👈 ¡Nuevo! Martes 30
+        '31/12/2025'  // 👈 ¡Nuevo! Miércoles 31
+    ];
+
+    if (specialDates.includes(date)) {
+        console.log('Matias: Día especial habilitado para reserva.');
+        // Si es un día especial, la función continúa sin mostrar la alerta.
     } else {
         // Validación normal de días (Jueves, Viernes, Sábado)
         const dayOfWeek = selectedDate.getDay();
@@ -551,21 +580,51 @@ async function populateTimeOptions() {
     const dateObj = new Date(formattedDate);
     const dayOfWeek = dateObj.getDay(); // 0 = Domingo, 1 = Lunes, ..., 6 = Sábado
 
-    // Restricción de Matías (solo Jueves, Viernes, Sábado)
+    // // Restricción de Matías (solo Jueves, Viernes, Sábado)
+    // if (professional === 'Matias' && dayOfWeek !== 3 && dayOfWeek !== 4 && dayOfWeek !== 5) { 
+    //     // Permite excepciones especiales de lunes antes de este return
+    //     if (date !== '22/12/2025' && date !== '29/12/2025') {
+    //         timeSelect.innerHTML = '';
+    //         const defaultOption = document.createElement('option');
+    //         defaultOption.value = '';
+    //         defaultOption.disabled = true;
+    //         defaultOption.selected = true;
+    //         timeSelect.appendChild(defaultOption);
+    //         noAvailableMessage.style.display = 'block';
+    //         console.log('--- populateTimeOptions FINALIZADA (día inválido para Matias) ---');
+    //         return;
+    //     }
+    // }
+
     if (professional === 'Matias' && dayOfWeek !== 3 && dayOfWeek !== 4 && dayOfWeek !== 5) { 
-        // Permite excepciones especiales de lunes antes de este return
-        if (date !== '22/12/2025' && date !== '29/12/2025') {
-            timeSelect.innerHTML = '';
-            const defaultOption = document.createElement('option');
-            defaultOption.value = '';
-            defaultOption.disabled = true;
-            defaultOption.selected = true;
-            timeSelect.appendChild(defaultOption);
-            noAvailableMessage.style.display = 'block';
-            console.log('--- populateTimeOptions FINALIZADA (día inválido para Matias) ---');
-            return;
-        }
+    // Permite excepciones especiales de días antes de este return
+    
+    // Lista de todas las excepciones especiales
+    const specialDates = [
+        '22/12/2025', 
+        '23/12/2025', // 👈 ¡Nuevo!
+        '24/12/2025', // 👈 ¡Nuevo!
+        '29/12/2025', 
+        '30/12/2025', // 👈 ¡Nuevo!
+        '31/12/2025'  // 👈 ¡Nuevo!
+    ];
+
+    // Si la fecha actual NO está incluida en las fechas especiales, entonces bloqueamos.
+    if (!specialDates.includes(date)) {
+        timeSelect.innerHTML = '';
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.disabled = true;
+        defaultOption.selected = true;
+        defaultOption.textContent = 'Selecciona un horario'; // Añadido para mejor UX
+        timeSelect.appendChild(defaultOption);
+        noAvailableMessage.style.display = 'block';
+        console.log('--- populateTimeOptions FINALIZADA (día inválido para Matias) ---');
+        return;
     }
+
+    // Si la fecha SÍ está en specialDates, el código continúa y se cargan los horarios.
+}
     noAvailableMessage.textContent = 'No hay turnos disponibles para la fecha seleccionada.';
 
 
@@ -1118,8 +1177,10 @@ function parseDate(dateString) {
     // Enviar mensajes con setTimeout para asegurar la apertura correcta de cada mensaje
     reservations.forEach((reservation, index) => {
         const phoneNumber = `549${reservation.contacto}`;
-        const message = `¡Hola ${reservation.nombre}! Te recordamos tu turno de mañana a las ${reservation.hora} con ${reservation.profesional} para ${reservation.servicio}. ¡Te esperamos!`;
+        // const message = `¡Hola ${reservation.nombre}! Te recordamos tu turno de mañana a las ${reservation.hora} con ${reservation.profesional} para ${reservation.servicio}. ¡Te esperamos!`;
+        const message = `¡Hola ${reservation.nombre}! Te recordamos tu turno de mañana a las ${reservation.hora} con ${reservation.profesional} para ${reservation.servicio}. ¡Te esperamos!
 
+        **Recordatorio importante:** En caso de no poder asistir, solicitamos avisar con un mínimo de **2 horas de anticipación**. De lo contrario, se deberá abonar el valor total del servicio.`;
         console.log(`Enviando mensaje a: ${phoneNumber}`);
         console.log(`Mensaje: ${message}`);
 
