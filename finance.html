@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Finanzas - Nile Urban Lounge</title>
+    <!-- Estilos reutilizados -->
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: 'Bank Gothic Light BT', sans-serif;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Login Modal Styles */
+        #login-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('images/newequipo.jpg');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .login-box {
+            background-color: rgba(30, 30, 30, 0.6);
+            backdrop-filter: blur(5px);
+            padding: 40px;
+            border-radius: 10px;
+            text-align: center;
+            width: 90%;
+            max-width: 300px;
+            border: 1px solid #333;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #444;
+            background-color: #2d2d2d;
+            color: white;
+        }
+
+        .btn {
+            background-color: #d4af37;
+            /* Gold color matching original site */
+            color: black;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #b5952f;
+        }
+
+        .btn-danger {
+            background-color: #ff4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #cc0000;
+        }
+
+        /* Dashboard Styles */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filters select {
+            padding: 8px;
+            border-radius: 5px;
+            background-color: #2d2d2d;
+            color: white;
+            border: 1px solid #444;
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background-color: #1e1e1e;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            border: 1px solid #333;
+        }
+
+        .card h3 {
+            color: #888;
+            font-size: 0.9em;
+            margin-top: 0;
+        }
+
+        .card .amount {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 10px 0;
+            color: #d4af37;
+        }
+
+        .card.income .amount {
+            color: #4caf50;
+        }
+
+        .card.expense .amount {
+            color: #f44336;
+        }
+
+        .card.balance .amount {
+            color: #2196f3;
+        }
+
+        .charts-section {
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 40px;
+            border: 1px solid #333;
+        }
+
+        .expense-management {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .expense-management {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .filters {
+                flex-wrap: wrap;
+                width: 100%;
+            }
+
+            .filters select {
+                flex-grow: 1;
+            }
+
+            .container {
+                padding: 10px;
+            }
+        }
+
+        .expense-form,
+        .expense-list {
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #333;
+        }
+
+        .expense-form input,
+        .expense-form select,
+        .expense-form button {
+            width: 100%;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #444;
+            background-color: #2d2d2d;
+            color: white;
+            box-sizing: border-box;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #333;
+        }
+
+        th {
+            color: #d4af37;
+        }
+
+        /* Spinner */
+        #loader {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        /* Barber Stats Styles */
+        .barber-stats-section {
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 40px;
+            border: 1px solid #333;
+        }
+
+        .barber-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .barber-table th,
+        .barber-table td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #333;
+        }
+
+        .barber-table th {
+            color: #d4af37;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Login Modal -->
+    <div id="login-modal">
+        <div class="login-box">
+            <h2 style="color: #d4af37;">Acceso Personal</h2>
+            <p>Ingresa la contraseña para ver las finanzas</p>
+            <form id="login-form">
+                <input type="password" id="password-input" placeholder="Contraseña">
+                <button type="submit" class="btn">Entrar</button>
+            </form>
+            <p id="login-error" style="color: red; display: none; margin-top: 10px;">Contraseña incorrecta</p>
+        </div>
+    </div>
+
+    <div id="main-content" class="container" style="display: none;">
+        <div class="dashboard-header">
+            <h1><i class="fas fa-chart-line"></i> Panel de Finanzas</h1>
+            <div class="filters">
+                <input type="text" id="filter-client" placeholder="Buscar Cliente..."
+                    style="padding: 8px; border-radius: 5px; background: #2d2d2d; color: white; border: 1px solid #444;">
+
+                <!-- NEW: Date Range Filter -->
+                <select id="filter-range"
+                    style="padding: 8px; border-radius: 5px; background: #2d2d2d; color: white; border: 1px solid #444; margin-right: 5px;">
+                    <option value="month" selected>Ver por Mes</option>
+                    <option value="today">Hoy</option>
+                    <option value="3days">Últimos 3 Días</option>
+                    <option value="week">Esta Semana</option>
+                </select>
+
+                <select id="filter-barber">
+                    <option value="all">Todos los Barberos</option>
+                    <!-- Opciones generadas por JS -->
+                </select>
+                <select id="filter-month">
+                    <!-- Opciones generadas por JS -->
+                </select>
+                <select id="filter-year">
+                    <!-- Opciones generadas por JS -->
+                </select>
+                <button id="logout-btn" class="btn"
+                    style="background-color: #333; border: 1px solid #555; color: #fff;">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="loader"><i class="fas fa-spinner fa-spin fa-2x"></i> Cargando datos...</div>
+
+        <div class="cards-container">
+            <div class="card income">
+                <h3><i class="fas fa-arrow-down"></i> Ingresos Totales</h3>
+                <div class="amount" id="total-income">$0</div>
+                <p>Calculado de Reservas</p>
+            </div>
+            <div class="card expense">
+                <h3><i class="fas fa-arrow-up"></i> Gastos Totales</h3>
+                <div class="amount" id="total-expenses">$0</div>
+                <p>Gastos registrados</p>
+            </div>
+            <div class="card balance">
+                <h3><i class="fas fa-balance-scale"></i> Balance Neto</h3>
+                <div class="amount" id="net-balance">$0</div>
+                <p>Ingresos - Gastos</p>
+            </div>
+        </div>
+
+        <!-- NEW: Manual Reservation Entry -->
+        <div id="manual-reservation-section" class="expense-management" style="margin-bottom: 40px;">
+            <div class="expense-form" style="grid-column: span 2;">
+                <h3 style="color: #d4af37; margin-top: 0;"><i class="fas fa-calendar-plus"></i> Registrar Turno Manual
+                </h3>
+                <form id="add-reservation-form"
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div>
+                        <label>Cliente</label>
+                        <input type="text" id="manual-client" required placeholder="Nombre del cliente">
+                    </div>
+                    <div>
+                        <label>Servicio</label>
+                        <select id="manual-service">
+                            <option value="Corte">Corte</option>
+                            <option value="Corte + Barba">Corte + Barba</option>
+                            <option value="Barba">Barba</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Fecha</label>
+                        <input type="date" id="manual-date" required>
+                    </div>
+                    <!-- Hora removida -->
+                    <div>
+                        <label>Profesional</label>
+                        <select id="manual-barber">
+                            <!-- Options filled by JS -->
+                        </select>
+                        <input type="text" id="manual-barber-readonly" style="display: none;" readonly>
+                    </div>
+                    <div style="grid-column: span 1; display: flex; align-items: flex-end;">
+                        <button type="submit" class="btn" style="width: 100%; margin-bottom: 15px;">Registrar
+                            Turno</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- NEW: Barber Breakdown Section -->
+        <div class="barber-stats-section">
+            <h3 style="color: #d4af37; margin-top: 0;"><i class="fas fa-users"></i> Desglose por Barbero</h3>
+            <table class="barber-table">
+                <thead>
+                    <tr>
+                        <th>Barbero</th>
+                        <th>Cantidad de Cortes</th>
+                        <th>Total Generado</th>
+                    </tr>
+                </thead>
+                <tbody id="barber-table-body">
+                    <!-- JS generated -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- NEW: Detailed Service List -->
+        <div class="barber-stats-section">
+            <h3 style="color: #d4af37; margin-top: 0;"><i class="fas fa-list"></i> Detalle de Servicios</h3>
+            <div style="overflow-x: auto; max-height: 400px; overflow-y: auto;">
+                <table class="barber-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Hora</th>
+                            <th>Barbero</th>
+                            <th>Cliente</th>
+                            <th>Servicio</th>
+                            <th>Precio</th>
+                        </tr>
+                    </thead>
+                    <tbody id="services-table-body">
+                        <!-- JS generated -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="charts-section">
+            <canvas id="financeChart"></canvas>
+        </div>
+
+        <div id="expense-management-section" class="expense-management">
+            <div class="expense-form">
+                <h3 style="color: #d4af37; margin-top: 0;">Registrar Nuevo Gasto</h3>
+                <form id="add-expense-form">
+                    <label>Descripción</label>
+                    <input type="text" id="expense-desc" required placeholder="Ej. Compra de insumos">
+
+                    <label>Monto ($)</label>
+                    <input type="number" id="expense-amount" required placeholder="0.00" min="0">
+
+                    <label>Categoría</label>
+                    <select id="expense-category">
+                        <option value="Insumos">Insumos</option>
+                        <option value="Servicios">Servicios (Luz, Agua, etc.)</option>
+                        <option value="Sueldos">Sueldos/Comisiones</option>
+                        <option value="Mantenimiento">Mantenimiento</option>
+                        <option value="Otros">Otros</option>
+                    </select>
+
+                    <label>Fecha</label>
+                    <input type="date" id="expense-date" required>
+
+                    <button type="submit" class="btn">Agregar Gasto</button>
+                </form>
+            </div>
+
+            <div class="expense-list">
+                <h3 style="color: #d4af37; margin-top: 0;">Últimos Gastos</h3>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Descripción</th>
+                                <th>Categoría</th>
+                                <th>Monto</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expenses-table-body">
+                            <!-- Filas generadas por JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Script Logic -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
+        import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, query, where, Timestamp, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+
+        // --- Configuración de Firebase (Copiada de principal.html) ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyA_vfbPHFvTTg6HbsqPD4ym50Q2pfxnLYU",
+            authDomain: "nileurban-c9bd9.firebaseapp.com",
+            projectId: "nileurban-c9bd9",
+            storageBucket: "nileurban-c9bd9.appspot.com",
+            messagingSenderId: "798328145085",
+            appId: "1:798328145085:web:8ad8642e133fdd6fab63d4",
+            measurementId: "G-44H22X36PS"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // --- Estado Global ---
+        let allReservations = [];
+        let allExpenses = [];
+        let financeChart = null;
+        let uniqueBarbers = new Set();
+        let currentUser = null; // { name: '...', role: 'admin'|'barber' }
+
+        const USERS = {
+            'nico1234': { name: 'Nicolas', role: 'admin' },
+            'lautaro123': { name: 'Lautaro', role: 'barber' },
+            'pablo123': { name: 'Pablo', role: 'barber' },
+            'matias123': { name: 'Matias', role: 'barber' }
+        };
+
+        // --- Login Logic ---
+        const loginModal = document.getElementById('login-modal');
+        const loginForm = document.getElementById('login-form');
+        const passwordInput = document.getElementById('password-input');
+        const loginError = document.getElementById('login-error');
+        const mainContent = document.getElementById('main-content');
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const pass = passwordInput.value.trim();
+            const user = USERS[pass];
+
+            if (user) {
+                currentUser = user;
+                loginModal.style.display = 'none';
+                mainContent.style.display = 'block';
+
+                // Personalización de bienvenida o UI
+                console.log(`Logueado como ${user.name} (${user.role})`);
+
+                initDashboard();
+            } else {
+                loginError.style.display = 'block';
+            }
+        });
+
+        // Logout Logic
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            if (confirm('¿Cerrar sesión?')) {
+                location.reload();
+            }
+        });
+
+        const addReservationForm = document.getElementById('add-reservation-form');
+
+        addReservationForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const client = document.getElementById('manual-client').value;
+            const service = document.getElementById('manual-service').value;
+            const dateInput = document.getElementById('manual-date').value; // YYYY-MM-DD
+            const time = "00:00"; // Default time for manual entries
+
+            let professional;
+            if (currentUser.role === 'admin') {
+                professional = document.getElementById('manual-barber').value;
+            } else {
+                professional = currentUser.name;
+            }
+
+            // Formatear fecha a DD/MM/YYYY para coincidir con schema existente
+            const [year, month, day] = dateInput.split('-');
+            const formattedDate = `${day}/${month}/${year}`;
+
+            try {
+                document.getElementById('loader').style.display = 'block';
+                await addDoc(collection(db, 'Reserva'), {
+                    nombre: client,
+                    servicio: service,
+                    fecha: formattedDate,
+                    hora: time,
+                    profesional: professional,
+                    telefono: '', // Opcional para manual
+                    email: ''     // Opcional para manual
+                });
+
+                alert('Turno registrado correctamente');
+                addReservationForm.reset();
+                // Reset date to today
+                document.getElementById('manual-date').valueAsDate = new Date();
+
+                await loadData();
+            } catch (error) {
+                console.error("Error adding reservation:", error);
+                alert("Error registrando turno: " + error.message);
+            } finally {
+                document.getElementById('loader').style.display = 'none';
+            }
+        });
+
+        // --- Precios (Lógica replicada) ---
+        // Martes(2)/Miércoles(3): Corte 18000, Corte+Barba 20000
+        // Jueves(4)/Viernes(5)/Sábado(6): Corte 20000, Corte+Barba 22000
+        // Barba siempre 14000
+        function getPrice(service, dateString) {
+            const parts = dateString.split('/'); // DD/MM/YYYY
+            if (parts.length !== 3) return 0;
+
+            const date = new Date(parts[2], parts[1] - 1, parts[0]);
+            const day = date.getDay(); // 0-6
+
+            let corte = 18000;
+            let corteBarba = 20000;
+            let barba = 14000;
+
+            if (day >= 4 && day <= 6) { // Jueves, Viernes, Sábado
+                corte = 20000;
+                corteBarba = 22000;
+            }
+
+            if (service.includes('Corte + Barba')) return corteBarba;
+            if (service.includes('Corte')) return corte;
+            if (service.includes('Barba')) return barba;
+
+            return 0; // Servicio no reconocido
+        }
+
+        // --- Inicialización ---
+        async function initDashboard() {
+            populateDateFilters();
+
+            // Set fecha por defecto en formulario de gastos y de turnos
+            const today = new Date();
+            document.getElementById('expense-date').valueAsDate = today;
+            document.getElementById('manual-date').valueAsDate = today;
+
+            document.getElementById('filter-month').addEventListener('change', updateUI);
+            document.getElementById('filter-year').addEventListener('change', updateUI);
+            document.getElementById('filter-barber').addEventListener('change', updateUI);
+            document.getElementById('filter-client').addEventListener('input', updateUI);
+            document.getElementById('filter-range').addEventListener('change', updateUI);
+
+            await loadData();
+        }
+
+        function populateDateFilters() {
+            const monthSelect = document.getElementById('filter-month');
+            const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+
+            months.forEach((m, index) => {
+                const opt = document.createElement('option');
+                opt.value = index;
+                opt.textContent = m;
+                if (index === new Date().getMonth()) opt.selected = true;
+                monthSelect.appendChild(opt);
+            });
+
+            const optAll = document.createElement('option');
+            optAll.value = "all";
+            optAll.textContent = "Todos los Meses";
+            monthSelect.prepend(optAll);
+
+            const yearSelect = document.getElementById('filter-year');
+            const currentYear = new Date().getFullYear();
+            for (let y = currentYear; y >= 2024; y--) {
+                const opt = document.createElement('option');
+                opt.value = y;
+                opt.textContent = y;
+                yearSelect.appendChild(opt);
+            }
+        }
+
+        // --- Carga de Datos ---
+        async function loadData() {
+            document.getElementById('loader').style.display = 'block';
+
+            try {
+                // 1. Cargar Reservas (Ingresos)
+                const resSnapshot = await getDocs(collection(db, 'Reserva'));
+                allReservations = [];
+                uniqueBarbers = new Set();
+
+                resSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.fecha && data.servicio) {
+                        if (data.profesional) uniqueBarbers.add(data.profesional);
+                        allReservations.push({
+                            id: doc.id,
+                            ...data,
+                            price: getPrice(data.servicio, data.fecha),
+                            dateObj: parseDate(data.fecha)
+                        });
+                    }
+                });
+
+                // Populate Barber Filter
+                const barberSelect = document.getElementById('filter-barber');
+                // Keep 'All' option or reset
+                barberSelect.innerHTML = '<option value="all">Todos los Barberos</option>';
+                uniqueBarbers.forEach(barber => {
+                    const opt = document.createElement('option');
+                    opt.value = barber;
+                    opt.textContent = barber;
+                    barberSelect.appendChild(opt);
+                });
+
+                // Populate Manual Reservation Barber Select (For Admin)
+                const manualBarberSelect = document.getElementById('manual-barber');
+                manualBarberSelect.innerHTML = '';
+                uniqueBarbers.forEach(barber => {
+                    const opt = document.createElement('option');
+                    opt.value = barber;
+                    opt.textContent = barber;
+                    manualBarberSelect.appendChild(opt);
+                });
+
+                // 2. Cargar Gastos
+                const expSnapshot = await getDocs(query(collection(db, 'Gastos'), orderBy('date', 'desc')));
+                allExpenses = [];
+                expSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    allExpenses.push({
+                        id: doc.id,
+                        ...data,
+                        // Convertir string YYYY-MM-DD a Date object para filtrado consistente
+                        dateObj: new Date(data.date + 'T00:00:00')
+                    });
+                });
+
+                updateUI();
+
+            } catch (error) {
+                console.error("Error loading data:", error);
+                alert("Error cargando datos: " + error.message);
+            } finally {
+                document.getElementById('loader').style.display = 'none';
+            }
+        }
+
+        // Helper para convertir DD/MM/YYYY a Date
+        function parseDate(dateString) {
+            const parts = dateString.split('/');
+            return new Date(parts[2], parts[1] - 1, parts[0]);
+        }
+
+        // --- Actualización de UI ---
+        function updateUI() {
+            const rangeMode = document.getElementById('filter-range').value;
+            const selectedMonth = document.getElementById('filter-month').value;
+            const selectedYear = parseInt(document.getElementById('filter-year').value);
+            const selectedBarber = document.getElementById('filter-barber').value;
+            const clientSearch = document.getElementById('filter-client').value.toLowerCase();
+
+            // Toggle visibility of Month/Year filters based on Range Mode
+            const dateFilters = [document.getElementById('filter-month'), document.getElementById('filter-year')];
+            dateFilters.forEach(el => el.style.display = (rangeMode === 'month') ? 'inline-block' : 'none');
+
+
+            // Fecha de hoy (inicio del día)
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            // Filtrar datos
+            const filteredReservations = allReservations.filter(r => {
+                const rYear = r.dateObj.getFullYear();
+                const rMonth = r.dateObj.getMonth();
+
+                // 1. Lógica de Fecha (Range vs Month/Year)
+                let matchDate = false;
+
+                if (rangeMode === 'month') {
+                    // Logic existente
+                    const matchYear = rYear === selectedYear;
+                    const matchMonth = selectedMonth === "all" || rMonth === parseInt(selectedMonth);
+                    matchDate = matchYear && matchMonth;
+                } else if (rangeMode === 'today') {
+                    // Solo hoy
+                    matchDate = r.dateObj.getTime() === today.getTime();
+                } else if (rangeMode === '3days') {
+                    // Últimos 3 días (incluyendo hoy)
+                    const threeDaysAgo = new Date(today);
+                    threeDaysAgo.setDate(today.getDate() - 3);
+                    matchDate = r.dateObj >= threeDaysAgo && r.dateObj <= today;
+                } else if (rangeMode === 'week') {
+                    // Últimos 7 días (incluyendo hoy)
+                    const oneWeekAgo = new Date(today);
+                    oneWeekAgo.setDate(today.getDate() - 7);
+                    matchDate = r.dateObj >= oneWeekAgo && r.dateObj <= today;
+                }
+
+
+                // 2. Filtro Barbero (Si es admin, usa el select. Si es barbero, fuerza su nombre)
+                let matchBarber = true;
+                if (currentUser.role === 'barber') {
+                    matchBarber = r.profesional === currentUser.name;
+                } else {
+                    matchBarber = selectedBarber === "all" || r.profesional === selectedBarber;
+                }
+
+                // 3. Filtro Cliente
+                const matchClient = !clientSearch || (r.nombre && r.nombre.toLowerCase().includes(clientSearch));
+
+                // 4. Lógica "Hasta Hoy" (para month mode) o rango exacto (para otros)
+                // En 'month' mode, ya filtramos por mes, y 'isPast' asegura que no veamos futuro.
+                // En ranges (today, etc), el rango ya es "pasado".
+                const isPast = r.dateObj <= today;
+
+                return matchDate && matchBarber && matchClient && isPast;
+            });
+
+            // Filtrar Gastos (Similar date logic)
+            const filteredExpenses = (currentUser.role === 'barber') ? [] : allExpenses.filter(e => {
+                // Logic de Fecha
+                let matchDate = false;
+                if (rangeMode === 'month') {
+                    const eYear = e.dateObj.getFullYear();
+                    const eMonth = e.dateObj.getMonth();
+                    const matchYear = eYear === selectedYear;
+                    const matchMonth = selectedMonth === "all" || eMonth === parseInt(selectedMonth);
+                    matchDate = matchYear && matchMonth;
+                } else if (rangeMode === 'today') {
+                    matchDate = e.dateObj.getTime() === today.getTime();
+                } else if (rangeMode === '3days') {
+                    const threeDaysAgo = new Date(today);
+                    threeDaysAgo.setDate(today.getDate() - 3);
+                    matchDate = e.dateObj >= threeDaysAgo && e.dateObj <= today;
+                } else if (rangeMode === 'week') {
+                    const oneWeekAgo = new Date(today);
+                    oneWeekAgo.setDate(today.getDate() - 7);
+                    matchDate = e.dateObj >= oneWeekAgo && e.dateObj <= today;
+                }
+                return matchDate;
+            });
+
+            // --- Control de Visibilidad por Rol ---
+            if (currentUser.role === 'barber') {
+                // Ocultar selects de barbero si existen
+                document.getElementById('filter-barber').style.display = 'none';
+
+                // Ocultar Cards de Gastos y Balance
+                document.querySelector('.card.expense').style.display = 'none';
+                document.querySelector('.card.balance').style.display = 'none';
+
+                // Ocultar Sección de Gestión de Gastos (EL VIEJO)
+                document.getElementById('expense-management-section').style.display = 'none';
+
+                // Mostrar Sección de Manual Reservation (EL NUEVO, asegurarnos que se vea)
+                document.getElementById('manual-reservation-section').style.display = 'grid';
+
+                // Ocultar Gráficos
+                document.querySelector('.charts-section').style.display = 'none';
+            } else {
+                // Admin: Asegurar visibilidad
+                document.getElementById('filter-barber').style.display = 'block';
+                document.querySelector('.card.expense').style.display = 'block';
+                document.querySelector('.card.balance').style.display = 'block';
+
+                // Fix selector to use ID
+                const expenseSection = document.getElementById('expense-management-section');
+                if (expenseSection) expenseSection.style.display = 'grid';
+
+                // Ocultar Gráficos para Admin también
+                document.querySelector('.charts-section').style.display = 'none';
+
+                // Configuración Formulario Manual para Admin
+                document.getElementById('manual-barber').style.display = 'block';
+                document.getElementById('manual-barber-readonly').style.display = 'none';
+            }
+
+            // Configuración Formulario Manual si es Barbero
+            if (currentUser.role === 'barber') {
+                const readOnlyInput = document.getElementById('manual-barber-readonly');
+                readOnlyInput.value = currentUser.name;
+                readOnlyInput.style.display = 'block';
+                document.getElementById('manual-barber').style.display = 'none';
+            }
+
+            // Calcular Totales
+            const income = filteredReservations.reduce((sum, r) => sum + r.price, 0);
+            const expenses = filteredExpenses.reduce((sum, e) => sum + parseFloat(e.amount), 0);
+            const balance = income - expenses;
+
+            // Renderizar Cards
+            document.getElementById('total-income').textContent = `$${income.toLocaleString('es-AR')}`;
+            document.getElementById('total-expenses').textContent = `$${expenses.toLocaleString('es-AR')}`;
+            const balEl = document.getElementById('net-balance');
+            balEl.textContent = `$${balance.toLocaleString('es-AR')}`;
+            balEl.style.color = balance >= 0 ? '#4caf50' : '#f44336';
+
+            // Renderizar Desglose por Barbero
+            renderBarberTable(filteredReservations);
+
+            // Renderizar Detalle de Servicios
+            renderServicesTable(filteredReservations);
+
+            // Renderizar Tabla de Gastos
+            renderExpensesTable(filteredExpenses);
+
+            // Renderizar Gráfico
+            renderChart(filteredReservations, filteredExpenses, selectedMonth, selectedYear);
+        }
+
+        function renderServicesTable(reservations) {
+            const tbody = document.getElementById('services-table-body');
+            tbody.innerHTML = '';
+
+            // Ordenar por fecha y hora
+            const sorted = [...reservations].sort((a, b) => a.dateObj - b.dateObj);
+
+            sorted.forEach(r => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${r.fecha}</td>
+                    <td>${r.hora}</td>
+                    <td>${r.profesional}</td>
+                    <td>${r.nombre}</td>
+                    <td>${r.servicio}</td>
+                    <td style="color: #4caf50;">$${r.price.toLocaleString('es-AR')}</td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            if (sorted.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color: #666;">No hay servicios registrados</td></tr>';
+            }
+        }
+
+        // --- NEW: Render Barber Breakdown ---
+        function renderBarberTable(reservations) {
+            const stats = {};
+
+            // Agrupar
+            reservations.forEach(r => {
+                const name = r.profesional || 'Desconocido';
+                if (!stats[name]) {
+                    stats[name] = { count: 0, total: 0 };
+                }
+                stats[name].count++;
+                stats[name].total += r.price;
+            });
+
+            const tbody = document.getElementById('barber-table-body');
+            tbody.innerHTML = '';
+
+            Object.keys(stats).forEach(name => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${name}</td>
+                    <td>${stats[name].count}</td>
+                    <td style="color: #4caf50; font-weight: bold;">$${stats[name].total.toLocaleString('es-AR')}</td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            if (Object.keys(stats).length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color: #666;">No hay datos para este período</td></tr>';
+            }
+        }
+
+
+        function renderExpensesTable(expenses) {
+            const tbody = document.getElementById('expenses-table-body');
+            tbody.innerHTML = '';
+
+            // Mostrar solo los ultimos 20 si son muchos, o todos si son pocos
+            // En este caso mostramos todos los filtrados
+            expenses.forEach(e => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${e.date}</td>
+                    <td>${e.description}</td>
+                    <td><span style="background: #333; padding: 2px 6px; border-radius: 4px; font-size: 0.85em;">${e.category}</span></td>
+                    <td style="color: #f44336;">$${parseFloat(e.amount).toLocaleString('es-AR')}</td>
+                    <td>
+                        <button class="btn-danger delete-expense-btn" data-id="${e.id}" style="padding: 5px 10px; font-size: 0.8em;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            // Attach events
+            document.querySelectorAll('.delete-expense-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const id = e.currentTarget.dataset.id;
+                    if (confirm('¿Eliminar este gasto?')) {
+                        await deleteExpense(id);
+                    }
+                });
+            });
+        }
+
+        async function deleteExpense(id) {
+            try {
+                await deleteDoc(doc(db, 'Gastos', id));
+                await loadData(); // Reload all
+            } catch (error) {
+                console.error("Error deleting expense:", error);
+                alert("Error eliminando gasto");
+            }
+        }
+
+        // --- Gráficos con Chart.js ---
+        function renderChart(reservations, expenses, selectedMonth, selectedYear) {
+            const ctx = document.getElementById('financeChart').getContext('2d');
+
+            if (financeChart) {
+                financeChart.destroy();
+            }
+
+            let labels = [];
+            let incomeData = [];
+            let expenseData = [];
+
+            // Si se selecciona "Todos los meses", mostrar desglose mensual
+            if (selectedMonth === 'all') {
+                labels = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+                incomeData = new Array(12).fill(0);
+                expenseData = new Array(12).fill(0);
+
+                reservations.forEach(r => incomeData[r.dateObj.getMonth()] += r.price);
+                expenses.forEach(e => expenseData[e.dateObj.getMonth()] += parseFloat(e.amount));
+            } else {
+                // Si se selecciona un mes específico, mostrar desglose diario? 
+                // Mejor mostrar desglose por días para ver evolución en el mes
+                const daysInMonth = new Date(selectedYear, parseInt(selectedMonth) + 1, 0).getDate();
+                labels = Array.from({ length: daysInMonth }, (_, i) => `${i + 1}`);
+                incomeData = new Array(daysInMonth).fill(0);
+                expenseData = new Array(daysInMonth).fill(0);
+
+                reservations.forEach(r => {
+                    const day = r.dateObj.getDate() - 1;
+                    if (day >= 0 && day < daysInMonth) incomeData[day] += r.price;
+                });
+
+                expenses.forEach(e => {
+                    const day = e.dateObj.getDate() - 1; // Asumiendo e.dateObj es correcta
+                    // e.dateObj viene de YYYY-MM-DDT00:00:00 local time constructor usually works
+                    // Need to double check timezone issues but for simple visuals it's mostly fine
+                    // Ajuste simple: getDate() usa hora local
+                    if (day >= 0 && day < daysInMonth) expenseData[day] += parseFloat(e.amount);
+                });
+            }
+
+            financeChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Ingresos',
+                            data: incomeData,
+                            backgroundColor: 'rgba(76, 175, 80, 0.5)',
+                            borderColor: 'rgba(76, 175, 80, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Egresos',
+                            data: expenseData,
+                            backgroundColor: 'rgba(244, 67, 54, 0.5)',
+                            borderColor: 'rgba(244, 67, 54, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#333' }
+                        },
+                        x: {
+                            grid: { color: '#333' }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: 'white' } },
+                        title: {
+                            display: true,
+                            text: selectedMonth === 'all' ? `Finanzas ${selectedYear}` : `Finanzas Diarias - ${document.getElementById('filter-month').options[parseInt(selectedMonth) + 1].text}`,
+                            color: 'white',
+                            font: { size: 16 }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- Agregar Gasto ---
+        document.getElementById('add-expense-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const desc = document.getElementById('expense-desc').value;
+            const amount = document.getElementById('expense-amount').value;
+            const category = document.getElementById('expense-category').value;
+            const date = document.getElementById('expense-date').value;
+
+            if (!desc || !amount || !date) return;
+
+            try {
+                await addDoc(collection(db, 'Gastos'), {
+                    description: desc,
+                    amount: parseFloat(amount),
+                    category: category,
+                    date: date,
+                    timestamp: Timestamp.now()
+                });
+
+                // Limpiar form
+                document.getElementById('expense-desc').value = '';
+                document.getElementById('expense-amount').value = '';
+
+                await loadData();
+                alert('Gasto agregado correctamente');
+
+            } catch (error) {
+                console.error("Error adding expense:", error);
+                alert("Error al guardar gasto");
+            }
+        });
+
+    </script>
+</body>
+
+</html>

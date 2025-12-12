@@ -4,17 +4,23 @@
     font-weight: normal;
     font-style: normal;
 }
+
 /* Estilos para el contenedor de la lista de reservas */
 #appointment-list {
-    list-style-type: none; /* Quitar viñetas por defecto */
-    padding: 0; /* Eliminar el padding por defecto */
-    margin: 0; /* Eliminar el margen por defecto */
+    list-style-type: none;
+    /* Quitar viñetas por defecto */
+    padding: 0;
+    /* Eliminar el padding por defecto */
+    margin: 0;
+    /* Eliminar el margen por defecto */
 }
 
 /* Estilos para los elementos de la lista */
 #appointment-list ul {
-    padding: 0; /* Eliminar el padding interno de las listas */
-    margin: 0; /* Eliminar el margen interno de las listas */
+    padding: 0;
+    /* Eliminar el padding interno de las listas */
+    margin: 0;
+    /* Eliminar el margen interno de las listas */
 }
 
 li {
@@ -23,95 +29,128 @@ li {
 
 /* Estilos generales para la lista de reservas */
 #appointment-list {
-    list-style: none; /* Eliminar viñetas de la lista */
-    padding: 0; /* Quitar espaciado interno */
-    margin: 0; /* Quitar margen */
+    list-style: none;
+    /* Eliminar viñetas de la lista */
+    padding: 0;
+    /* Quitar espaciado interno */
+    margin: 0;
+    /* Quitar margen */
 }
 
 #appointment-list li {
-    background: #333; /* Color de fondo oscuro para los ítems */
-    padding: 10px; /* Espaciado interno de los ítems */
-    margin-bottom: 5px; /* Espaciado entre ítems */
-    border-radius: 5px; /* Bordes redondeados para un diseño más suave */
-    font-size: 14px; /* Tamaño de fuente adecuado */
-    color: #fff; /* Color de texto blanco */
-    display: flex; /* Usar flexbox para alinear los ítems */
-    align-items: center; /* Centrar verticalmente el contenido */
-    justify-content: space-between; /* Distribuir el contenido con espacio entre */
+    background: #333;
+    /* Color de fondo oscuro para los ítems */
+    padding: 10px;
+    /* Espaciado interno de los ítems */
+    margin-bottom: 5px;
+    /* Espaciado entre ítems */
+    border-radius: 5px;
+    /* Bordes redondeados para un diseño más suave */
+    font-size: 14px;
+    /* Tamaño de fuente adecuado */
+    color: #fff;
+    /* Color de texto blanco */
+    display: flex;
+    /* Usar flexbox para alinear los ítems */
+    align-items: center;
+    /* Centrar verticalmente el contenido */
+    justify-content: space-between;
+    /* Distribuir el contenido con espacio entre */
 }
 
 /* Estilos para los botones de eliminar */
 /* Estilos para los botones de eliminar */
 #appointment-list .delete-btn {
-    background: #e74c3c; /* Fondo rojo para el botón de eliminar */
-    border: none; /* Sin borde para el botón */
-    color: #fff; /* Color blanco para el texto del botón */
-    padding: 5px 10px; /* Espaciado interno del botón */
-    border-radius: 5px; /* Bordes redondeados para el botón */
-    cursor: pointer; /* Cambiar el cursor al pasar por encima */
-    font-size: 14px; /* Tamaño de fuente del botón */
-    width: 36px; /* Ancho fijo para el botón */
-    text-align: center; /* Alinear el texto del botón al centro */
-    display: flex; /* Usar flexbox para alinear el contenido del botón */
-    align-items: center; /* Centrar verticalmente el contenido del botón */
-    justify-content: center; /* Centrar horizontalmente el contenido del botón */
-    margin-left: auto; /* Empujar el botón a la derecha del contenedor */
+    background: #e74c3c;
+    /* Fondo rojo para el botón de eliminar */
+    border: none;
+    /* Sin borde para el botón */
+    color: #fff;
+    /* Color blanco para el texto del botón */
+    padding: 5px 10px;
+    /* Espaciado interno del botón */
+    border-radius: 5px;
+    /* Bordes redondeados para el botón */
+    cursor: pointer;
+    /* Cambiar el cursor al pasar por encima */
+    font-size: 14px;
+    /* Tamaño de fuente del botón */
+    width: 36px;
+    /* Ancho fijo para el botón */
+    text-align: center;
+    /* Alinear el texto del botón al centro */
+    display: flex;
+    /* Usar flexbox para alinear el contenido del botón */
+    align-items: center;
+    /* Centrar verticalmente el contenido del botón */
+    justify-content: center;
+    /* Centrar horizontalmente el contenido del botón */
+    margin-left: auto;
+    /* Empujar el botón a la derecha del contenedor */
     margin-right: 20px;
 }
 
 #appointment-list .delete-btn i {
-    margin-right: 5px; /* Espaciado entre el ícono y el texto */
+    margin-right: 5px;
+    /* Espaciado entre el ícono y el texto */
 }
 
 /* Estilos específicos para la lista de reservas */
 .reservation-list {
-    list-style: none; /* Eliminar viñetas de la lista */
-    padding: 0; /* Quitar espaciado interno */
-    margin: 0; /* Quitar margen */
+    list-style: none;
+    /* Eliminar viñetas de la lista */
+    padding: 0;
+    /* Quitar espaciado interno */
+    margin: 0;
+    /* Quitar margen */
 }
 
 .reservation-item {
-    display: flex; /* Usar flexbox para alinear ítems */
-    align-items: center; /* Centrar verticalmente el contenido */
-    margin-bottom: 10px; /* Espaciado entre ítems */
+    display: flex;
+    /* Usar flexbox para alinear ítems */
+    align-items: center;
+    /* Centrar verticalmente el contenido */
+    margin-bottom: 10px;
+    /* Espaciado entre ítems */
 }
 
 .reservation-item button.delete-btn {
-    margin-left: 10px; /* Espaciado entre el ítem y el botón */
-    background-color: #f44336; /* Rojo para el botón de eliminar */
-    color: white; /* Color blanco para el texto del botón */
-    border: none; /* Sin borde para el botón */
-    padding: 5px 10px; /* Espaciado interno del botón */
-    cursor: pointer; /* Cambiar el cursor al pasar por encima */
-    display: none; /* Ocultar el botón por defecto, mostrar cuando sea necesario */
+    margin-left: 10px;
+    /* Espaciado entre el ítem y el botón */
+    background-color: #f44336;
+    /* Rojo para el botón de eliminar */
+    color: white;
+    /* Color blanco para el texto del botón */
+    border: none;
+    /* Sin borde para el botón */
+    padding: 5px 10px;
+    /* Espaciado interno del botón */
+    cursor: pointer;
+    /* Cambiar el cursor al pasar por encima */
+    display: none;
+    /* Ocultar el botón por defecto, mostrar cuando sea necesario */
 }
 
 
 .reservation-item button.delete-btn:hover {
-    background-color: #c62828; /* Rojo oscuro al pasar el ratón */
+    background-color: #c62828;
+    /* Rojo oscuro al pasar el ratón */
 }
+
 .modal {
-    display: none; /* Ocultar por defecto */
+    display: none;
+    /* Ocultar por defecto */
     position: fixed;
     z-index: 1;
     left: 0;
     top: 2;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Fondo semitransparente */
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Fondo semitransparente */
 }
 
-.modal-content {
-    background-color: #fff;
-     margin: 45% auto!important;
-    padding: 90px!important; 
-    border: 1px solid #888;
-    width: 400%;
-    max-width: 500px;
-    text-align: center;
-    color: white;
-    display: table-caption;
-}
+
 
 .close-btn {
     color: #aaa;
@@ -128,22 +167,28 @@ li {
 }
 
 
-html, body {
+html,
+body {
     height: 100%;
     margin: 0;
     font-family: 'Bank Gothic Light BT', sans-serif;
     display: flex;
     flex-direction: column;
     /* background-color: black; */
-    background-size: cover; /* Ajusta la imagen para cubrir todo el fondo */
-    background-position: center; /* Centra la imagen */
-    background-repeat: no-repeat; /* Evita que la imagen se repita */
+    background-size: cover;
+    /* Ajusta la imagen para cubrir todo el fondo */
+    background-position: center;
+    /* Centra la imagen */
+    background-repeat: no-repeat;
+    /* Evita que la imagen se repita */
     background: black;
     object-fit: cover;
     z-index: -1;
 }
 
-h2, h1, p {
+h2,
+h1,
+p {
     color: white;
 }
 
@@ -166,7 +211,8 @@ button#send-whatsapp {
 }
 
 
-.booking-form, .reservations {
+.booking-form,
+.reservations {
     border: 1px solid grey;
     border-radius: 8px;
     padding: 20px;
@@ -325,7 +371,8 @@ header {
 
 /* Estilo para los modales */
 .modal {
-    display: none; /* Ocultar el modal por defecto */
+    display: none;
+    /* Ocultar el modal por defecto */
     position: fixed;
     z-index: 1000;
     left: 50%;
@@ -334,7 +381,8 @@ header {
     transform: translate(-50%, -50%);
     width: 80%;
     max-width: 600px;
-    background-color: rgba(0,0,0,0.4); /* Fondo oscuro para el modal */
+    background-color: rgba(0, 0, 0, 0.4);
+    /* Fondo oscuro para el modal */
 }
 
 .modal-content {
@@ -387,7 +435,8 @@ header {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.booking-form input, .booking-form select {
+.booking-form input,
+.booking-form select {
     display: block;
     width: calc(100% - 16px);
     font-family: 'Bank Gothic Light BT', sans-serif;
@@ -402,27 +451,39 @@ header {
 
 /* Estilos para el modal de autenticación */
 #admin-auth-modal {
-    display: none; /* Ocultar el modal por defecto */
-    position: fixed; /* Fijo en la pantalla */
-    z-index: 1; /* Encima de otros elementos */
+    display: none;
+    /* Ocultar el modal por defecto */
+    position: fixed;
+    /* Fijo en la pantalla */
+    z-index: 1;
+    /* Encima de otros elementos */
     left: 0;
     top: 0;
-    width: 100%; /* Ancho completo */
-    height: 100%; /* Altura completa */
-    overflow: auto; /* Desplazamiento si es necesario */
-    background-color: rgb(0,0,0); /* Color de fondo */
-    background-color: rgba(0,0,0,0.4); /* Fondo con opacidad */
+    width: 100%;
+    /* Ancho completo */
+    height: 100%;
+    /* Altura completa */
+    overflow: auto;
+    /* Desplazamiento si es necesario */
+    background-color: rgb(0, 0, 0);
+    /* Color de fondo */
+    background-color: rgba(0, 0, 0, 0.4);
+    /* Fondo con opacidad */
 }
 
 /* Estilos del contenido del modal */
 #admin-auth-modal .modal-content {
     background-color: #fefefe;
-    margin: 15% auto; /* Margen vertical centrado */
+    margin: 15% auto;
+    /* Margen vertical centrado */
     padding: 20px;
     border: 1px solid #888;
-    width: 80%; /* Ancho del modal */
-    max-width: 400px; /* Ancho máximo */
-    text-align: center; /* Texto centrado */
+    width: 80%;
+    /* Ancho del modal */
+    max-width: 400px;
+    /* Ancho máximo */
+    text-align: center;
+    /* Texto centrado */
 }
 
 /* Estilos del botón de cerrar */
@@ -445,12 +506,15 @@ header {
 #admin-auth-modal button {
     margin: 10px 0;
     padding: 10px;
-    width: calc(100% - 22px); /* Ancho del input y el botón */
+    width: calc(100% - 22px);
+    /* Ancho del input y el botón */
 }
 
 /* Media Queries para dispositivos móviles */
 @media (max-width: 768px) {
-    .booking-form, .reservations {
+
+    .booking-form,
+    .reservations {
         padding: 15px;
         margin-bottom: 15px;
     }
@@ -475,6 +539,7 @@ header {
 }
 
 @media (max-width: 480px) {
+
     .booking-form input,
     .booking-form select {
         font-size: 14px;
@@ -498,22 +563,29 @@ header {
 
 /* Imagen de fondo */
 .imagen-fondo {
-    position: absolute; /* Posición absoluta para que quede detrás */
+    position: absolute;
+    /* Posición absoluta para que quede detrás */
     top: 0;
     left: 0;
-    width: 100%; /* Que ocupe todo el ancho */
-    height: 100%; /* Que ocupe todo el alto */
-    object-fit: cover; /* Ajusta la imagen sin deformarla */
-    z-index: -1; /* Envía la imagen al fondo */
-  }
+    width: 100%;
+    /* Que ocupe todo el ancho */
+    height: 100%;
+    /* Que ocupe todo el alto */
+    object-fit: cover;
+    /* Ajusta la imagen sin deformarla */
+    z-index: -1;
+    /* Envía la imagen al fondo */
+}
 
-  /* Estilos para la grilla de turnos */
+/* Estilos para la grilla de turnos */
 .reservations-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Crea columnas flexibles */
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    /* Crea columnas flexibles */
     gap: 20px;
     padding: 20px;
-    background-color: #2c2c2c; /* Color de fondo */
+    background-color: #2c2c2c;
+    /* Color de fondo */
     border-radius: 8px;
     margin-top: 20px;
 }
@@ -567,7 +639,8 @@ header {
 }
 
 .professional-column ul li .appointment-details a {
-    color: #00e676; /* WhatsApp green */
+    color: #00e676;
+    /* WhatsApp green */
     text-decoration: none;
     font-weight: bold;
 }
@@ -772,7 +845,8 @@ header {
 }
 
 .barber-column ul li .appointment-details a {
-    color: #00e676; /* WhatsApp green */
+    color: #00e676;
+    /* WhatsApp green */
     text-decoration: none;
     font-weight: bold;
     transition: color 0.3s ease;
@@ -875,7 +949,8 @@ header {
 }
 
 .appointment-item .appointment-details a {
-    color: #00e676; /* WhatsApp green */
+    color: #00e676;
+    /* WhatsApp green */
     text-decoration: none;
     font-weight: bold;
     transition: color 0.3s ease;
@@ -942,7 +1017,7 @@ header {
     .reservations-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .barber-columns {
         grid-template-columns: 1fr;
         max-width: 100%;
@@ -950,7 +1025,7 @@ header {
         padding: 0 8px;
         margin: 10px auto;
     }
-    
+
     .barber-column {
         min-height: auto;
         width: 100%;
@@ -958,17 +1033,17 @@ header {
         padding: 15px;
         box-sizing: border-box;
     }
-    
+
     .view-controls {
         flex-direction: column;
         align-items: center;
     }
-    
+
     .view-btn {
         width: 200px;
         margin-bottom: 10px;
     }
-    
+
     .barber-column ul li {
         flex-direction: column;
         align-items: flex-start;
@@ -977,18 +1052,18 @@ header {
         word-wrap: break-word;
         overflow-wrap: break-word;
     }
-    
+
     .appointment-item {
         flex-direction: column;
         align-items: flex-start;
         gap: 10px;
     }
-    
+
     .barber-column h3 {
         font-size: 1.4em;
         letter-spacing: 2px;
     }
-    
+
     .barber-column h4 {
         font-size: 1em;
         padding: 8px 12px;
@@ -999,35 +1074,143 @@ header {
     .barber-columns-container {
         padding: 5px;
     }
-    
+
     .barber-columns {
         padding: 0 5px;
         gap: 15px;
     }
-    
+
     .barber-column {
         padding: 10px;
         width: 100%;
         max-width: 100%;
     }
-    
+
     .barber-column h3 {
         font-size: 1.2em;
         letter-spacing: 1px;
     }
-    
+
     .barber-column h4 {
         font-size: 0.9em;
         padding: 6px 10px;
     }
-    
+
     .barber-column ul li {
         padding: 10px;
         font-size: 0.85em;
     }
-    
+
     .appointment-details {
         word-break: break-word;
         overflow-wrap: break-word;
     }
+}
+
+/* Estilos para controles de vista dinamicos */
+.view-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+    align-items: center;
+}
+
+.view-btn {
+    padding: 10px 15px;
+    border: none;
+    background-color: #333;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: background-color 0.3s;
+    text-decoration: none;
+    /* Para el enlace que parece botón */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    box-sizing: border-box;
+    font-family: inherit;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.view-btn.active,
+.view-btn:hover {
+    background-color: #d4af37;
+    color: black;
+}
+
+/* === IMPROVED ADMIN MODAL STYLES === */
+.modal-content {
+    background-color: #1e1e1e;
+    /* Fondo oscuro premium */
+    margin: 15% auto;
+    /* Centrado vertical mejorado */
+    padding: 30px;
+    border: 1px solid #d4af37;
+    /* Borde dorado sutil */
+    border-radius: 15px;
+    /* Bordes redondeados */
+    width: 90%;
+    max-width: 400px;
+    /* Ancho máximo contenido */
+    text-align: center;
+    color: #fff;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    /* Sombra elegante */
+    position: relative;
+    font-family: 'Bank Gothic Light BT', sans-serif;
+}
+
+/* Estilos para el formulario de autenticación */
+#auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+#auth-form label {
+    text-align: left;
+    font-size: 0.9em;
+    color: #ccc;
+    margin-bottom: -10px;
+}
+
+#auth-form input {
+    background-color: #2d2d2d;
+    border: 1px solid #444;
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 1em;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+#auth-form input:focus {
+    border-color: #d4af37;
+}
+
+#auth-form button {
+    background-color: #d4af37;
+    color: #000;
+    border: none;
+    padding: 12px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s, transform 0.1s;
+}
+
+#auth-form button:hover {
+    background-color: #b5952f;
+}
+
+#auth-form button:active {
+    transform: scale(0.98);
 }
