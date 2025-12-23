@@ -16,12 +16,23 @@
             background-color: #121212;
             color: #ffffff;
             font-family: 'Bank Gothic Light BT', sans-serif;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        html {
+            width: 100%;
+            overflow-x: hidden;
         }
 
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
+            max-width: 100%;
+            width: 100%;
+            margin: 0;
             padding: 20px;
+            box-sizing: border-box;
         }
 
         /* Login Modal Styles */
@@ -161,6 +172,7 @@
             display: grid;
             grid-template-columns: 1fr 2fr;
             gap: 20px;
+            width: 100%;
         }
 
         @media (max-width: 768px) {
@@ -240,6 +252,13 @@
             border-radius: 10px;
             margin-bottom: 40px;
             border: 1px solid #333;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        #main-content {
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .barber-table {
@@ -359,12 +378,79 @@
                         </select>
                         <input type="text" id="manual-barber-readonly" style="display: none;" readonly>
                     </div>
+                    <div style="display: flex; align-items: center; gap: 8px; margin-top: 15px;">
+                        <input type="checkbox" id="manual-included-in-abono" style="width: auto; margin: 0;">
+                        <label for="manual-included-in-abono" style="margin: 0; font-weight: normal;">Incluido en abono</label>
+                    </div>
                     <div style="grid-column: span 1; display: flex; align-items: flex-end;">
                         <button type="submit" class="btn" style="width: 100%; margin-bottom: 15px;">Registrar
                             Turno</button>
                     </div>
                 </form>
             </div>
+        </div>
+
+        <!-- NEW: Abonos Management Section -->
+        <div id="abonos-management-section" class="expense-management" style="margin-top: 40px; margin-bottom: 40px;">
+            <div class="expense-form">
+                <h3 style="color: #d4af37; margin-top: 0;"><i class="fas fa-id-card"></i> Registrar Abono Mensual</h3>
+                <form id="add-abono-form">
+                    <label>Cliente</label>
+                    <input type="text" id="abono-client" required placeholder="Nombre del cliente">
+
+                    <label>Monto ($)</label>
+                    <input type="number" id="abono-amount" required placeholder="0.00" min="0">
+
+                    <label>Mes</label>
+                    <select id="abono-month" required>
+                        <option value="0">Enero</option>
+                        <option value="1">Febrero</option>
+                        <option value="2">Marzo</option>
+                        <option value="3">Abril</option>
+                        <option value="4">Mayo</option>
+                        <option value="5">Junio</option>
+                        <option value="6">Julio</option>
+                        <option value="7">Agosto</option>
+                        <option value="8">Septiembre</option>
+                        <option value="9">Octubre</option>
+                        <option value="10">Noviembre</option>
+                        <option value="11">Diciembre</option>
+                    </select>
+
+                    <label>Año</label>
+                    <input type="number" id="abono-year" required placeholder="2024" min="2024" max="2099">
+
+                    <label>Fecha de Pago</label>
+                    <input type="date" id="abono-payment-date" required>
+
+                    <button type="submit" class="btn">Registrar Abono</button>
+                </form>
+            </div>
+
+            <div class="expense-list">
+                <h3 style="color: #d4af37; margin-top: 0;"><i class="fas fa-list"></i> Abonos Registrados</h3>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Mes/Año</th>
+                                <th>Monto</th>
+                                <th>Fecha Pago</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="abonos-table-body">
+                            <!-- Filas generadas por JS -->
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="charts-section">
+            <canvas id="financeChart"></canvas>
         </div>
 
         <!-- NEW: Barber Breakdown Section -->
@@ -404,10 +490,6 @@
                     </tbody>
                 </table>
             </div>
-        </div>
-
-        <div class="charts-section">
-            <canvas id="financeChart"></canvas>
         </div>
 
         <div id="expense-management-section" class="expense-management">
@@ -480,6 +562,7 @@
         // --- Estado Global ---
         let allReservations = [];
         let allExpenses = [];
+        let allAbonos = [];
         let financeChart = null;
         let uniqueBarbers = new Set();
         let currentUser = null; // { name: '...', role: 'admin'|'barber' }
@@ -533,6 +616,7 @@
             const service = document.getElementById('manual-service').value;
             const dateInput = document.getElementById('manual-date').value; // YYYY-MM-DD
             const time = "00:00"; // Default time for manual entries
+            const includedInAbono = document.getElementById('manual-included-in-abono').checked;
 
             let professional;
             if (currentUser.role === 'admin') {
@@ -554,13 +638,16 @@
                     hora: time,
                     profesional: professional,
                     telefono: '', // Opcional para manual
-                    email: ''     // Opcional para manual
+                    email: '',     // Opcional para manual
+                    incluidoEnAbono: includedInAbono || false // Campo para indicar si está incluido en abono
                 });
 
                 alert('Turno registrado correctamente');
                 addReservationForm.reset();
                 // Reset date to today
                 document.getElementById('manual-date').valueAsDate = new Date();
+                // Reset checkbox
+                document.getElementById('manual-included-in-abono').checked = false;
 
                 await loadData();
             } catch (error) {
@@ -606,6 +693,9 @@
             const today = new Date();
             document.getElementById('expense-date').valueAsDate = today;
             document.getElementById('manual-date').valueAsDate = today;
+            document.getElementById('abono-payment-date').valueAsDate = today;
+            document.getElementById('abono-year').value = today.getFullYear();
+            document.getElementById('abono-month').value = today.getMonth();
 
             document.getElementById('filter-month').addEventListener('change', updateUI);
             document.getElementById('filter-year').addEventListener('change', updateUI);
@@ -700,6 +790,21 @@
                     });
                 });
 
+                // 3. Cargar Abonos
+                const abonosSnapshot = await getDocs(query(collection(db, 'Abonos'), orderBy('paymentDate', 'desc')));
+                allAbonos = [];
+                abonosSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    allAbonos.push({
+                        id: doc.id,
+                        ...data,
+                        // Convertir string YYYY-MM-DD a Date object para filtrado consistente
+                        paymentDateObj: new Date(data.paymentDate + 'T00:00:00'),
+                        // Crear dateObj para el mes/año del abono para filtrado por mes
+                        monthDateObj: new Date(data.year, data.month, 1)
+                    });
+                });
+
                 updateUI();
 
             } catch (error) {
@@ -755,10 +860,30 @@
                     threeDaysAgo.setDate(today.getDate() - 3);
                     matchDate = r.dateObj >= threeDaysAgo && r.dateObj <= today;
                 } else if (rangeMode === 'week') {
-                    // Últimos 7 días (incluyendo hoy)
-                    const oneWeekAgo = new Date(today);
-                    oneWeekAgo.setDate(today.getDate() - 7);
-                    matchDate = r.dateObj >= oneWeekAgo && r.dateObj <= today;
+                    // Semana laboral anterior completa: martes a sábado de la semana pasada
+                    const dayOfWeek = today.getDay(); // 0 = domingo, 1 = lunes, ..., 6 = sábado
+                    let daysToLastSaturday;
+                    
+                    // Calcular días hasta el último sábado pasado
+                    if (dayOfWeek === 0) { // Domingo
+                        daysToLastSaturday = 1; // Sábado fue ayer
+                    } else if (dayOfWeek === 6) { // Sábado
+                        daysToLastSaturday = 7; // Sábado de la semana pasada fue hace 7 días
+                    } else { // Lunes a Viernes (1-5)
+                        daysToLastSaturday = dayOfWeek + 1; // Sábado fue hace (díaActual + 1) días
+                    }
+                    
+                    // Calcular el sábado de la semana pasada
+                    const lastSaturday = new Date(today);
+                    lastSaturday.setDate(today.getDate() - daysToLastSaturday);
+                    lastSaturday.setHours(23, 59, 59, 999);
+                    
+                    // El martes de esa semana es 4 días antes del sábado
+                    const lastTuesday = new Date(lastSaturday);
+                    lastTuesday.setDate(lastSaturday.getDate() - 4);
+                    lastTuesday.setHours(0, 0, 0, 0);
+                    
+                    matchDate = r.dateObj >= lastTuesday && r.dateObj <= lastSaturday;
                 }
 
 
@@ -776,7 +901,14 @@
                 // 4. Lógica "Hasta Hoy" (para month mode) o rango exacto (para otros)
                 // En 'month' mode, ya filtramos por mes, y 'isPast' asegura que no veamos futuro.
                 // En ranges (today, etc), el rango ya es "pasado".
-                const isPast = r.dateObj <= today;
+                // Para 'week', permitimos todo el rango de la semana (martes a sábado)
+                let isPast = true;
+                if (rangeMode === 'week') {
+                    // Para semana, no limitamos por isPast, ya que el rango matchDate ya define el límite
+                    isPast = true; // No aplicamos restricción de fecha pasada para semana
+                } else {
+                    isPast = r.dateObj <= today;
+                }
 
                 return matchDate && matchBarber && matchClient && isPast;
             });
@@ -798,9 +930,72 @@
                     threeDaysAgo.setDate(today.getDate() - 3);
                     matchDate = e.dateObj >= threeDaysAgo && e.dateObj <= today;
                 } else if (rangeMode === 'week') {
-                    const oneWeekAgo = new Date(today);
-                    oneWeekAgo.setDate(today.getDate() - 7);
-                    matchDate = e.dateObj >= oneWeekAgo && e.dateObj <= today;
+                    // Semana laboral anterior completa: martes a sábado de la semana pasada
+                    const dayOfWeek = today.getDay(); // 0 = domingo, 1 = lunes, ..., 6 = sábado
+                    let daysToLastSaturday;
+                    
+                    // Calcular días hasta el último sábado pasado
+                    if (dayOfWeek === 0) { // Domingo
+                        daysToLastSaturday = 1; // Sábado fue ayer
+                    } else if (dayOfWeek === 6) { // Sábado
+                        daysToLastSaturday = 7; // Sábado de la semana pasada fue hace 7 días
+                    } else { // Lunes a Viernes (1-5)
+                        daysToLastSaturday = dayOfWeek + 1; // Sábado fue hace (díaActual + 1) días
+                    }
+                    
+                    // Calcular el sábado de la semana pasada
+                    const lastSaturday = new Date(today);
+                    lastSaturday.setDate(today.getDate() - daysToLastSaturday);
+                    lastSaturday.setHours(23, 59, 59, 999);
+                    
+                    // El martes de esa semana es 4 días antes del sábado
+                    const lastTuesday = new Date(lastSaturday);
+                    lastTuesday.setDate(lastSaturday.getDate() - 4);
+                    lastTuesday.setHours(0, 0, 0, 0);
+                    
+                    matchDate = e.dateObj >= lastTuesday && e.dateObj <= lastSaturday;
+                }
+                return matchDate;
+            });
+
+            // Filtrar Abonos (Similar date logic)
+            const filteredAbonos = (currentUser.role === 'barber') ? [] : allAbonos.filter(a => {
+                // Logic de Fecha - filtrar por mes/año del abono
+                let matchDate = false;
+                if (rangeMode === 'month') {
+                    const aYear = a.monthDateObj.getFullYear();
+                    const aMonth = a.monthDateObj.getMonth();
+                    const matchYear = aYear === selectedYear;
+                    const matchMonth = selectedMonth === "all" || aMonth === parseInt(selectedMonth);
+                    matchDate = matchYear && matchMonth;
+                } else if (rangeMode === 'today') {
+                    matchDate = a.paymentDateObj.getTime() === today.getTime();
+                } else if (rangeMode === '3days') {
+                    const threeDaysAgo = new Date(today);
+                    threeDaysAgo.setDate(today.getDate() - 3);
+                    matchDate = a.paymentDateObj >= threeDaysAgo && a.paymentDateObj <= today;
+                } else if (rangeMode === 'week') {
+                    // Para semana, filtramos por fecha de pago
+                    const dayOfWeek = today.getDay();
+                    let daysToLastSaturday;
+                    
+                    if (dayOfWeek === 0) {
+                        daysToLastSaturday = 1;
+                    } else if (dayOfWeek === 6) {
+                        daysToLastSaturday = 7;
+                    } else {
+                        daysToLastSaturday = dayOfWeek + 1;
+                    }
+                    
+                    const lastSaturday = new Date(today);
+                    lastSaturday.setDate(today.getDate() - daysToLastSaturday);
+                    lastSaturday.setHours(23, 59, 59, 999);
+                    
+                    const lastTuesday = new Date(lastSaturday);
+                    lastTuesday.setDate(lastSaturday.getDate() - 4);
+                    lastTuesday.setHours(0, 0, 0, 0);
+                    
+                    matchDate = a.paymentDateObj >= lastTuesday && a.paymentDateObj <= lastSaturday;
                 }
                 return matchDate;
             });
@@ -814,10 +1009,13 @@
                 document.querySelector('.card.expense').style.display = 'none';
                 document.querySelector('.card.balance').style.display = 'none';
 
-                // Ocultar Sección de Gestión de Gastos (EL VIEJO)
+                // Ocultar Sección de Gestión de Gastos
                 document.getElementById('expense-management-section').style.display = 'none';
 
-                // Mostrar Sección de Manual Reservation (EL NUEVO, asegurarnos que se vea)
+                // Ocultar Sección de Abonos
+                document.getElementById('abonos-management-section').style.display = 'none';
+
+                // Mostrar Sección de Manual Reservation
                 document.getElementById('manual-reservation-section').style.display = 'grid';
 
                 // Ocultar Gráficos
@@ -831,6 +1029,10 @@
                 // Fix selector to use ID
                 const expenseSection = document.getElementById('expense-management-section');
                 if (expenseSection) expenseSection.style.display = 'grid';
+
+                // Mostrar Sección de Abonos
+                const abonosSection = document.getElementById('abonos-management-section');
+                if (abonosSection) abonosSection.style.display = 'grid';
 
                 // Ocultar Gráficos para Admin también
                 document.querySelector('.charts-section').style.display = 'none';
@@ -849,8 +1051,17 @@
             }
 
             // Calcular Totales
-            const income = filteredReservations.reduce((sum, r) => sum + r.price, 0);
-            const expenses = filteredExpenses.reduce((sum, e) => sum + parseFloat(e.amount), 0);
+            // Ingresos de reservas (excluyendo las que están incluidas en abono)
+            const reservationsIncome = filteredReservations
+                .filter(r => !r.incluidoEnAbono) // Excluir reservas con abono
+                .reduce((sum, r) => sum + (r.price || 0), 0);
+            
+            // Ingresos de abonos
+            const abonosIncome = filteredAbonos.reduce((sum, a) => sum + parseFloat(a.amount || 0), 0);
+            
+            // Ingresos totales = reservas (sin abono) + abonos
+            const income = reservationsIncome + abonosIncome;
+            const expenses = filteredExpenses.reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
             const balance = income - expenses;
 
             // Renderizar Cards
@@ -868,6 +1079,9 @@
 
             // Renderizar Tabla de Gastos
             renderExpensesTable(filteredExpenses);
+
+            // Renderizar Tabla de Abonos
+            renderAbonosTable(filteredAbonos);
 
             // Renderizar Gráfico
             renderChart(filteredReservations, filteredExpenses, selectedMonth, selectedYear);
@@ -971,6 +1185,53 @@
             } catch (error) {
                 console.error("Error deleting expense:", error);
                 alert("Error eliminando gasto");
+            }
+        }
+
+        function renderAbonosTable(abonos) {
+            const tbody = document.getElementById('abonos-table-body');
+            tbody.innerHTML = '';
+
+            abonos.forEach(a => {
+                const row = document.createElement('tr');
+                const months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+                const monthName = months[a.month] || 'Desconocido';
+                row.innerHTML = `
+                    <td>${a.client}</td>
+                    <td>${monthName} ${a.year}</td>
+                    <td style="color: #4caf50; font-weight: bold;">$${parseFloat(a.amount).toLocaleString('es-AR')}</td>
+                    <td>${a.paymentDate}</td>
+                    <td>
+                        <button class="btn-danger delete-abono-btn" data-id="${a.id}" style="padding: 5px 10px; font-size: 0.8em;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            if (abonos.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: #666;">No hay abonos registrados</td></tr>';
+            }
+
+            // Attach events
+            document.querySelectorAll('.delete-abono-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const id = e.currentTarget.dataset.id;
+                    if (confirm('¿Eliminar este abono?')) {
+                        await deleteAbono(id);
+                    }
+                });
+            });
+        }
+
+        async function deleteAbono(id) {
+            try {
+                await deleteDoc(doc(db, 'Abonos', id));
+                await loadData(); // Reload all
+            } catch (error) {
+                console.error("Error deleting abono:", error);
+                alert("Error eliminando abono");
             }
         }
 
@@ -1090,6 +1351,42 @@
             } catch (error) {
                 console.error("Error adding expense:", error);
                 alert("Error al guardar gasto");
+            }
+        });
+
+        // --- Agregar Abono ---
+        document.getElementById('add-abono-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const client = document.getElementById('abono-client').value;
+            const amount = document.getElementById('abono-amount').value;
+            const month = parseInt(document.getElementById('abono-month').value);
+            const year = parseInt(document.getElementById('abono-year').value);
+            const paymentDate = document.getElementById('abono-payment-date').value;
+
+            if (!client || !amount || !paymentDate) return;
+
+            try {
+                await addDoc(collection(db, 'Abonos'), {
+                    client: client,
+                    amount: parseFloat(amount),
+                    month: month,
+                    year: year,
+                    paymentDate: paymentDate,
+                    timestamp: Timestamp.now()
+                });
+
+                // Limpiar form
+                document.getElementById('add-abono-form').reset();
+                document.getElementById('abono-year').value = new Date().getFullYear();
+                document.getElementById('abono-payment-date').valueAsDate = new Date();
+                document.getElementById('abono-month').value = new Date().getMonth();
+
+                await loadData();
+                alert('Abono registrado correctamente');
+
+            } catch (error) {
+                console.error("Error adding abono:", error);
+                alert("Error al guardar abono");
             }
         });
 
