@@ -402,7 +402,7 @@
             const service = document.getElementById('service').value;
             const phone = document.getElementById('phone').value;
 
-            if (name && date && time && professional && service) {
+            if (name && date && time && professional && service && phone) {
                 // Validar que la fecha no sea posterior a una semana desde hoy
                 const today = new Date();
                 const maxDate = new Date(today);
@@ -1209,6 +1209,110 @@
 
 
 
+
+        // --- LOGICA DEL BOT DE CONSULTA ---
+        const botBtn = document.getElementById('bot-btn');
+        const botModal = document.getElementById('bot-modal');
+        const closeBotBtn = document.getElementById('close-bot-modal');
+        const botConsultBtn = document.getElementById('bot-consult-btn');
+        const botPhoneInput = document.getElementById('bot-phone-input');
+        const botResults = document.getElementById('bot-results');
+
+        if (botBtn) {
+            botBtn.addEventListener('click', () => {
+                botModal.style.display = 'block';
+                botPhoneInput.focus();
+            });
+        }
+
+        if (closeBotBtn) {
+            closeBotBtn.addEventListener('click', () => {
+                botModal.style.display = 'none';
+            });
+        }
+
+        // Cerrar modal al hacer clic fuera (si se hace clic en el fondo oscuro)
+        window.addEventListener('click', (event) => {
+            // Verificamos si el clic fue en el modal contenedor (fondo oscuro)
+            if (event.target == botModal) {
+                botModal.style.display = "none";
+            }
+        });
+
+        if (botConsultBtn) {
+            botConsultBtn.addEventListener('click', async () => {
+                const phone = botPhoneInput.value.trim();
+
+                if (!phone) {
+                    alert("Por favor, ingresa tu número de teléfono.");
+                    return;
+                }
+
+                botResults.innerHTML = '<p style="text-align:center; color: #ccc;">Buscando...</p>';
+
+                try {
+                    // Consulta simple por coincidencia exacta del campo 'contacto'
+                    const q = query(collection(db, "Reserva"), where("contacto", "==", phone));
+                    const querySnapshot = await getDocs(q);
+
+                    const appointments = [];
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+
+                        // Parsear fecha DD/MM/YYYY para comparar
+                        if (data.fecha) {
+                            const partes = data.fecha.split('/');
+                            if (partes.length === 3) {
+                                const appDate = new Date(partes[2], partes[1] - 1, partes[0]);
+                                // Si es hoy o futuro
+                                if (appDate >= today) {
+                                    appointments.push(data);
+                                }
+                            }
+                        }
+                    });
+
+                    // Ordenar por fecha y hora
+                    appointments.sort((a, b) => {
+                        const [d1, m1, y1] = a.fecha.split('/');
+                        const date1 = new Date(y1, m1 - 1, d1);
+                        const [d2, m2, y2] = b.fecha.split('/');
+                        const date2 = new Date(y2, m2 - 1, d2);
+
+                        if (date1.getTime() !== date2.getTime()) {
+                            return date1 - date2;
+                        }
+                        // Si es la misma fecha, ordenar por hora
+                        return a.hora.localeCompare(b.hora);
+                    });
+
+                    if (appointments.length === 0) {
+                        botResults.innerHTML = '<p style="text-align:center; color: #ff9999;">No se encontraron turnos futuros para este número.</p>';
+                    } else {
+                        botResults.innerHTML = '';
+                        appointments.forEach(app => {
+                            const item = document.createElement('div');
+                            item.className = 'bot-result-item';
+                            item.innerHTML = `
+                                <div style="font-weight:bold; color: #c8a97e; font-size: 1.1em;">${app.fecha} - ${app.hora}hs</div>
+                                <div style="color: white;">Profesional: <span style="color: #ccc;">${app.profesional}</span></div>
+                                <div style="color: white;">Servicio: <span style="color: #ccc;">${app.servicio}</span></div>
+                            `;
+                            botResults.appendChild(item);
+                        });
+                    }
+
+                } catch (error) {
+                    console.error("Error consultando bot:", error);
+                    botResults.innerHTML = '<p style="color:red; text-align:center;">Error al consultar. Intenta nuevamente.</p>';
+                }
+            });
+        }
+
+
         // Inicializar al cargar la página
         window.onload = function () {
             initDatePicker();
@@ -1342,6 +1446,26 @@
             </div>
         </div>
     </footer>
+
+    <!-- Botón Flotante del Bot -->
+    <button id="bot-btn" class="bot-float-btn" title="Consultar mis turnos">
+        <i class="fas fa-calendar-check"></i>
+    </button>
+
+    <!-- Modal del Bot -->
+    <div id="bot-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="close-bot-modal">&times;</span>
+            <h2 style="color: #c8a97e; border-bottom: 2px solid #c8a97e; padding-bottom: 10px; margin-bottom: 10px;">
+                Consulta tus Turnos</h2>
+            <p style="color: #ccc; margin-bottom: 5px;">Ingresa tu número de teléfono para ver tus próximas citas.</p>
+            <input type="tel" id="bot-phone-input" placeholder="Ej: 1199998888"
+                style="background: #333; color: white; border: 1px solid #555; padding: 10px; width: 90%; border-radius: 5px; text-align: center;">
+            <button id="bot-consult-btn"
+                style="width: 100%; margin-top: 15px; background-color: #c8a97e; color: black; border: none; font-weight: bold;">Consultar</button>
+            <div id="bot-results"></div>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
