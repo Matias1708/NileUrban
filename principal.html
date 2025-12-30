@@ -230,7 +230,7 @@
                                     `<input type="checkbox" class="whatsapp-checkbox" data-id="${reservation.id}" ${reservation.enviar === 'S' ? 'checked' : ''}>
                                 <span class="appointment-details">
                                     ${reservation.nombre} - ${reservation.hora}hs - ${reservation.servicio} - 
-                                    <a href="https://wa.me/${reservation.contacto}?text=${encodeURIComponent(`¡Hola ${reservation.nombre}! Te recordamos tu turno el dia ${reservation.fecha} a las ${reservation.hora} con ${reservation.profesional} para ${reservation.servicio}. En caso de no asistir, avisar por este medio. ¡Te esperamos!`)}" target="_blank">
+                                    <a href="https://wa.me/${reservation.contacto}?text=${encodeURIComponent(`¡Hola ${reservation.nombre}! Te recordamos tu turno el dia ${reservation.fecha} a las ${reservation.hora} con ${reservation.profesional} para ${reservation.servicio}. La tolerancia es de 15 minutos. En caso de no asistir, avisar por este medio. ¡Te esperamos!`)}" target="_blank">
                                         ${reservation.contacto}
                                     </a>
                                 </span>
@@ -282,7 +282,7 @@
                             `<input type="checkbox" class="whatsapp-checkbox" data-id="${reservation.id}" ${reservation.enviar === 'S' ? 'checked' : ''}>
                         <span class="appointment-details">
                             <strong>${reservation.profesional}:</strong> ${reservation.nombre} - ${reservation.hora}hs - ${reservation.servicio} - 
-                            <a href="https://wa.me/${reservation.contacto}?text=${encodeURIComponent(`¡Hola ${reservation.nombre}! Te recordamos tu turno el dia ${reservation.fecha} a las ${reservation.hora} con ${reservation.profesional} para ${reservation.servicio}. En caso de no asistir, avisar por este medio. ¡Te esperamos!`)}" target="_blank">
+                            <a href="https://wa.me/${reservation.contacto}?text=${encodeURIComponent(`¡Hola ${reservation.nombre}! Te recordamos tu turno el dia ${reservation.fecha} a las ${reservation.hora} con ${reservation.profesional} para ${reservation.servicio}. La tolerancia es de 15 minutos. En caso de no asistir, avisar por este medio. ¡Te esperamos!`)}" target="_blank">
                                 ${reservation.contacto}
                             </a>
                         </span>
@@ -1185,7 +1185,7 @@
             reservations.forEach((reservation, index) => {
                 const phoneNumber = `549${reservation.contacto}`;
                 // const message = `¡Hola ${reservation.nombre}! Te recordamos tu turno de mañana a las ${reservation.hora} con ${reservation.profesional} para ${reservation.servicio}. ¡Te esperamos!`;
-                const message = `¡Hola ${reservation.nombre}! Te recordamos tu turno de mañana a las ${reservation.hora} con ${reservation.profesional} para ${reservation.servicio}. ¡Te esperamos!
+                const message = `¡Hola ${reservation.nombre}! Te recordamos tu turno de mañana a las ${reservation.hora} con ${reservation.profesional} para ${reservation.servicio}. La tolerancia es de 15 minutos. ¡Te esperamos!
 
         **Recordatorio importante:** En caso de no poder asistir, solicitamos avisar con un mínimo de **2 horas de anticipación**. De lo contrario, se deberá abonar el valor total del servicio.`;
                 console.log(`Enviando mensaje a: ${phoneNumber}`);
