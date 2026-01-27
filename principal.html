@@ -729,12 +729,15 @@
                 } else if (professional === 'Nicolas' && dayOfWeek === 2) {
                     timesToIterate = timesToIterate.filter(time => time >= '14:15');
 
-                } else if (professional === 'Lautaro' && dayOfWeek === 1) {
+                } else if (professional === 'Lautaro' && dayOfWeek === 2) {
+                    // Martes: empieza a las 12:30
                     timesToIterate = timesToIterate.filter(time => time >= '12:30');
 
-                } else if (professional === 'Lautaro' && dayOfWeek === 3) {
+                } else if (professional === 'Lautaro' && dayOfWeek === 4) {
+                    // Jueves: empieza a las 12:30
                     timesToIterate = timesToIterate.filter(time => time >= '12:30');
                 }
+                // Miércoles, Viernes y Sábado de Lautaro empiezan a las 10:15 (horario base, no requiere filtro)
             } else {
                 console.log(`${professional}: Usando horario completo en semana especial (${date}).`);
             }
