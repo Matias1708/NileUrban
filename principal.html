@@ -453,43 +453,64 @@
                 // }
 
                 if (professional === 'Matias') {
-
-                    // 🟢 EXCEPCIÓN PARA DÍAS ESPECIALES 🟢
-                    // La variable 'date' (DD/MM/YYYY) está disponible en la función.
-                    const specialDates = [
-                        '22/12/2025',
-                        '23/12/2025', // 👈 ¡Nuevo! Martes 23
-                        '24/12/2025', // 👈 ¡Nuevo! Miércoles 24
-                        '29/12/2025',
-                        '30/12/2025', // 👈 ¡Nuevo! Martes 30
-                        '31/12/2025',  // 👈 ¡Nuevo! Miércoles 31
-                        '06/01/2026',  // 👈 Martes 6
-                        '07/01/2026',  // 👈 Miércoles 7
-                        '08/01/2026',  // 👈 Jueves 8
-                        '09/01/2026',  // 👈 Viernes 9
-                        '10/01/2026',   // 👈 Sábado 10
-                        '20/01/2026',  // 👈 Martes 20 - Semana especial
-                        '21/01/2026',  // 👈 Miércoles 21 - Semana especial
-                        '22/01/2026',  // 👈 Jueves 22 - Semana especial
-                        '23/01/2026',  // 👈 Viernes 23 - Semana especial
-                        '24/01/2026'   // 👈 Sábado 24 - Semana especial
-                    ];
-
-                    if (specialDates.includes(date)) {
-                        console.log('Matias: Día especial habilitado para reserva.');
-                        // Si es un día especial, la función continúa sin mostrar la alerta.
+                    const dayOfWeek = selectedDate.getDay();
+                    
+                    // Matias puede atender: Lunes (1), Jueves (4), Viernes (5) y Sábado (6)
+                    if (dayOfWeek === 0 || dayOfWeek === 1 || dayOfWeek === 4 || dayOfWeek === 5 || dayOfWeek === 6) {
+                        // Días válidos, continuar con la reserva
+                        console.log('Matias: Día válido para reserva (Lunes, Jueves, Viernes o Sábado).');
                     } else {
-                        // Validación normal de días (Jueves, Viernes, Sábado)
-                        const dayOfWeek = selectedDate.getDay();
-                        // Convertir: Martes=2→1, Miércoles=3→2, Jueves=4→3, Viernes=5→4, Sábado=6→5
-                        const diaLaboral = dayOfWeek >= 2 ? dayOfWeek - 1 : null;
+                        // 🟢 EXCEPCIÓN PARA DÍAS ESPECIALES 🟢
+                        // La variable 'date' (DD/MM/YYYY) está disponible en la función.
+                        const specialDates = [
+                            '22/12/2025',
+                            '23/12/2025', // 👈 ¡Nuevo! Martes 23
+                            '24/12/2025', // 👈 ¡Nuevo! Miércoles 24
+                            '29/12/2025',
+                            '30/12/2025', // 👈 ¡Nuevo! Martes 30
+                            '31/12/2025',  // 👈 ¡Nuevo! Miércoles 31
+                            '06/01/2026',  // 👈 Martes 6
+                            '07/01/2026',  // 👈 Miércoles 7
+                            '08/01/2026',  // 👈 Jueves 8
+                            '09/01/2026',  // 👈 Viernes 9
+                            '10/01/2026',   // 👈 Sábado 10
+                            '20/01/2026',  // 👈 Martes 20 - Semana especial
+                            '21/01/2026',  // 👈 Miércoles 21 - Semana especial
+                            '22/01/2026',  // 👈 Jueves 22 - Semana especial
+                            '23/01/2026',  // 👈 Viernes 23 - Semana especial
+                            '24/01/2026'   // 👈 Sábado 24 - Semana especial
+                        ];
 
-                        if (diaLaboral !== 3 && diaLaboral !== 4 && diaLaboral !== 5) {
-                            alert('Matias solo ofrece turnos los jueves, viernes y sábados.');
+                        if (specialDates.includes(date)) {
+                            console.log('Matias: Día especial habilitado para reserva.');
+                            // Si es un día especial, la función continúa sin mostrar la alerta.
+                        } else {
+                            alert('Matias solo ofrece turnos los lunes, jueves, viernes y sábados.');
                             return;
                         }
                     }
                 }
+                
+                // 🟢 VALIDACIÓN: Lautaro NO atiende los lunes 🟢
+                if (professional === 'Lautaro') {
+                    const dayOfWeek = selectedDate.getDay();
+                    if (dayOfWeek === 0) {
+                        alert('Lautaro no atiende los lunes.');
+                        return;
+                    }
+                }
+                // 🔴 FIN VALIDACIÓN LAUTARO 🔴
+                
+                // 🟢 VALIDACIÓN: Nicolas NO atiende los miércoles 🟢
+                if (professional === 'Nicolas') {
+                    const dayOfWeek = selectedDate.getDay();
+                    if (dayOfWeek === 3) {
+                        alert('Nicolas no atiende los miércoles.');
+                        return;
+                    }
+                }
+                // 🔴 FIN VALIDACIÓN NICOLAS 🔴
+                
                 // Resto del código de validación y reserva...
                 const bookBtn = document.getElementById('book-button');
                 const setBookingState = (active) => {
@@ -596,6 +617,36 @@
             const dateObj = new Date(formattedDate);
             const dayOfWeek = dateObj.getDay(); // 0 = Domingo, 1 = Lunes, ..., 6 = Sábado
 
+            // 🟢 VALIDACIÓN: Lautaro NO tiene turnos los lunes 🟢
+            if (dayOfWeek === 0 && professional === 'Lautaro') {
+                timeSelect.innerHTML = '';
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.disabled = true;
+                defaultOption.selected = true;
+                defaultOption.textContent = 'Lautaro no atiende los lunes';
+                timeSelect.appendChild(defaultOption);
+                noAvailableMessage.style.display = 'block';
+                console.log('--- populateTimeOptions FINALIZADA (Lautaro no atiende lunes) ---');
+                return;
+            }
+            // 🔴 FIN VALIDACIÓN LAUTARO 🔴
+
+            // 🟢 VALIDACIÓN: Nicolas NO tiene turnos los miércoles 🟢
+            if (dayOfWeek === 2 && professional === 'Nicolas') {
+                timeSelect.innerHTML = '';
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.disabled = true;
+                defaultOption.selected = true;
+                defaultOption.textContent = 'Nicolas no atiende los miércoles';
+                timeSelect.appendChild(defaultOption);
+                noAvailableMessage.style.display = 'block';
+                console.log('--- populateTimeOptions FINALIZADA (Nicolas no atiende miércoles) ---');
+                return;
+            }
+            // 🔴 FIN VALIDACIÓN NICOLAS 🔴
+
             // // Restricción de Matías (solo Jueves, Viernes, Sábado)
             // if (professional === 'Matias' && dayOfWeek !== 3 && dayOfWeek !== 4 && dayOfWeek !== 5) { 
             //     // Permite excepciones especiales de lunes antes de este return
@@ -612,7 +663,8 @@
             //     }
             // }
 
-            if (professional === 'Matias' && dayOfWeek !== 3 && dayOfWeek !== 4 && dayOfWeek !== 5) {
+            // Validación de Matias: permite Lunes (1), Jueves (4), Viernes (5) y Sábado (6)
+            if (professional === 'Matias' && dayOfWeek !== 0 &&  dayOfWeek !== 2 && dayOfWeek !== 4 && dayOfWeek !== 5 && dayOfWeek !== 6) {
                 // Permite excepciones especiales de días antes de este return
 
                 // Lista de todas las excepciones especiales
@@ -669,6 +721,41 @@
             // Determinar la lista de horarios a iterar: base o una versión filtrada por horario de inicio
             let timesToIterate = [...baseAvailableTimes];
 
+            // 🟢 REGLA: Lunes con turnos de 40 minutos (13:00 a 18:20) para Pablo, Matias y Nicolas 🟢
+            // NOTA: dayOfWeek === 1 es Lunes (0=Domingo, 1=Lunes, 2=Martes, etc.)
+            if (dayOfWeek === 0 && (professional === 'Pablo' || professional === 'Matias' || professional === 'Nicolas')) {
+                console.log(`Regla de lunes aplicada para ${professional}.`);
+                const mondayTimes40min = [
+                    '13:00',
+                    '13:40',
+                    '14:20',
+                    '15:00',
+                    '15:40',
+                    '16:20',
+                    '17:00',
+                    '17:40',
+                    '18:20'
+                ];
+                timesToIterate = mondayTimes40min;
+            }
+            // 🔴 FIN REGLA LUNES 🔴
+
+            // 🟢 REGLA: Martes para Pablo (10:15 a 15:00) 🟢
+            // NOTA: dayOfWeek === 2 es Martes
+            if (dayOfWeek === 1 && professional === 'Pablo') {
+                console.log(`Regla de martes aplicada para Pablo (10:15 a 15:00).`);
+                const tuesdayTimesPablo = [
+                    '10:15',
+                    '11:00',
+                    '11:45',
+                    '12:30',
+                    '13:30',
+                    '14:15',
+                    '15:00'
+                ];
+                timesToIterate = tuesdayTimesPablo;
+            }
+            // 🔴 FIN REGLA MARTES PABLO 🔴
 
             // 🟢 REGLA TEMPORAL: Lunes 22/12/2025 y Lunes 29/12/2025 🟢
             if (date === '22/12/2025' || date === '29/12/2025') {
@@ -713,18 +800,18 @@
 
             // Verificar si es una fecha de la semana especial (20-24 enero) para Matias o Lautaro
             const esSemanaEspecial = semanaEspecialFechas.includes(date) && (professional === 'Matias' || professional === 'Lautaro');
+            
+            // Verificar si es lunes con horarios de 40 minutos para Pablo, Matias o Nicolas
+            const esLunes40min = dayOfWeek === 0 && (professional === 'Pablo' || professional === 'Matias' || professional === 'Nicolas');
+            
+            // Verificar si es martes para Pablo (horario especial 10:15 a 15:00)
+            const esMartesPablo = dayOfWeek === 1 && professional === 'Pablo';
 
-            if (!esSemanaEspecial) {
-                // Solo aplicar restricciones de horario si NO es semana especial
-                if (professional === 'Matias' && (dayOfWeek === 3)) {
+            if (!esSemanaEspecial && !esLunes40min && !esMartesPablo) {
+                // Solo aplicar restricciones de horario si NO es semana especial, ni lunes con 40 min, ni martes de Pablo
+                if (professional === 'Matias' && (dayOfWeek === 4)) {
                     // Horario normal de Matias (Jueves), comienza 12:30
                     timesToIterate = timesToIterate.filter(time => time >= '12:30');
-
-                } else if (professional === 'Matias' && dayOfWeek === 1) {
-                    // 🟢 NUEVO: Matías en Lunes 22/12 y 29/12
-                    // No se aplica ningún filtro de inicio aquí. El horario de 10:15 a 19:30
-                    // ya está cargado en 'timesToIterate' por la regla temporal anterior.
-                    console.log("Matias: Usando horario especial de Lunes (10:15 - 19:30).");
 
                 } else if (professional === 'Nicolas' && dayOfWeek === 2) {
                     timesToIterate = timesToIterate.filter(time => time >= '14:15');
@@ -738,6 +825,10 @@
                     timesToIterate = timesToIterate.filter(time => time >= '12:30');
                 }
                 // Miércoles, Viernes y Sábado de Lautaro empiezan a las 10:15 (horario base, no requiere filtro)
+            } else if (esLunes40min) {
+                console.log(`${professional}: Usando horarios de 40 minutos los lunes (13:00 - 18:20).`);
+            } else if (esMartesPablo) {
+                console.log(`Pablo: Usando horario especial de martes (10:15 - 15:00).`);
             } else {
                 console.log(`${professional}: Usando horario completo en semana especial (${date}).`);
             }
@@ -760,8 +851,8 @@
                     timesToIterate.sort();
                 }
             }
-            // No aplicar exclusiones durante la semana especial para Matias y Lautaro
-            const currentExclusions = esSemanaEspecial ? [] : (professionalSpecificExclusions[professional]?.[dayOfWeek] || []);
+            // No aplicar exclusiones durante la semana especial para Matias y Lautaro, ni en lunes con horarios de 40 min, ni en martes para Pablo
+            const currentExclusions = (esSemanaEspecial || esLunes40min || esMartesPablo) ? [] : (professionalSpecificExclusions[professional]?.[dayOfWeek] || []);
 
 
             // Iterar sobre la lista de horarios determinada
@@ -1060,7 +1151,8 @@
 
                 onDayCreate: function (dObj, dStr, fp, dayElem) {
                     const dayOfWeek = dayElem.dateObj.getDay();
-                    if (dayOfWeek === 0 || dayOfWeek === 1) {
+                    // Solo deshabilitar visualmente los domingos
+                    if (dayOfWeek === 0) {
                         dayElem.classList.add('disabled');
                         dayElem.title = "Este día no está disponible";
                     }
@@ -1075,25 +1167,14 @@
                     function (date) {
                         const dayOfWeek = date.getDay();
 
-                        // Formatear la fecha para comparación DD/MM/YYYY
-                        const day = String(date.getDate()).padStart(2, '0');
-                        const month = String(date.getMonth() + 1).padStart(2, '0');
-                        const year = date.getFullYear();
-                        const dateString = `${day}/${month}/${year}`;
-
-                        // Excepción para los lunes 22/12/2025 y 29/12/2025
-                        const isSpecialMonday = (dateString === '22/12/2025' || dateString === '29/12/2025');
-
-                        // Deshabilita domingos (0) Y lunes (1) A MENOS QUE sea un lunes de excepción
+                        // Deshabilita solo domingos (0)
                         if (dayOfWeek === 0) {
                             return true; // Deshabilita todos los domingos
                         }
 
-                        if (dayOfWeek === 1) {
-                            return !isSpecialMonday; // Deshabilita lunes, PERO habilita si es la fecha especial
-                        }
-
-                        return false; // Habilita el resto de días (Martes a Sábado)
+                        // Los lunes ahora están habilitados para Pablo, Matias y Nicolas
+                        // La validación específica se hace en populateTimeOptions()
+                        return false; // Habilita todos los demás días (Lunes a Sábado)
                     }
                 ]
             });
