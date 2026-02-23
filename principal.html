@@ -602,8 +602,8 @@
                     4: ['10:15', '14:15', '17:15']
                 },
                 'Lautaro': {
-                    3: ['15:45'],
-                    5: ['17:15']
+                    3: ['15:45']
+                    // 5: ['17:15']
                 },
                 'Pablo': {
                     5: ['18:45']
@@ -816,15 +816,8 @@
                 } else if (professional === 'Nicolas' && dayOfWeek === 2) {
                     timesToIterate = timesToIterate.filter(time => time >= '14:15');
 
-                } else if (professional === 'Lautaro' && dayOfWeek === 1) {
-                    // Martes: empieza a las 12:30
-                    timesToIterate = timesToIterate.filter(time => time >= '12:30');
-
-                } else if (professional === 'Lautaro' && dayOfWeek === 3) {
-                    // Jueves: empieza a las 12:30
-                    timesToIterate = timesToIterate.filter(time => time >= '12:30');
                 }
-                // Miércoles, Viernes y Sábado de Lautaro empiezan a las 10:15 (horario base, no requiere filtro)
+                // Lautaro: Martes, Miércoles, Jueves, Viernes y Sábado empiezan a las 10:15 (horario base, no requiere filtro)
             } else if (esLunes40min) {
                 console.log(`${professional}: Usando horarios de 40 minutos los lunes (13:00 - 18:20).`);
             } else if (esMartesPablo) {
