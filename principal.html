@@ -455,10 +455,10 @@
                 if (professional === 'Matias') {
                     const dayOfWeek = selectedDate.getDay();
                     
-                    // Matias puede atender: Lunes (1), Jueves (4), Viernes (5) y Sábado (6)
-                    if (dayOfWeek === 0 || dayOfWeek === 1 || dayOfWeek === 4 || dayOfWeek === 5 || dayOfWeek === 6) {
+                    // Matias puede atender: Lunes (1), Miércoles (3), Jueves (4), Viernes (5) y Sábado (6)
+                    if (dayOfWeek === 0 || dayOfWeek === 1 || dayOfWeek === 3 || dayOfWeek === 4 || dayOfWeek === 5 || dayOfWeek === 6) {
                         // Días válidos, continuar con la reserva
-                        console.log('Matias: Día válido para reserva (Lunes, Jueves, Viernes o Sábado).');
+                        console.log('Matias: Día válido para reserva (Lunes, Miércoles, Jueves, Viernes o Sábado).');
                     } else {
                         // 🟢 EXCEPCIÓN PARA DÍAS ESPECIALES 🟢
                         // La variable 'date' (DD/MM/YYYY) está disponible en la función.
@@ -485,7 +485,7 @@
                             console.log('Matias: Día especial habilitado para reserva.');
                             // Si es un día especial, la función continúa sin mostrar la alerta.
                         } else {
-                            alert('Matias solo ofrece turnos los lunes, jueves, viernes y sábados.');
+                            alert('Matias solo ofrece turnos los lunes, miércoles, jueves, viernes y sábados.');
                             return;
                         }
                     }
@@ -663,8 +663,8 @@
             //     }
             // }
 
-            // Validación de Matias: permite Lunes (1), Jueves (4), Viernes (5) y Sábado (6)
-            if (professional === 'Matias' && dayOfWeek !== 0 &&  dayOfWeek !== 2 && dayOfWeek !== 4 && dayOfWeek !== 5 && dayOfWeek !== 6) {
+            // Validación de Matias: permite Lunes (1), Miércoles (3), Jueves (4), Viernes (5) y Sábado (6). Bloquea Domingo (0) y Martes (2).
+            if (professional === 'Matias' && (dayOfWeek === 0 || dayOfWeek === 2)) {
                 // Permite excepciones especiales de días antes de este return
 
                 // Lista de todas las excepciones especiales
@@ -809,11 +809,7 @@
 
             if (!esSemanaEspecial && !esLunes40min && !esMartesPablo) {
                 // Solo aplicar restricciones de horario si NO es semana especial, ni lunes con 40 min, ni martes de Pablo
-                if (professional === 'Matias' && (dayOfWeek === 4)) {
-                    // Horario normal de Matias (Jueves), comienza 12:30
-                    timesToIterate = timesToIterate.filter(time => time >= '12:30');
-
-                } else if (professional === 'Nicolas' && dayOfWeek === 2) {
+                if (professional === 'Nicolas' && dayOfWeek === 2) {
                     timesToIterate = timesToIterate.filter(time => time >= '14:15');
 
                 }
