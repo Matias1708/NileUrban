@@ -686,18 +686,12 @@
             }
             // 🔴 FIN REGLA LUNES 🔴
 
-            // 🟢 REGLA: Martes para Pablo (10:15 a 15:00) 🟢
-            // NOTA: dayOfWeek === 2 es Martes
+            // Pablo los martes trabaja hasta las 15:00 (turnos de 40 min, último 14:20)
             if (dayOfWeek === 1 && professional === 'Pablo') {
-                console.log(`Regla de martes aplicada para Pablo (10:15 a 15:00).`);
+                console.log(`Regla de martes aplicada para Pablo (hasta 15:00).`);
                 const tuesdayTimesPablo = [
-                    '10:15',
-                    '11:00',
-                    '11:45',
-                    '12:30',
-                    '13:30',
-                    '14:15',
-                    '15:00'
+                    '10:00', '10:40', '11:20', '12:00',
+                    '13:00', '13:40', '14:20','15:00'
                 ];
                 timesToIterate = tuesdayTimesPablo;
             }
@@ -769,7 +763,7 @@
             } else if (esLunes40min) {
                 console.log(`${professional}: Usando horarios de 40 minutos los lunes (13:00 - 18:20).`);
             } else if (esMartesPablo) {
-                console.log(`Pablo: Usando horario especial de martes (10:15 - 15:00).`);
+                console.log(`Pablo: Usando horario de martes (hasta 15:00).`);
             } else {
                 console.log(`${professional}: Usando horario completo en semana especial (${date}).`);
             }
@@ -1270,9 +1264,9 @@
             if (!serviceSelect) return;
 
             // Todos los días tienen los mismos precios
-            let corte = 20000;
-            let corteBarba = 22000;
-            let barba = 14000;
+            let corte = 24000;
+            let corteBarba = 26000;
+            let barba = 16000;
 
             serviceSelect.innerHTML = `
             <option value="Corte">Corte $${corte.toLocaleString('es-AR')}</option>
