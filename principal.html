@@ -771,8 +771,8 @@
 
             // Aquí se agrega el nuevo horario solo para viernes y sábado (y se asegura que no se duplique si ya está por la regla temporal)
             if (dayOfWeek === 5 || dayOfWeek === 4) {
-                if (!timesToIterate.includes('19:30')) {
-                    timesToIterate.push('19:30');
+                if (!timesToIterate.includes('19:00')) {
+                    timesToIterate.push('19:00');
                     timesToIterate.sort();
                 }
             }
