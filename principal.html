@@ -347,27 +347,25 @@
                     console.error('Error al actualizar el estado de envío:', error);
                 }
             }
+        }
 
+        async function handleAppointmentListClick(e) {
+            const deleteBtn = e.target.closest('.delete-btn');
+            if (!deleteBtn) return;
 
-            // Agregar evento para eliminar turnos
-            // Delegación de eventos para eliminar turnos (funciona para vistas dinámicas columnas/filtro)
-            appointmentList.addEventListener('click', async (e) => {
-                const deleteBtn = e.target.closest('.delete-btn');
-                if (deleteBtn) {
-                    const id = deleteBtn.dataset.id;
+            const id = deleteBtn.dataset.id;
+            if (!id) return;
 
-                    if (confirm('¿Estás seguro de que deseas eliminar este turno?')) {
-                        try {
-                            await deleteDoc(doc(db, 'Reserva', id));
-                            alert('Turno eliminado con éxito');
-                            getRecords(); // Recargar la lista
-                        } catch (error) {
-                            console.error('Error al eliminar el turno: ', error);
-                            alert('Error al eliminar: ' + error.message);
-                        }
-                    }
-                }
-            });
+            if (!confirm('¿Estás seguro de que deseas eliminar este turno?')) return;
+
+            try {
+                await deleteDoc(doc(db, 'Reserva', id));
+                alert('Turno eliminado con éxito');
+                await getRecords(); // Recargar la lista
+            } catch (error) {
+                console.error('Error al eliminar el turno: ', error);
+                alert('Error al eliminar: ' + error.message);
+            }
         }
 
         // Función para obtener las reservas para una fecha y profesional específicos
@@ -1104,6 +1102,12 @@
         // Inicializar al cargar la página
         window.onload = function () {
             initDatePicker();
+            // Registrar 1 sola vez el listener de eliminar (evita confirmaciones repetidas)
+            const appointmentList = document.getElementById('appointment-list');
+            if (appointmentList && !appointmentList.dataset.deleteListenerAdded) {
+                appointmentList.addEventListener('click', handleAppointmentListClick);
+                appointmentList.dataset.deleteListenerAdded = 'true';
+            }
             getRecords(); // Cargar las reservas al iniciar
 
             // Agregar evento al botón de reserva
