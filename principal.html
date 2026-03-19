@@ -1268,10 +1268,24 @@
             const serviceSelect = document.getElementById('service');
             if (!serviceSelect) return;
 
-            // Todos los días tienen los mismos precios
             let corte = 24000;
             let corteBarba = 26000;
             let barba = 16000;
+
+            let dow = null;
+            if (fechaStr && /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(fechaStr.trim())) {
+                const [d, m, y] = fechaStr.trim().split('/');
+                const dt = new Date(parseInt(y, 10), parseInt(m, 10) - 1, parseInt(d, 10));
+                if (!isNaN(dt.getTime())) dow = dt.getDay();
+            } else {
+                dow = new Date().getDay();
+            }
+            // Lunes (1), martes (2), miércoles (3): $2000 menos en cada servicio
+            if (dow === 1 || dow === 2 || dow === 3) {
+                corte -= 2000;
+                corteBarba -= 2000;
+                barba -= 2000;
+            }
 
             serviceSelect.innerHTML = `
             <option value="Corte">Corte $${corte.toLocaleString('es-AR')}</option>

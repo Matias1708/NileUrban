@@ -658,10 +658,9 @@
             }
         });
 
-        // --- Precios (Lógica replicada) ---
-        // Martes(2)/Miércoles(3): Corte 18000, Corte+Barba 20000
-        // Jueves(4)/Viernes(5)/Sábado(6): Corte 20000, Corte+Barba 22000
-        // Barba siempre 14000
+        // --- Precios (alineado con principal.html) ---
+        // Base: Corte 24000, Corte+Barba 26000, Barba 16000
+        // Lunes(1), martes(2), miércoles(3): -$2000 en cada servicio
         function getPrice(service, dateString) {
             const parts = dateString.split('/'); // DD/MM/YYYY
             if (parts.length !== 3) return 0;
@@ -669,13 +668,14 @@
             const date = new Date(parts[2], parts[1] - 1, parts[0]);
             const day = date.getDay(); // 0-6
 
-            let corte = 18000;
-            let corteBarba = 20000;
-            let barba = 14000;
+            let corte = 24000;
+            let corteBarba = 26000;
+            let barba = 16000;
 
-            if (day >= 4 && day <= 6) { // Jueves, Viernes, Sábado
-                corte = 20000;
-                corteBarba = 22000;
+            if (day === 1 || day === 2 || day === 3) {
+                corte -= 2000;
+                corteBarba -= 2000;
+                barba -= 2000;
             }
 
             if (service.includes('Corte + Barba')) return corteBarba;
