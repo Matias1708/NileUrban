@@ -435,41 +435,10 @@ Nile`)}" target="_blank">
                 
 
                 if (professional === 'Matias') {
-                    const dayOfWeek = selectedDate.getDay();
-                    
-                    // Matias puede atender: Lunes (1), Miércoles (3), Jueves (4), Viernes (5) y Sábado (6). No Domingo (0) ni Martes (2).
-                    if (dayOfWeek === 1 || dayOfWeek === 3 || dayOfWeek === 4 || dayOfWeek === 5 || dayOfWeek === 6) {
-                        // Días válidos, continuar con la reserva
-                        console.log('Matias: Día válido para reserva (Lunes, Miércoles, Jueves, Viernes o Sábado).');
-                    } else {
-                        // 🟢 EXCEPCIÓN PARA DÍAS ESPECIALES 🟢
-                        // La variable 'date' (DD/MM/YYYY) está disponible en la función.
-                        const specialDates = [
-                            '22/12/2025',
-                            '23/12/2025', // 👈 ¡Nuevo! Martes 23
-                            '24/12/2025', // 👈 ¡Nuevo! Miércoles 24
-                            '29/12/2025',
-                            '30/12/2025', // 👈 ¡Nuevo! Martes 30
-                            '31/12/2025',  // 👈 ¡Nuevo! Miércoles 31
-                            '06/01/2026',  // 👈 Martes 6
-                            '07/01/2026',  // 👈 Miércoles 7
-                            '08/01/2026',  // 👈 Jueves 8
-                            '09/01/2026',  // 👈 Viernes 9
-                            '10/01/2026',   // 👈 Sábado 10
-                            '20/01/2026',  // 👈 Martes 20 - Semana especial
-                            '21/01/2026',  // 👈 Miércoles 21 - Semana especial
-                            '22/01/2026',  // 👈 Jueves 22 - Semana especial
-                            '23/01/2026',  // 👈 Viernes 23 - Semana especial
-                            '24/01/2026'   // 👈 Sábado 24 - Semana especial
-                        ];
-
-                        // Especial: solo lista de fechas puntuales
-                        if (specialDates.includes(date)) {
-                            console.log('Matias: Día especial habilitado para reserva.');
-                        } else {
-                            alert('Matias solo ofrece turnos los lunes, miércoles, jueves, viernes y sábados.');
-                            return;
-                        }
+                    const dayOfWeekLocalMatias = new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10)).getDay();
+                    if (dayOfWeekLocalMatias === 1 || dayOfWeekLocalMatias === 2) {
+                        alert('Matias no atiende lunes ni martes.');
+                        return;
                     }
                 }
                 
@@ -586,10 +555,7 @@ Nile`)}" target="_blank">
                     3: ['17:00', '18:20'],
                     4: ['10:00', '14:20', '17:00']
                 },
-                'Lautaro': {
-                    3: ['15:40']
-                    // 5: ['17:15']
-                },
+                
                 'Pablo': {
                     5: ['19:00']
                 }
@@ -601,6 +567,7 @@ Nile`)}" target="_blank">
             const formattedDate = `${year}-${month}-${day}`;
             const dateObj = new Date(formattedDate);
             const dayOfWeek = dateObj.getDay(); // 0 = Domingo, 1 = Lunes, ..., 6 = Sábado
+            const dayOfWeekLocal = new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10)).getDay();
 
             // 🟢 VALIDACIÓN: Lautaro NO tiene turnos los lunes 🟢
             if (dayOfWeek === 0 && professional === 'Lautaro') {
@@ -630,41 +597,18 @@ Nile`)}" target="_blank">
                 console.log('--- populateTimeOptions FINALIZADA (Nicolas no atiende miércoles) ---');
                 return;
             }
-                       // Validación de Matias: permite Lunes (1), Miércoles (3), Jueves (4), Viernes (5) y Sábado (6).
-            if (professional === 'Matias' && (dayOfWeek === 1 )) {
-                const specialDates = [
-                    '22/12/2025',
-                    '23/12/2025',
-                    '24/12/2025',
-                    '29/12/2025',
-                    '30/12/2025',
-                    '31/12/2025',
-                    '06/01/2026',
-                    '07/01/2026',
-                    '08/01/2026',
-                    '09/01/2026',
-                    '10/01/2026',
-                    '20/01/2026',
-                    '21/01/2026',
-                    '22/01/2026',
-                    '23/01/2026',
-                    '24/01/2026',
-                    '05/03/2026',
-                    '12/03/2026',
-                    '19/03/2026'
-                ];
-                if (!specialDates.includes(date)) {
-                    timeSelect.innerHTML = '';
-                    const defaultOption = document.createElement('option');
-                    defaultOption.value = '';
-                    defaultOption.disabled = true;
-                    defaultOption.selected = true;
-                    defaultOption.textContent = 'Selecciona un horario';
-                    timeSelect.appendChild(defaultOption);
-                    noAvailableMessage.style.display = 'block';
-                    console.log('--- populateTimeOptions FINALIZADA (día inválido para Matias) ---');
-                    return;
-                }
+            // Matias no atiende lunes ni martes.
+            if (professional === 'Matias' && (dayOfWeekLocal === 1 || dayOfWeekLocal === 2)) {
+                timeSelect.innerHTML = '';
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.disabled = true;
+                defaultOption.selected = true;
+                defaultOption.textContent = 'Matias no atiende lunes ni martes';
+                timeSelect.appendChild(defaultOption);
+                noAvailableMessage.style.display = 'block';
+                console.log('--- populateTimeOptions FINALIZADA (Matias no atiende lunes ni martes) ---');
+                return;
             }
             noAvailableMessage.textContent = 'No hay turnos disponibles para la fecha seleccionada.';
 
@@ -684,9 +628,9 @@ Nile`)}" target="_blank">
             // Determinar la lista de horarios a iterar: base o una versión filtrada por horario de inicio
             let timesToIterate = [...baseAvailableTimes];
 
-            // 🟢 REGLA: Lunes con turnos de 40 minutos (13:00 a 18:20) para Pablo, Matias y Nicolas 🟢
+            // 🟢 REGLA: Lunes con turnos de 40 minutos (13:00 a 18:20) para Pablo y Nicolas 🟢
             // NOTA: dayOfWeek === 1 es Lunes (0=Domingo, 1=Lunes, 2=Martes, etc.)
-            if (dayOfWeek === 0 && (professional === 'Pablo' || professional === 'Matias' || professional === 'Nicolas')) {
+            if (dayOfWeek === 0 && (professional === 'Pablo' || professional === 'Nicolas')) {
                 console.log(`Regla de lunes aplicada para ${professional}.`);
                 const mondayTimes40min = [
                     '13:00',
@@ -751,21 +695,14 @@ Nile`)}" target="_blank">
             }
             // 🔴 FIN REGLA TEMPORAL SEMANA ESPECIAL 🔴
 
-            // Matias: lunes, miércoles, jueves y viernes.
-            if (professional === 'Matias' && (dayOfWeek === 1 || dayOfWeek === 3 || dayOfWeek === 4)) {
-                timesToIterate = [
-                    '13:00', '13:40', '14:20', '15:00', '15:40', '16:20', '17:00', '17:40', '18:20','19:00'
-                ];
-            }
-
             // === Lógica de Horario de Inicio por Profesional y Día ===
             // 💡 NOTA: El Lunes es el día de la semana '1' en JavaScript.
 
             // Verificar si es una fecha de la semana especial (20-24 enero) para Matias o Lautaro
             const esSemanaEspecial = semanaEspecialFechas.includes(date) && (professional === 'Matias' || professional === 'Lautaro');
             
-            // Verificar si es lunes con horarios de 40 minutos para Pablo, Matias o Nicolas
-            const esLunes40min = dayOfWeek === 0 && (professional === 'Pablo' || professional === 'Matias' || professional === 'Nicolas');
+            // Verificar si es lunes con horarios de 40 minutos para Pablo o Nicolas
+            const esLunes40min = dayOfWeek === 0 && (professional === 'Pablo' || professional === 'Nicolas');
             
             // Verificar si es martes para Pablo (horario especial 10:15 a 15:00)
             const esMartesPablo = dayOfWeek === 1 && professional === 'Pablo';
@@ -793,6 +730,17 @@ Nile`)}" target="_blank">
                     timesToIterate.sort();
                 }
             }
+
+            // Lautaro: quitar 18:20 y 19:00 todos los días excepto sábados.
+            if (professional === 'Lautaro' && dayOfWeekLocal !== 6) {
+                timesToIterate = timesToIterate.filter(time => time !== '18:20' && time !== '19:00');
+            }
+
+            // Matias: desde las 13:00, excepto sábados (sábado mantiene todo el día).
+            if (professional === 'Matias' && dayOfWeekLocal !== 6) {
+                timesToIterate = timesToIterate.filter(time => time >= '13:00');
+            }
+
             // No aplicar exclusiones durante la semana especial para Matias y Lautaro, ni en lunes con horarios de 40 min, ni en martes para Pablo
             const currentExclusions = (esSemanaEspecial || esLunes40min || esMartesPablo) ? [] : (professionalSpecificExclusions[professional]?.[dayOfWeek] || []);
 
