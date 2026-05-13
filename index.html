@@ -6,7 +6,7 @@
     <meta name="description" content="Nile Urban Lounge - Salón de belleza masculino en Ramos Mejía">
     <meta name="keywords" content="peluquería, barbería, salón masculino, Ramos Mejía">
     <title>Nile Urban Lounge | Salón Masculino</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=nosotros-title-cream">
     <link rel="icon" href="images/nile_header.jpg" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -17,7 +17,7 @@
             <nav class="main-nav">
                 <div class="logo-container">
                     <!-- <img src="images/nile_header.jpg" alt="Nile Urban Lounge Logo" class="header-logo"> -->
-                    <h1>Nile Urban Lounge</h1>
+                    <h1 class="site-logo"><span class="site-logo__mark">Nile</span><span class="site-logo__rest"> Urban Lounge</span></h1>
                 </div>
                 <ul class="nav-links">
                     <li><a href="index.html" class="active">Inicio</a></li>
@@ -42,32 +42,55 @@
         </div>
     </section>
 
-    <section id="nosotros" class="nosotros">
-        <div class="container">
-            <h2 class="section-title">Nosotros</h2>
-            <div class="nosotros-content">
-                <div class="nosotros-text">
-                    <!-- <p>En nuestro salón te ofrecemos una experiencia con personal perfectamente capacitado, productos de alta gama y un ambiente sofisticado.</p>
-                    <p>Cada visita es un momento de relajación y belleza, diseñado para resaltar lo mejor de vos.</p> -->
-                </div>
-                <div class="cards-container">
-                    <div class="card">
-                        <img src="images/pablo.jpg" alt="Equipo Nile Urban Lounge">
-                        <p class="nombre-card">Pablo</p>
+    <section id="nosotros" class="nosotros" aria-label="Nosotros">
+        <div class="nosotros-bg" aria-hidden="true"></div>
+        <div class="container nosotros-inner">
+            <div class="nosotros-copy">
+                <h2 class="nosotros-section-title">Nosotros</h2>
+                <p class="nosotros-text">Somos un equipo de barberos enfocados en el estilo masculino: cortes precisos, barba y detalle. Trabajamos con productos de calidad y un espacio pensado para que te sientas cómodo de principio a fin.</p>
+                <p class="nosotros-text">Cada turno es personal: te escuchamos, recomendamos y buscamos el resultado que mejor encaje con vos. Reservá online y elegí al profesional con el que querés trabajar.</p>
+            </div>
+            <div class="cards-container team-grid" aria-label="Equipo de barberos">
+                <article class="team-card">
+                    <div class="team-card__media">
+                        <img src="images/pablo.jpg" alt="Retrato de Pablo, barbero en Nile Urban Lounge">
                     </div>
-                    <div class="card">
-                        <img src="images/nico (2).jpg" alt="Nile Urban Lounge">
-                        <p class="nombre-card">Nicolas</p>
+                    <div class="team-card__body">
+                        <h3 class="team-card__name">Pablo</h3>
+                        <p class="team-card__role">Barbero</p>
+                        <a href="principal.html?profesional=Pablo" class="team-card__cta">Reservar turno</a>
                     </div>
-                    <div class="card">
-                        <img src="images/lauti (2).jpg" alt="Nile Urban Lounge">
-                        <p class="nombre-card">Lautaro</p>
+                </article>
+                <article class="team-card">
+                    <div class="team-card__media">
+                        <img src="images/nico (2).jpg" alt="Retrato de Nicolás, barbero en Nile Urban Lounge">
                     </div>
-                    <div class="card">
-                        <img src="images/mati.jpg" alt="Nile Urban Lounge">
-                        <p class="nombre-card">Matias</p>
+                    <div class="team-card__body">
+                        <h3 class="team-card__name">Nicolás</h3>
+                        <p class="team-card__role">Barbero</p>
+                        <a href="principal.html?profesional=Nicolas" class="team-card__cta">Reservar turno</a>
                     </div>
-                </div>
+                </article>
+                <article class="team-card">
+                    <div class="team-card__media">
+                        <img src="images/lauti (2).jpg" alt="Retrato de Lautaro, barbero en Nile Urban Lounge">
+                    </div>
+                    <div class="team-card__body">
+                        <h3 class="team-card__name">Lautaro</h3>
+                        <p class="team-card__role">Barbero</p>
+                        <a href="principal.html?profesional=Lautaro" class="team-card__cta">Reservar turno</a>
+                    </div>
+                </article>
+                <article class="team-card">
+                    <div class="team-card__media">
+                        <img src="images/mati.jpg" alt="Retrato de Matías, barbero en Nile Urban Lounge">
+                    </div>
+                    <div class="team-card__body">
+                        <h3 class="team-card__name">Matías</h3>
+                        <p class="team-card__role">Barbero</p>
+                        <a href="principal.html?profesional=Matias" class="team-card__cta">Reservar turno</a>
+                    </div>
+                </article>
             </div>
         </div>
     </section>
@@ -194,75 +217,5 @@
         })();
     </script>
 
-    <style>
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 16px;
-        }
-        .cards-container {
-            display: flex;
-            gap: 16px;
-            justify-content: center;
-            align-items: stretch;
-            width: 100%;
-            margin-top: 30px;
-        }
-
-        .card {
-            flex: 1 1 0;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-            background: none;
-            min-width: 0;
-            display: block;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-        }
-
-        .card img {
-            width: 100%;
-            height: 60vh;
-            object-fit: cover;
-            display: block;
-        }
-
-        @media (max-width: 900px) {
-            .card img {
-                height: 40vh;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .cards-container {
-                display: block;
-                width: 100%;
-                margin-top: 30px;
-            }
-            .card {
-                width: 100%;
-                max-width: 100%;
-                margin: 0 auto;
-                display: block;
-            }
-            .card img {
-                height: 340px;
-            }
-        }
-
-        .nombre-card {
-            text-align: center;
-            margin: 12px 0 0 0;
-            font-size: 1.1em;
-            color: #fff; /* O el color que prefieras */
-            font-weight: 500;
-            letter-spacing: 1px;
-        }
-    </style>
 </body>
 </html>

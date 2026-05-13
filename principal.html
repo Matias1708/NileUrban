@@ -1113,6 +1113,33 @@ Nile`;
             // Actualizar opciones de hora cuando se seleccione la fecha o el profesional
             document.getElementById('calendar').addEventListener('change', populateTimeOptions);
             document.getElementById('professional').addEventListener('change', populateTimeOptions);
+
+            (() => {
+                const params = new URLSearchParams(window.location.search);
+                const raw = (params.get('profesional') || params.get('barber') || '').trim();
+                if (!raw) return;
+                const strip = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                const norm = strip(raw.toLowerCase());
+                const aliases = {
+                    pablo: 'Pablo',
+                    nicolas: 'Nicolas',
+                    nico: 'Nicolas',
+                    lautaro: 'Lautaro',
+                    matias: 'Matias',
+                    mati: 'Matias'
+                };
+                let value = aliases[norm];
+                const sel = document.getElementById('professional');
+                if (!sel) return;
+                if (!value) {
+                    const opt = [...sel.options].find((o) => strip(o.value.toLowerCase()) === norm);
+                    value = opt ? opt.value : null;
+                }
+                if (value && [...sel.options].some((o) => o.value === value)) {
+                    sel.value = value;
+                    sel.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            })();
         };
 
 
