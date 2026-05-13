@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-store, max-age=0">
     <title>NileUrbanLounge</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -436,8 +437,8 @@ Nile`)}" target="_blank">
 
                 if (professional === 'Matias') {
                     const dayOfWeekLocalMatias = new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10)).getDay();
-                    if (dayOfWeekLocalMatias === 1 || dayOfWeekLocalMatias === 2) {
-                        alert('Matias no atiende lunes ni martes.');
+                    if (dayOfWeekLocalMatias === 2) {
+                        alert('Matias no atiende los martes.');
                         return;
                     }
                 }
@@ -597,17 +598,17 @@ Nile`)}" target="_blank">
                 console.log('--- populateTimeOptions FINALIZADA (Nicolas no atiende miércoles) ---');
                 return;
             }
-            // Matias no atiende lunes ni martes.
-            if (professional === 'Matias' && (dayOfWeekLocal === 1 || dayOfWeekLocal === 2)) {
+            // Matias no atiende martes (lunes habilitado).
+            if (professional === 'Matias' && dayOfWeekLocal === 2) {
                 timeSelect.innerHTML = '';
                 const defaultOption = document.createElement('option');
                 defaultOption.value = '';
                 defaultOption.disabled = true;
                 defaultOption.selected = true;
-                defaultOption.textContent = 'Matias no atiende lunes ni martes';
+                defaultOption.textContent = 'Matias no atiende los martes';
                 timeSelect.appendChild(defaultOption);
                 noAvailableMessage.style.display = 'block';
-                console.log('--- populateTimeOptions FINALIZADA (Matias no atiende lunes ni martes) ---');
+                console.log('--- populateTimeOptions FINALIZADA (Matias no atiende martes) ---');
                 return;
             }
             noAvailableMessage.textContent = 'No hay turnos disponibles para la fecha seleccionada.';
@@ -647,7 +648,11 @@ Nile`)}" target="_blank">
             }
             // 🔴 FIN REGLA LUNES 🔴
 
-            // Pablo los martes trabaja hasta las 15:00 (turnos de 40 min, último 14:20)
+            /*
+             * [DESHABILITADO] Pablo: martes con horario acortado (10:00–15:00, turnos 40 min).
+             * Para volver a activarlo: descomentar este if y, más abajo, `esMartesPablo` + ramas if + currentExclusions
+             * (ver segundo bloque comentado junto a `esLunes40min`).
+             *
             if (dayOfWeek === 1 && professional === 'Pablo') {
                 console.log(`Regla de martes aplicada para Pablo (hasta 15:00).`);
                 const tuesdayTimesPablo = [
@@ -656,7 +661,7 @@ Nile`)}" target="_blank">
                 ];
                 timesToIterate = tuesdayTimesPablo;
             }
-            // 🔴 FIN REGLA MARTES PABLO 🔴
+            */
 
             // 🟢 REGLA TEMPORAL: Lunes 22/12/2025 y Lunes 29/12/2025 🟢
             if (date === '22/12/2025' || date === '29/12/2025') {
@@ -703,8 +708,12 @@ Nile`)}" target="_blank">
             
             // Verificar si es lunes con horarios de 40 minutos para Pablo o Nicolas
             const esLunes40min = dayOfWeek === 0 && (professional === 'Pablo' || professional === 'Nicolas');
-            
-            // Verificar si es martes para Pablo (horario especial 10:15 a 15:00)
+
+            /*
+             * [DESHABILITADO] Variante con "martes corto" para Pablo (acompaña al if comentado tras FIN REGLA LUNES).
+             * Reactivar: descomentar `const esMartesPablo`, sustituir el if/else siguiente por esta versión,
+             * y en currentExclusions volver a añadir `|| esMartesPablo`.
+             *
             const esMartesPablo = dayOfWeek === 1 && professional === 'Pablo';
 
             if (!esSemanaEspecial && !esLunes40min && !esMartesPablo) {
@@ -718,6 +727,20 @@ Nile`)}" target="_blank">
                 console.log(`${professional}: Usando horarios de 40 minutos los lunes (13:00 - 18:20).`);
             } else if (esMartesPablo) {
                 console.log(`Pablo: Usando horario de martes (hasta 15:00).`);
+            } else {
+                console.log(`${professional}: Usando horario completo en semana especial (${date}).`);
+            }
+            */
+
+            if (!esSemanaEspecial && !esLunes40min) {
+                // Solo aplicar restricciones de horario si NO es semana especial ni lunes con 40 min
+                if (professional === 'Nicolas' && dayOfWeek === 2) {
+                    timesToIterate = timesToIterate.filter(time => time >= '14:15');
+
+                }
+                // Lautaro: Martes, Miércoles, Jueves, Viernes y Sábado empiezan a las 10:15 (horario base, no requiere filtro)
+            } else if (esLunes40min) {
+                console.log(`${professional}: Usando horarios de 40 minutos los lunes (13:00 - 18:20).`);
             } else {
                 console.log(`${professional}: Usando horario completo en semana especial (${date}).`);
             }
@@ -741,8 +764,10 @@ Nile`)}" target="_blank">
                 timesToIterate = timesToIterate.filter(time => time >= '13:00');
             }
 
-            // No aplicar exclusiones durante la semana especial para Matias y Lautaro, ni en lunes con horarios de 40 min, ni en martes para Pablo
-            const currentExclusions = (esSemanaEspecial || esLunes40min || esMartesPablo) ? [] : (professionalSpecificExclusions[professional]?.[dayOfWeek] || []);
+            // No aplicar exclusiones durante la semana especial para Matias y Lautaro, ni en lunes con horarios de 40 min
+            // Con regla Pablo-martes activa, añadir: || esMartesPablo (ver bloque comentado arriba).
+            const currentExclusions = (esSemanaEspecial || esLunes40min) ? [] : (professionalSpecificExclusions[professional]?.[dayOfWeek] || []);
+            // [DESHABILITADO] const currentExclusions = (esSemanaEspecial || esLunes40min || esMartesPablo) ? [] : (professionalSpecificExclusions[professional]?.[dayOfWeek] || []);
 
 
             // Iterar sobre la lista de horarios determinada
@@ -836,8 +861,7 @@ Nile`)}" target="_blank">
                             return true; // Deshabilita todos los domingos
                         }
 
-                        // Los lunes ahora están habilitados para Pablo, Matias y Nicolas
-                        // La validación específica se hace en populateTimeOptions()
+                        // Domingos cerrados. Lunes a sábado visibles; Matias sin martes se aplica en populateTimeOptions().
                         return false; // Habilita todos los demás días (Lunes a Sábado)
                     }
                 ]
@@ -1196,7 +1220,7 @@ Nile`;
         <div class="footer-content">
             <div class="contact-info">
                 <p><strong>Dirección: </strong>Av. De Mayo 702 - Ramos Mejia</p>
-                <p><strong>Horarios:</strong> Martes a Sábado: 10:30 - 20:00</p>
+                <p><strong>Horarios:</strong><br>Lunes de 13 a 19 hs<br>Martes a sábado de 10 a 19 hs</p>
             </div>
             <div class="social-media">
                 <a href="https://www.instagram.com/nile.urbanlounge" target="_blank" title="Síguenos en Instagram">
