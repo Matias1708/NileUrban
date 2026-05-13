@@ -1,6 +1,6 @@
 @font-face {
     font-family: 'Bank Gothic Light BT';
-    src: url('fuentes/bank-gothic-light-bt.ttf') format('woff2');
+    src: url('fuentes/bank-gothic-light-bt.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
@@ -1293,4 +1293,298 @@ header {
     border-radius: 8px;
     border-left: 4px solid #c8a97e;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+/* =============================================================================
+   Reservas (principal.html): UI alineada a la home. Solo aplica con
+   <body class="page-reservas"> — finance.html no usa esta clase.
+   ============================================================================= */
+body.page-reservas {
+    --rs-bg: #080808;
+    --rs-text: #f2f2f2;
+    --rs-muted: #a3a3a3;
+    --rs-cream: #d4c8ae;
+    --rs-accent: #a8926f;
+    --rs-surface: rgba(14, 14, 14, 0.9);
+    --rs-border: 1px solid rgba(255, 255, 255, 0.08);
+    font-family: 'Poppins', system-ui, sans-serif;
+    background-color: var(--rs-bg) !important;
+    background-image: none !important;
+}
+
+body.page-reservas h1,
+body.page-reservas h2,
+body.page-reservas h3 {
+    font-family: 'Bank Gothic Light BT', 'Poppins', sans-serif;
+}
+
+body.page-reservas .reservas-header {
+    text-align: left;
+    padding: 0;
+    border-bottom: var(--rs-border);
+    background: rgba(8, 8, 8, 0.96);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+body.page-reservas .reservas-header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0.65rem 1rem;
+}
+
+body.page-reservas .reservas-header__brand {
+    display: inline-flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0;
+    text-decoration: none;
+    line-height: 1.2;
+}
+
+body.page-reservas .reservas-header__brand .site-logo__mark {
+    font-family: 'Bank Gothic Light BT', 'Poppins', sans-serif;
+    font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--rs-text);
+}
+
+body.page-reservas .reservas-header__brand .site-logo__rest {
+    font-family: 'Poppins', system-ui, sans-serif;
+    font-size: clamp(0.82rem, 2.2vw, 0.95rem);
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--rs-cream);
+}
+
+body.page-reservas .reservas-header__brand:hover .site-logo__rest {
+    color: #e8dcc8;
+}
+
+body.page-reservas .reservas-back-link {
+    flex-shrink: 0;
+    color: var(--rs-cream);
+    text-decoration: none;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+}
+
+body.page-reservas .reservas-back-link:hover {
+    color: #fff;
+}
+
+body.page-reservas .container {
+    position: relative;
+    isolation: isolate;
+}
+
+body.page-reservas .container::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+}
+
+body.page-reservas .imagen-fondo {
+    z-index: -1;
+}
+
+body.page-reservas .booking-form,
+body.page-reservas .reservations {
+    position: relative;
+    z-index: 1;
+    background: var(--rs-surface) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: var(--rs-border) !important;
+    border-radius: 6px;
+    box-shadow: none !important;
+    color: var(--rs-text);
+}
+
+body.page-reservas .reservations {
+    text-align: center;
+}
+
+body.page-reservas .booking-form label {
+    font-family: 'Poppins', system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--rs-cream);
+    margin-bottom: 0.4rem;
+}
+
+body.page-reservas .booking-form input {
+    font-family: 'Poppins', system-ui, sans-serif !important;
+    font-weight: 500;
+    font-size: 0.95rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 0.65rem 0.75rem;
+    margin-bottom: 0.75rem;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    color: var(--rs-text) !important;
+}
+
+body.page-reservas .booking-form select {
+    font-family: 'Poppins', system-ui, sans-serif !important;
+    font-weight: 500;
+    font-size: 0.95rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 0.65rem 0.75rem;
+    margin-bottom: 0.75rem;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    color: var(--rs-text) !important;
+    color-scheme: dark;
+}
+
+body.page-reservas .booking-form select option {
+    background-color: #1e1e1e !important;
+    color: #f5f5f5 !important;
+}
+
+body.page-reservas .booking-form input::placeholder {
+    color: rgba(255, 255, 255, 0.45);
+}
+
+body.page-reservas #book-button {
+    font-family: 'Poppins', system-ui, sans-serif !important;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    width: 100%;
+    max-width: 280px;
+    padding: 0.85rem 1.25rem;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: var(--rs-text) !important;
+    border-radius: 4px;
+}
+
+body.page-reservas #book-button:hover {
+    border-color: rgba(168, 146, 111, 0.55) !important;
+    background: rgba(168, 146, 111, 0.12) !important;
+}
+
+body.page-reservas footer {
+    border-top: var(--rs-border);
+    background: rgba(8, 8, 8, 0.96);
+    color: var(--rs-muted);
+}
+
+body.page-reservas .contact-info p,
+body.page-reservas .contact-info strong {
+    color: rgba(242, 242, 242, 0.9) !important;
+}
+
+body.page-reservas .social-media a {
+    color: var(--rs-cream);
+}
+
+body.page-reservas .social-media a:hover {
+    color: #fff;
+}
+
+body.page-reservas #open-modal-button {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    color: var(--rs-text) !important;
+    font-family: 'Poppins', system-ui, sans-serif !important;
+    font-size: 0.75rem !important;
+    letter-spacing: 0.05em;
+}
+
+body.page-reservas #open-modal-button:hover {
+    border-color: var(--rs-accent) !important;
+}
+
+body.page-reservas #appointment-list li {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    color: var(--rs-text);
+    border-bottom: none;
+}
+
+body.page-reservas #appointment-list .delete-btn {
+    background: rgba(160, 52, 52, 0.95);
+}
+
+body.page-reservas #appointment-list .delete-btn:hover {
+    background: rgba(190, 60, 60, 1);
+}
+
+body.page-reservas #auth-modal .modal-content,
+body.page-reservas #custom-modal .modal-content {
+    background: #121212;
+    border: var(--rs-border);
+    color: var(--rs-text);
+}
+
+body.page-reservas #auth-modal label,
+body.page-reservas #auth-modal h2 {
+    color: var(--rs-text);
+}
+
+body.page-reservas #auth-modal input {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: var(--rs-text);
+    font-family: 'Poppins', system-ui, sans-serif;
+}
+
+body.page-reservas #auth-modal button[type="submit"] {
+    font-family: 'Poppins', system-ui, sans-serif;
+    width: 100%;
+    max-width: none;
+}
+
+body.page-reservas .barber-column h3 {
+    color: var(--rs-cream);
+}
+
+body.page-reservas .view-controls .view-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: var(--rs-text);
+}
+
+body.page-reservas .view-controls .view-btn.active {
+    background: rgba(168, 146, 111, 0.4);
+    border-color: var(--rs-accent);
+    color: #0a0a0a;
+}
+
+body.page-reservas .view-controls .view-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+body.page-reservas .bot-float-btn {
+    background-color: var(--rs-accent);
+    color: #0a0a0a;
+}
+
+body.page-reservas .bot-float-btn:hover {
+    background-color: #b89b72;
+    transform: translateY(-2px);
 }
