@@ -6,6 +6,8 @@ import {
   query,
   where,
   type DocumentReference,
+  type UpdateData,
+  type DocumentData,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase/client";
 import { normalizePhone, phoneLookupVariants } from "@/lib/phone";
@@ -64,16 +66,17 @@ async function persistLoyaltyCycle(ref: DocumentReference, profile: LoyaltyProfi
   });
 }
 
-function loyaltyUpdateData(profile: LoyaltyProfile) {
-  return {
+function loyaltyUpdateData(profile: LoyaltyProfile): UpdateData<DocumentData> {
+  const data: UpdateData<DocumentData> = {
     contacto: profile.contacto,
     nombre: profile.nombre,
     points: profile.points,
     totalVisits: profile.totalVisits,
     pendingRewards: profile.pendingRewards ?? [],
-    lastVisit: profile.lastVisit,
-    cycleStartedAt: profile.cycleStartedAt,
   };
+  if (profile.lastVisit !== undefined) data.lastVisit = profile.lastVisit;
+  if (profile.cycleStartedAt !== undefined) data.cycleStartedAt = profile.cycleStartedAt;
+  return data;
 }
 
 async function loadNormalizedLoyalty(found: {
