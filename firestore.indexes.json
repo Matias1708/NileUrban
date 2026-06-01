@@ -1,0 +1,29 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "Reserva",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "fecha", "order": "ASCENDING" },
+        { "fieldPath": "profesional", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "Reserva",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "contacto", "order": "ASCENDING" },
+        { "fieldPath": "fecha", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "bookings",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        { "fieldPath": "fecha", "order": "ASCENDING" },
+        { "fieldPath": "profesional", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

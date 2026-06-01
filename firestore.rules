@@ -1,0 +1,124 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isStaff() {
+      return request.auth != null
+        && request.auth.token.staff == true;
+    }
+
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.admin == true;
+    }
+
+    function isCanonicalSlot(hora) {
+      return hora in [
+        '10:00', '10:40', '11:20', '12:00', '13:00', '13:40', '14:20',
+        '15:00', '15:40', '16:20', '17:00', '17:40', '18:20', '19:00'
+      ];
+    }
+
+    function isValidBookingCreate() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['nombre', 'fecha', 'hora', 'profesional', 'servicio', 'contacto'])
+        && data.nombre is string && data.nombre.size() >= 2 && data.nombre.size() <= 80
+        && data.fecha is string && data.fecha.matches('^\\d{2}/\\d{2}/\\d{4}$')
+        && data.hora is string && data.hora.matches('^\\d{2}:\\d{2}$')
+        && (isCanonicalSlot(data.hora) || (data.hora == '00:00' && data.contacto == ''))
+        && data.profesional in ['Pablo', 'Nicolas', 'Lautaro', 'Matias']
+        && data.servicio in ['Corte', 'Corte + Barba', 'Barba']
+        && data.contacto is string && data.contacto.size() >= 8 && data.contacto.size() <= 15
+        && (!('estado' in data) || data.estado in ['pending', 'confirmed', 'paid', 'cancelled', 'completed'])
+        && (!('enviar' in data) || data.enviar in ['S', 'N']);
+    }
+
+    // Legacy collection — read limited, writes via Cloud Functions preferred
+    match /Reserva/{bookingId} {
+      allow read: if true;
+      allow create: if isValidBookingCreate()
+        && request.resource.data.enviar == 'N'
+        && !('depositPaid' in request.resource.data);
+      allow update, delete: if isStaff();
+    }
+
+    match /salons/{salonId}/bookings/{bookingId} {
+      allow read: if true;
+      allow create: if isValidBookingCreate();
+      allow update, delete: if isStaff();
+    }
+
+    match /salons/{salonId}/barbers/{barberId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /salons/{salonId}/services/{serviceId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /Gastos/{expenseId} {
+      allow read, write: if isStaff();
+    }
+
+    match /Abonos/{subId} {
+      allow read, write: if isStaff();
+    }
+
+    match /salons/{salonId}/expenses/{expenseId} {
+      allow read, write: if isStaff();
+    }
+
+    match /salons/{salonId}/subscriptions/{subId} {
+      allow read, write: if isStaff();
+    }
+
+    match /otpSessions/{sessionId} {
+      allow read, write: if false;
+    }
+
+    match /waitlist/{entryId} {
+      allow read: if isStaff();
+      allow create: if request.resource.data.keys().hasAll(['contacto', 'profesional', 'fecha', 'servicio'])
+        && request.resource.data.contacto is string;
+      allow update, delete: if isStaff();
+    }
+
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasAll(['rating', 'comment', 'bookingId'])
+        && request.resource.data.rating is int
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5;
+      allow update, delete: if isAdmin();
+    }
+
+    match /loyalty/{clientId} {
+      allow read: if true;
+      allow create, update: if request.resource.data.keys().hasAll(['contacto', 'nombre', 'points', 'totalVisits'])
+        && request.resource.data.points is int
+        && request.resource.data.points >= 0
+        && request.resource.data.points <= 10
+        && request.resource.data.totalVisits is int
+        && request.resource.data.totalVisits >= 0;
+      allow delete: if isStaff();
+    }
+
+    match /clients/{clientId} {
+      allow read: if isStaff();
+      allow write: if isStaff();
+    }
+
+    // Horarios configurables desde panel staff (auth legacy en cliente)
+    match /barber_schedules/{barberId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /salon_config/{configId} {
+      allow read: if true;
+      allow write: if true;
+    }
+  }
+}

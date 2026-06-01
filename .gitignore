@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+web/node_modules/
+functions/node_modules/
+
+# Environment
+.env
+.env.local
+.env*.local
+web/.env.local
+
+# Build
+web/.next/
+web/out/
+functions/lib/
+
+# Firebase
+.firebase/
+firebase-debug.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/

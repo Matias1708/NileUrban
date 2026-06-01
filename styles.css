@@ -718,21 +718,19 @@ header {
 
 .barber-columns {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 40px;
     margin: 20px auto;
     width: 100%;
     max-width: 1400px;
     padding: 0 12px;
-    justify-items: center;
+    align-items: start;
 }
 
 .barber-column {
     width: 100%;
+    min-width: 0;
     min-height: 400px;
-}
-
-.barber-column {
     background: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
     border-radius: 15px;
     padding: 20px;
@@ -741,6 +739,7 @@ header {
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    box-sizing: border-box;
 }
 
 .barber-column::before {
@@ -999,17 +998,19 @@ header {
 /* Media Queries para responsividad */
 @media (max-width: 1200px) {
     .barber-columns {
-        grid-template-columns: repeat(3, 1fr);
-        max-width: 1200px;
-        gap: 30px;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        max-width: 100%;
+        gap: 24px;
+        overflow-x: auto;
     }
 }
 
 @media (max-width: 900px) {
     .barber-columns {
-        grid-template-columns: repeat(2, 1fr);
-        max-width: 900px;
-        gap: 25px;
+        grid-template-columns: repeat(4, minmax(220px, 1fr));
+        max-width: 100%;
+        gap: 16px;
+        overflow-x: auto;
     }
 }
 
@@ -1019,17 +1020,20 @@ header {
     }
 
     .barber-columns {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(4, minmax(240px, 1fr));
         max-width: 100%;
-        gap: 20px;
+        gap: 16px;
         padding: 0 8px;
         margin: 10px auto;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     .barber-column {
         min-height: auto;
-        width: 100%;
-        max-width: 100%;
+        min-width: 240px;
+        width: auto;
+        max-width: none;
         padding: 15px;
         box-sizing: border-box;
     }
