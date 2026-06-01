@@ -64,6 +64,18 @@ async function persistLoyaltyCycle(ref: DocumentReference, profile: LoyaltyProfi
   });
 }
 
+function loyaltyUpdateData(profile: LoyaltyProfile) {
+  return {
+    contacto: profile.contacto,
+    nombre: profile.nombre,
+    points: profile.points,
+    totalVisits: profile.totalVisits,
+    pendingRewards: profile.pendingRewards ?? [],
+    lastVisit: profile.lastVisit,
+    cycleStartedAt: profile.cycleStartedAt,
+  };
+}
+
 async function loadNormalizedLoyalty(found: {
   ref: DocumentReference;
   data: LoyaltyProfile;
@@ -184,7 +196,7 @@ export async function recordCompletedVisit(
     lastVisit: visitDate,
   };
 
-  await updateDoc(found.ref, updated);
+  await updateDoc(found.ref, loyaltyUpdateData(updated));
   return updated;
 }
 
@@ -203,6 +215,6 @@ export async function redeemLoyaltyReward(
     ...current,
     pendingRewards: pending.filter((r) => r !== reward),
   };
-  await updateDoc(found.ref, updated);
+  await updateDoc(found.ref, loyaltyUpdateData(updated));
   return updated;
 }
