@@ -671,6 +671,36 @@ body {
   color: rgba(255, 255, 255, 0.12);
 }
 
+.staff-top-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.staff-top-nav-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 0.55rem;
+  background: rgba(255, 255, 255, 0.03);
+  white-space: nowrap;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.staff-top-nav-link:hover {
+  border-color: rgba(200, 169, 126, 0.45);
+  color: var(--gold);
+}
+
+.staff-top-nav::-webkit-scrollbar {
+  height: 4px;
+}
+
 @media (min-width: 900px) {
   .staff-calendar-cell {
     min-height: 5.5rem;
@@ -1182,5 +1212,18 @@ body {
   .finance-filter-input {
     min-width: 100%;
     flex: 1 1 100%;
+  }
+
+  .finance-amount {
+    font-size: 1.55rem;
+  }
+
+  .finance-table {
+    min-width: 640px;
+  }
+
+  .finance-section {
+    padding: 1rem;
+    margin-bottom: 1.25rem;
   }
 }

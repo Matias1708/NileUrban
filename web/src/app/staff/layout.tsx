@@ -27,31 +27,40 @@ function StaffShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-white/10 bg-surface px-4 py-4">
-        <div className="mx-auto flex w-full max-w-none items-center justify-between px-2">
-          <Link href="/staff" className="font-bold text-gold">Panel Staff — Nile</Link>
-          <nav className="flex items-center gap-4 text-sm">
-            <Link href="/staff" className="hover:text-gold">Agenda</Link>
-            {staff?.role === "admin" && (
-              <>
-                <Link href="/staff/horarios" className="hover:text-gold">Horarios</Link>
-                <Link href="/staff/precios" className="hover:text-gold">Precios</Link>
-              </>
-            )}
-            {(staff?.role === "admin" || staff?.role === "barber") && (
-              <>
-                <Link href="/staff/fidelidad" className="hover:text-gold">Fidelidad</Link>
-                <Link href="/staff/finanzas" className="hover:text-gold">Finanzas</Link>
-              </>
-            )}
-            <span className="text-muted">{staff?.name}</span>
-            <button type="button" onClick={() => logout()} className="text-red-400 hover:underline">
-              Salir
-            </button>
-          </nav>
+      <header className="border-b border-white/10 bg-surface px-3 py-3 sm:px-4 sm:py-4">
+        <div className="mx-auto w-full max-w-none">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div className="flex items-center justify-between gap-3">
+              <Link href="/staff" className="text-sm font-bold text-gold sm:text-base">
+                Panel Staff — Nile
+              </Link>
+              <div className="flex items-center gap-3 text-xs sm:text-sm">
+                <span className="max-w-[9rem] truncate text-muted sm:max-w-none">{staff?.name}</span>
+                <button type="button" onClick={() => logout()} className="text-red-400 hover:underline">
+                  Salir
+                </button>
+              </div>
+            </div>
+
+            <nav className="staff-top-nav pb-1 md:pb-0">
+              <Link href="/staff" className="staff-top-nav-link">Agenda</Link>
+              {staff?.role === "admin" && (
+                <>
+                  <Link href="/staff/horarios" className="staff-top-nav-link">Horarios</Link>
+                  <Link href="/staff/precios" className="staff-top-nav-link">Precios</Link>
+                </>
+              )}
+              {(staff?.role === "admin" || staff?.role === "barber") && (
+                <>
+                  <Link href="/staff/fidelidad" className="staff-top-nav-link">Fidelidad</Link>
+                  <Link href="/staff/finanzas" className="staff-top-nav-link">Finanzas</Link>
+                </>
+              )}
+            </nav>
+          </div>
         </div>
       </header>
-      <div className="w-full max-w-none px-4 py-8">{children}</div>
+      <div className="w-full max-w-none px-3 py-6 sm:px-4 sm:py-8">{children}</div>
     </div>
   );
 }
