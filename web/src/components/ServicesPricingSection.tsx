@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { loadPricingConfig } from "@/lib/pricing-store";
-import { formatPriceARS, getServiceOptions } from "@/lib/scheduling/pricing";
+import { formatPriceARS, getServiceBasePriceOptions } from "@/lib/scheduling/pricing";
 import type { PricingConfig } from "@/lib/types/pricing";
 import { WEEKDAY_LABELS } from "@/lib/types/schedule";
 
@@ -14,7 +14,7 @@ export function ServicesPricingSection() {
     loadPricingConfig().then(setPricing).catch(() => setPricing(null));
   }, []);
 
-  const services = getServiceOptions(undefined, pricing);
+  const services = getServiceBasePriceOptions(pricing);
 
   const discountText =
     pricing?.weekdayDiscountEnabled && pricing.weekdayDiscountDays.length

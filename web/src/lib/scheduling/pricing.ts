@@ -46,6 +46,21 @@ export function getServiceOptions(
   });
 }
 
+/** Precios de lista (sin descuento por día) — para la home y cartelería. */
+export function getServiceBasePriceOptions(
+  config?: PricingConfig | null
+): { value: ServiceName; label: string; price: number }[] {
+  const pricing = config ?? DEFAULT_PRICING_CONFIG;
+  return SERVICES.map((service) => {
+    const price = pricing.basePrices[service];
+    return {
+      value: service,
+      label: `${service} ${formatPriceARS(price)}`,
+      price,
+    };
+  });
+}
+
 /** Finance panel price resolver */
 export function getPriceFromServiceString(
   service: string,
