@@ -49,17 +49,10 @@ export async function POST(req: NextRequest) {
     path: "/",
   });
 
-  const waNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "5491164380904";
-  const message = encodeURIComponent(
-    `Tu código Nile Urban Lounge: ${code}. Válido 10 minutos.`
-  );
-  const whatsappUrl = `https://api.whatsapp.com/send?phone=${waNumber}&text=${message}`;
-
   return NextResponse.json({
     phone: normalized,
-    whatsappUrl,
-    message: "Te enviamos un código por WhatsApp.",
-    ...(process.env.NODE_ENV === "development" ? { code } : {}),
+    message: "Código generado. Ingresalo para validar tu acceso.",
+    code,
   });
 }
 

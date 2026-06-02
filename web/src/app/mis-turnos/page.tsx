@@ -17,14 +17,13 @@ function MisTurnosContent() {
   const initialTel = searchParams.get("tel") ?? "";
   const [phone, setPhone] = useState(initialTel);
   const [code, setCode] = useState("");
-  const [devCode, setDevCode] = useState<string | null>(null);
+  const [otpCodeHint, setOtpCodeHint] = useState<string | null>(null);
   const [step, setStep] = useState<"phone" | "otp" | "bookings">(
     initialTel ? "bookings" : "phone"
   );
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [whatsappUrl, setWhatsappUrl] = useState("");
   const [pricing, setPricing] = useState<PricingConfig | null>(null);
 
   useEffect(() => {
@@ -63,7 +62,7 @@ function MisTurnosContent() {
 
     setLoading(true);
     setError("");
-    setDevCode(null);
+    setOtpCodeHint(null);
     try {
       const res = await fetch("/api/otp", {
         method: "POST",
@@ -76,8 +75,7 @@ function MisTurnosContent() {
         return;
       }
       setPhone(data.phone ?? normalized);
-      setWhatsappUrl(data.whatsappUrl ?? "");
-      if (data.code) setDevCode(String(data.code));
+      if (data.code) setOtpCodeHint(String(data.code));
       setCode("");
       setStep("otp");
     } catch {
@@ -154,22 +152,12 @@ function MisTurnosContent() {
       {step === "otp" && (
         <div className="card mt-8 space-y-4">
           <p className="text-sm text-white/80">
-            Abrí WhatsApp para ver tu código de verificación.{" "}
-            {whatsappUrl && (
-              <a
-                href={whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gold hover:underline"
-              >
-                Abrir WhatsApp
-              </a>
-            )}
+            Ingresá el código de verificación para ver tus turnos.
           </p>
 
-          {devCode && (
+          {otpCodeHint && (
             <p className="rounded-lg border border-gold/30 bg-gold/10 px-3 py-2 text-center text-sm text-gold">
-              Código de prueba (solo desarrollo): <strong className="text-lg tracking-widest">{devCode}</strong>
+              Tu código: <strong className="text-lg tracking-widest">{otpCodeHint}</strong>
             </p>
           )}
 
@@ -194,7 +182,7 @@ function MisTurnosContent() {
               setStep("phone");
               setCode("");
               setError("");
-              setDevCode(null);
+              setOtpCodeHint(null);
             }}
           >
             ← Cambiar teléfono
