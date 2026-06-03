@@ -5,10 +5,17 @@ import Link from "next/link";
 import {
   getAllLoyaltyProfiles,
   redeemLoyaltyReward,
+  recordProductPurchase,
+  recordAbonoRenewal,
   LOYALTY_CYCLE,
   LOYALTY_CYCLE_DAYS,
+  LOYALTY_MILESTONES,
   LOYALTY_REWARD_LABELS,
+  LOYALTY_POINTS_PER_CUT,
+  LOYALTY_POINTS_PER_PRODUCT,
   getLoyaltyProgress,
+  getRewardLabel,
+  formatPoints,
 } from "@/lib/loyalty";
 import type { LoyaltyProfileWithId } from "@/lib/loyalty";
 import type { LoyaltyRewardId } from "@/lib/types/booking";
@@ -58,10 +65,22 @@ export function StaffFidelidadClient() {
   }, [profiles]);
 
   async function handleRedeem(contacto: string, reward: LoyaltyRewardId) {
-    if (!confirm(`¿Marcar "${LOYALTY_REWARD_LABELS[reward]}" como canjeado para este cliente?`)) {
+    if (!confirm(`¿Marcar "${getRewardLabel(reward)}" como canjeado para este cliente?`)) {
       return;
     }
     await redeemLoyaltyReward(contacto, reward);
+    await load();
+  }
+
+  async function handleProduct(contacto: string, nombre: string) {
+    if (!confirm("¿Sumar 1 punto por compra de producto?")) return;
+    await recordProductPurchase(contacto, nombre);
+    await load();
+  }
+
+  async function handleAbono(contacto: string, nombre: string) {
+    if (!confirm("¿Sumar 2 puntos por renovación de abono mensual?")) return;
+    await recordAbonoRenewal(contacto, nombre);
     await load();
   }
 
@@ -71,7 +90,7 @@ export function StaffFidelidadClient() {
         <div>
           <h1 className="text-2xl font-bold text-gold">Programa de fidelidad</h1>
           <p className="mt-1 text-sm text-muted">
-            Todos los clientes con puntos acumulados · ciclo de {LOYALTY_CYCLE} visitas · renueva cada{" "}
+            {formatPoints(LOYALTY_POINTS_PER_CUT)}/corte · {formatPoints(LOYALTY_POINTS_PER_PRODUCT)}/producto · ciclo de {formatPoints(LOYALTY_CYCLE)} · renueva cada{" "}
             {LOYALTY_CYCLE_DAYS} días
           </p>
         </div>
@@ -95,8 +114,8 @@ export function StaffFidelidadClient() {
         <div className="card border-white/10 sm:col-span-2 lg:col-span-1">
           <p className="text-sm text-muted">Hitos del ciclo</p>
           <p className="mt-2 text-xs leading-relaxed text-white/75">
-            5 pts → 20% off · 8 pts → Premium · 10 pts → Corte gratis · Reset cada {LOYALTY_CYCLE_DAYS}{" "}
-            días
+            {LOYALTY_MILESTONES.map((m) => `${formatPoints(m.at)} → ${LOYALTY_REWARD_LABELS[m.reward]}`).join(" · ")}
+            {" · "}Reset cada {LOYALTY_CYCLE_DAYS} días
           </p>
         </div>
       </div>
@@ -142,6 +161,7 @@ export function StaffFidelidadClient() {
                 <th>Renueva en</th>
                 <th>Próximo premio</th>
                 <th>Pendientes</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -184,7 +204,7 @@ export function StaffFidelidadClient() {
                     </td>
                     <td className="text-sm text-muted">
                       {progress.nextMilestone
-                        ? `${progress.pointsToNext} visita${progress.pointsToNext !== 1 ? "s" : ""} → ${LOYALTY_REWARD_LABELS[progress.nextMilestone.reward]}`
+                        ? `${formatPoints(progress.pointsToNext)} → ${getRewardLabel(progress.nextMilestone.reward)}`
                         : "—"}
                     </td>
                     <td>
@@ -192,7 +212,7 @@ export function StaffFidelidadClient() {
                         <ul className="staff-fidelidad-pending-list">
                           {profile.pendingRewards!.map((reward) => (
                             <li key={reward}>
-                              <span className="text-green-400">{LOYALTY_REWARD_LABELS[reward]}</span>
+                              <span className="text-green-400">{getRewardLabel(reward)}</span>
                               <button
                                 type="button"
                                 className="staff-loyalty-redeem"
@@ -206,6 +226,24 @@ export function StaffFidelidadClient() {
                       ) : (
                         <span className="text-muted">—</span>
                       )}
+                    </td>
+                    <td>
+                      <div className="flex flex-col gap-1">
+                        <button
+                          type="button"
+                          className="staff-loyalty-redeem whitespace-nowrap"
+                          onClick={() => handleProduct(profile.contacto, profile.nombre)}
+                        >
+                          +1 producto
+                        </button>
+                        <button
+                          type="button"
+                          className="staff-loyalty-redeem whitespace-nowrap"
+                          onClick={() => handleAbono(profile.contacto, profile.nombre)}
+                        >
+                          +2 abono
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );

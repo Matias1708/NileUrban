@@ -3,9 +3,12 @@
 import { normalizePhone } from "@/lib/phone";
 import {
   LOYALTY_REWARD_LABELS,
+  LOYALTY_CYCLE,
   LOYALTY_CYCLE_DAYS,
   getLoyaltyProgress,
   getPrimaryPendingReward,
+  getRewardLabel,
+  formatPoints,
 } from "@/lib/loyalty-logic";
 import type { LoyaltyProfile, LoyaltyRewardId } from "@/lib/types/booking";
 
@@ -24,14 +27,14 @@ export function StaffLoyaltyBadge({ profile, compact, onRedeem }: StaffLoyaltyBa
   if (compact) {
     return (
       <div className="staff-loyalty-badge staff-loyalty-badge--compact">
-        <span className="staff-loyalty-points">{progress.points}/10</span>
+        <span className="staff-loyalty-points">{progress.points}/{LOYALTY_CYCLE}</span>
         {primary ? (
-          <span className="staff-loyalty-reward" title={LOYALTY_REWARD_LABELS[primary]}>
-            🎁 {LOYALTY_REWARD_LABELS[primary]}
+          <span className="staff-loyalty-reward" title={getRewardLabel(primary)}>
+            🎁 {getRewardLabel(primary)}
           </span>
         ) : progress.nextMilestone ? (
           <span className="staff-loyalty-next">
-            +{progress.pointsToNext} → {LOYALTY_REWARD_LABELS[progress.nextMilestone.reward]}
+            +{progress.pointsToNext} → {getRewardLabel(progress.nextMilestone.reward)}
           </span>
         ) : null}
       </div>
@@ -40,12 +43,12 @@ export function StaffLoyaltyBadge({ profile, compact, onRedeem }: StaffLoyaltyBa
 
   return (
     <div className="staff-loyalty-badge">
-      <p className="staff-loyalty-title">Fidelidad · {progress.points}/10 pts</p>
+      <p className="staff-loyalty-title">Fidelidad · {progress.points}/{LOYALTY_CYCLE} puntos</p>
       {progress.pendingRewards.length > 0 ? (
         <ul className="staff-loyalty-pending">
           {progress.pendingRewards.map((reward) => (
             <li key={reward}>
-              <span>{LOYALTY_REWARD_LABELS[reward]}</span>
+              <span>{getRewardLabel(reward)}</span>
               {onRedeem ? (
                 <button
                   type="button"
@@ -60,8 +63,8 @@ export function StaffLoyaltyBadge({ profile, compact, onRedeem }: StaffLoyaltyBa
         </ul>
       ) : progress.nextMilestone ? (
         <p className="staff-loyalty-hint">
-          Faltan {progress.pointsToNext} visita{progress.pointsToNext !== 1 ? "s" : ""} para{" "}
-          {LOYALTY_REWARD_LABELS[progress.nextMilestone.reward]}
+          Faltan {formatPoints(progress.pointsToNext)} para{" "}
+          {getRewardLabel(progress.nextMilestone.reward)}
         </p>
       ) : null}
       <p className="staff-loyalty-hint">

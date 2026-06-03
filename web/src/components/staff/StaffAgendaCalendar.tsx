@@ -19,6 +19,11 @@ import {
   type DayLoad,
 } from "@/lib/agenda-calendar";
 import { buildReminderWhatsAppUrl, getDayName, getShortWeekday } from "@/lib/agenda-utils";
+import {
+  formatPoints,
+  LOYALTY_POINTS_PER_CUT,
+  LOYALTY_POINTS_PER_PRODUCT,
+} from "@/lib/loyalty-logic";
 
 interface StaffAgendaCalendarProps {
   selectedDate: string;
@@ -31,6 +36,7 @@ interface StaffAgendaCalendarProps {
   onDelete: (id: string) => void;
   onToggleSent: (id: string, sent: boolean) => void;
   onComplete: (id: string) => void;
+  onProductPurchase: (id: string) => void;
   loyaltyByPhone: Record<string, LoyaltyProfile>;
 }
 
@@ -48,6 +54,7 @@ function CalendarCell({
   onDelete,
   onToggleSent,
   onComplete,
+  onProductPurchase,
   loyaltyByPhone,
 }: {
   booking?: Booking;
@@ -57,6 +64,7 @@ function CalendarCell({
   onDelete: (id: string) => void;
   onToggleSent: (id: string, sent: boolean) => void;
   onComplete: (id: string) => void;
+  onProductPurchase: (id: string) => void;
   loyaltyByPhone: Record<string, LoyaltyProfile>;
 }) {
   if (barberOff) {
@@ -104,10 +112,20 @@ function CalendarCell({
               <button
                 type="button"
                 className="staff-calendar-complete"
-                title="Marcar como atendido"
+                title={`Marcar como atendido (+${formatPoints(LOYALTY_POINTS_PER_CUT)})`}
                 onClick={() => onComplete(booking.id!)}
               >
                 Atendido
+              </button>
+            ) : null}
+            {booking.id && booking.contacto?.trim() ? (
+              <button
+                type="button"
+                className="staff-calendar-product"
+                title={`Registrar compra de producto (+${formatPoints(LOYALTY_POINTS_PER_PRODUCT)})`}
+                onClick={() => onProductPurchase(booking.id!)}
+              >
+                Prod.
               </button>
             ) : null}
             {canDelete && booking.id ? (
@@ -156,6 +174,7 @@ export function StaffAgendaCalendar({
   onDelete,
   onToggleSent,
   onComplete,
+  onProductPurchase,
   loyaltyByPhone,
 }: StaffAgendaCalendarProps) {
   const dayBookings = bookings.filter((b) => b.fecha === selectedDate);
@@ -312,6 +331,7 @@ export function StaffAgendaCalendar({
                       onDelete={onDelete}
                       onToggleSent={onToggleSent}
                       onComplete={onComplete}
+                      onProductPurchase={onProductPurchase}
                       loyaltyByPhone={loyaltyByPhone}
                     />
                   );

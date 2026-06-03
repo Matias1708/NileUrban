@@ -18,6 +18,7 @@ export function Header() {
     { href: "/reservar", label: "Reservas" },
     { href: "/mis-turnos", label: "Mis turnos" },
     { href: "/fidelidad", label: "Fidelidad" },
+    { href: "/abonos", label: "Abonos" },
   ];
 
   return (
@@ -28,7 +29,7 @@ export function Header() {
           <span className="text-white"> Urban Lounge</span>
         </Link>
 
-        <nav className="hidden items-center gap-6 md:flex">
+        <nav className="hidden items-center gap-5 md:flex">
           {links.map((l) => (
             <Link
               key={l.href}

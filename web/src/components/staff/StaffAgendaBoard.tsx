@@ -17,7 +17,7 @@ import {
   buildReminderWhatsAppUrl,
 } from "@/lib/agenda-utils";
 import type { Booking, LoyaltyProfile, LoyaltyRewardId } from "@/lib/types/booking";
-import { getLoyaltyProfilesForPhones, redeemLoyaltyReward, LOYALTY_REWARD_LABELS } from "@/lib/loyalty";
+import { getLoyaltyProfilesForPhones, redeemLoyaltyReward, recordProductPurchase, getRewardLabel, formatPoints, LOYALTY_POINTS_PER_CUT, LOYALTY_POINTS_PER_PRODUCT } from "@/lib/loyalty";
 import { buildLoyaltyWhatsAppUrl } from "@/lib/loyalty-logic";
 import { lookupLoyaltyProfile, StaffLoyaltyBadge } from "@/components/staff/StaffLoyaltyBadge";
 import { useStaffAuth } from "@/components/staff/StaffAuthProvider";
@@ -37,6 +37,7 @@ function AppointmentRow({
   onDelete,
   onToggleSent,
   onComplete,
+  onProductPurchase,
   loyaltyByPhone,
   onRedeem,
 }: {
@@ -46,6 +47,7 @@ function AppointmentRow({
   onDelete: (id: string) => void;
   onToggleSent: (id: string, sent: boolean) => void;
   onComplete: (id: string) => void;
+  onProductPurchase: (id: string) => void;
   loyaltyByPhone: Record<string, LoyaltyProfile>;
   onRedeem: (contacto: string, reward: LoyaltyRewardId) => void;
 }) {
@@ -93,10 +95,20 @@ function AppointmentRow({
         <button
           type="button"
           className="shrink-0 rounded-lg border border-green-500/40 px-2 py-1 text-xs font-semibold text-green-400 hover:bg-green-500/10"
-          title="Marcar como atendido"
+          title={`Marcar como atendido (+${formatPoints(LOYALTY_POINTS_PER_CUT)})`}
           onClick={() => onComplete(booking.id!)}
         >
           Atendido
+        </button>
+      ) : null}
+      {booking.contacto?.trim() && booking.id ? (
+        <button
+          type="button"
+          className="shrink-0 rounded-lg border border-gold/40 px-2 py-1 text-xs font-semibold text-gold hover:bg-gold/10"
+          title={`Registrar compra de producto (+${formatPoints(LOYALTY_POINTS_PER_PRODUCT)})`}
+          onClick={() => onProductPurchase(booking.id!)}
+        >
+          Producto
         </button>
       ) : null}
       {canDelete && booking.id && (
@@ -120,6 +132,7 @@ function BarberColumn({
   onDelete,
   onToggleSent,
   onComplete,
+  onProductPurchase,
   loyaltyByPhone,
   onRedeem,
 }: {
@@ -129,6 +142,7 @@ function BarberColumn({
   onDelete: (id: string) => void;
   onToggleSent: (id: string, sent: boolean) => void;
   onComplete: (id: string) => void;
+  onProductPurchase: (id: string) => void;
   loyaltyByPhone: Record<string, LoyaltyProfile>;
   onRedeem: (contacto: string, reward: LoyaltyRewardId) => void;
 }) {
@@ -162,6 +176,7 @@ function BarberColumn({
                   onDelete={onDelete}
                   onToggleSent={onToggleSent}
                   onComplete={onComplete}
+                  onProductPurchase={onProductPurchase}
                   loyaltyByPhone={loyaltyByPhone}
                   onRedeem={onRedeem}
                 />
@@ -235,12 +250,18 @@ export function StaffAgendaBoard() {
     );
   }
 
+  async function refreshLoyalty() {
+    const phones = [...new Set(bookings.map((b) => b.contacto).filter(Boolean))];
+    const updated = await getLoyaltyProfilesForPhones(phones);
+    setLoyaltyByPhone(updated);
+  }
+
   async function handleComplete(id: string) {
     const booking = bookings.find((b) => b.id === id);
     const hasPhone = Boolean(booking?.contacto?.trim());
     const confirmMsg = hasPhone
-      ? "¿Marcar como atendido? Se sumará 1 punto y se abrirá WhatsApp para avisar al cliente."
-      : "¿Marcar este turno como atendido? Se sumará 1 punto de fidelidad.";
+      ? "¿Marcar como atendido? Se sumarán 2 puntos y se abrirá WhatsApp para avisar al cliente."
+      : "¿Marcar este turno como atendido? Se sumarán 2 puntos de fidelidad.";
     if (!confirm(confirmMsg)) return;
 
     const result = await completeBooking(id);
@@ -252,12 +273,22 @@ export function StaffAgendaBoard() {
     }
   }
 
+  async function handleProductPurchase(id: string) {
+    const booking = bookings.find((b) => b.id === id);
+    if (!booking?.contacto?.trim()) {
+      alert("Este turno no tiene teléfono — no se pueden sumar puntos.");
+      return;
+    }
+    if (!confirm(`¿Sumar 1 punto por producto a ${booking.nombre}?`)) return;
+
+    await recordProductPurchase(booking.contacto, booking.nombre);
+    await refreshLoyalty();
+  }
+
   async function handleRedeem(contacto: string, reward: LoyaltyRewardId) {
-    if (!confirm(`¿Marcar "${LOYALTY_REWARD_LABELS[reward]}" como canjeado?`)) return;
+    if (!confirm(`¿Marcar "${getRewardLabel(reward)}" como canjeado?`)) return;
     await redeemLoyaltyReward(contacto, reward);
-    const phones = [...new Set(bookings.map((b) => b.contacto).filter(Boolean))];
-    const updated = await getLoyaltyProfilesForPhones(phones);
-    setLoyaltyByPhone(updated);
+    await refreshLoyalty();
   }
 
   const barbersToShow: BarberName[] =
@@ -345,6 +376,7 @@ export function StaffAgendaBoard() {
           onDelete={handleDelete}
           onToggleSent={handleToggleSent}
           onComplete={handleComplete}
+          onProductPurchase={handleProductPurchase}
           loyaltyByPhone={loyaltyByPhone}
         />
       ) : view === "columns" ? (
@@ -358,6 +390,7 @@ export function StaffAgendaBoard() {
               onDelete={handleDelete}
               onToggleSent={handleToggleSent}
               onComplete={handleComplete}
+              onProductPurchase={handleProductPurchase}
               loyaltyByPhone={loyaltyByPhone}
               onRedeem={handleRedeem}
             />
@@ -399,6 +432,7 @@ export function StaffAgendaBoard() {
                       onDelete={handleDelete}
                       onToggleSent={handleToggleSent}
                       onComplete={handleComplete}
+                      onProductPurchase={handleProductPurchase}
                       loyaltyByPhone={loyaltyByPhone}
                       onRedeem={handleRedeem}
                     />

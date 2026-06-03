@@ -1,20 +1,37 @@
 import type { LoyaltyProfile, LoyaltyRewardId } from "@/lib/types/booking";
 import { normalizePhone } from "@/lib/phone";
 
-export const LOYALTY_CYCLE = 10;
+export const LOYALTY_CYCLE = 8;
 export const LOYALTY_CYCLE_DAYS = 45;
+export const LOYALTY_POINTS_PER_CUT = 2;
+export const LOYALTY_POINTS_PER_PRODUCT = 1;
+export const LOYALTY_POINTS_ABONO_RENEWAL = 2;
 
 export const LOYALTY_MILESTONES: { at: number; reward: LoyaltyRewardId }[] = [
-  { at: 5, reward: "discount_20" },
-  { at: 8, reward: "premium" },
-  { at: 10, reward: "free_cut" },
+  { at: 3, reward: "discount_20_product" },
+  { at: 6, reward: "discount_20_cut" },
+  { at: 8, reward: "free_cut" },
 ];
 
 export const LOYALTY_REWARD_LABELS: Record<LoyaltyRewardId, string> = {
-  discount_20: "20% de descuento",
-  premium: "Servicio premium",
+  discount_20_product: "20% desc. en productos",
+  discount_20_cut: "20% desc. en corte",
   free_cut: "Corte gratis",
 };
+
+const LEGACY_REWARD_LABELS: Record<string, string> = {
+  discount_20: "20% de descuento",
+  premium: "Servicio premium",
+};
+
+export function getRewardLabel(reward: LoyaltyRewardId | string): string {
+  return LOYALTY_REWARD_LABELS[reward as LoyaltyRewardId] ?? LEGACY_REWARD_LABELS[reward] ?? reward;
+}
+
+/** "1 punto" / "2 puntos" */
+export function formatPoints(n: number): string {
+  return `${n} punto${n !== 1 ? "s" : ""}`;
+}
 
 export interface LoyaltyProgress {
   points: number;
@@ -75,7 +92,6 @@ export function resetLoyaltyCycleProfile(profile: LoyaltyProfile, now = new Date
   };
 }
 
-/** Aplica reinicio de 45 días si corresponde; ancla ciclo en perfiles legacy. */
 export function normalizeLoyaltyCycle(
   profile: LoyaltyProfile,
   now = new Date()
@@ -106,13 +122,13 @@ export function getLoyaltyProgress(
   now = new Date()
 ): LoyaltyProgress {
   const points = profile.points ?? 0;
-  const pendingRewards = profile.pendingRewards ?? [];
+  const pendingRewards = (profile.pendingRewards ?? []) as LoyaltyRewardId[];
   const next = LOYALTY_MILESTONES.find((m) => m.at > points) ?? null;
   const cycleExpired = isLoyaltyCycleExpired(profile, now);
 
   return {
     points,
-    totalVisits: profile.totalVisits ?? profile.points ?? 0,
+    totalVisits: profile.totalVisits ?? 0,
     pendingRewards,
     nextMilestone: next,
     pointsToNext: next ? next.at - points : 0,
@@ -121,30 +137,57 @@ export function getLoyaltyProgress(
   };
 }
 
-export function applyVisitToLoyalty(current: {
+function applyPointsEarned(current: {
   points: number;
   totalVisits: number;
   pendingRewards: LoyaltyRewardId[];
-}): { points: number; totalVisits: number; pendingRewards: LoyaltyRewardId[] } {
-  const totalVisits = current.totalVisits + 1;
-  let points = current.points + 1;
+}, earned: number, countVisit: boolean) {
+  const totalVisits = countVisit ? current.totalVisits + 1 : current.totalVisits;
+  let points = current.points + earned;
   const pendingRewards = [...current.pendingRewards];
 
   for (const milestone of LOYALTY_MILESTONES) {
-    if (points === milestone.at && !pendingRewards.includes(milestone.reward)) {
+    if (points >= milestone.at && !pendingRewards.includes(milestone.reward)) {
       pendingRewards.push(milestone.reward);
     }
   }
 
   if (points >= LOYALTY_CYCLE) {
-    points = 0;
+    points = points - LOYALTY_CYCLE;
   }
 
   return { points, totalVisits, pendingRewards };
 }
 
+/** Corte atendido: +2 pts desde el primer corte. */
+export function applyVisitToLoyalty(current: {
+  points: number;
+  totalVisits: number;
+  pendingRewards: LoyaltyRewardId[];
+}): { points: number; totalVisits: number; pendingRewards: LoyaltyRewardId[] } {
+  return applyPointsEarned(current, LOYALTY_POINTS_PER_CUT, true);
+}
+
+/** Compra de producto: +1 pt. */
+export function applyProductToLoyalty(current: {
+  points: number;
+  totalVisits: number;
+  pendingRewards: LoyaltyRewardId[];
+}): { points: number; totalVisits: number; pendingRewards: LoyaltyRewardId[] } {
+  return applyPointsEarned(current, LOYALTY_POINTS_PER_PRODUCT, false);
+}
+
+/** Renovación de abono mensual: +2 pts de regalo. */
+export function applyAbonoRenewalToLoyalty(current: {
+  points: number;
+  totalVisits: number;
+  pendingRewards: LoyaltyRewardId[];
+}): { points: number; totalVisits: number; pendingRewards: LoyaltyRewardId[] } {
+  return applyPointsEarned(current, LOYALTY_POINTS_ABONO_RENEWAL, false);
+}
+
 export function getPrimaryPendingReward(pending: LoyaltyRewardId[]): LoyaltyRewardId | null {
-  const order: LoyaltyRewardId[] = ["free_cut", "premium", "discount_20"];
+  const order: LoyaltyRewardId[] = ["free_cut", "discount_20_cut", "discount_20_product"];
   for (const id of order) {
     if (pending.includes(id)) return id;
   }
@@ -153,13 +196,14 @@ export function getPrimaryPendingReward(pending: LoyaltyRewardId[]): LoyaltyRewa
 
 export function formatLoyaltyWhatsAppMessage(
   nombre: string,
-  profile: Pick<LoyaltyProfile, "points" | "totalVisits" | "pendingRewards" | "cycleStartedAt" | "lastVisit">
+  profile: Pick<LoyaltyProfile, "points" | "totalVisits" | "pendingRewards" | "cycleStartedAt" | "lastVisit">,
+  pointsEarned = LOYALTY_POINTS_PER_CUT
 ): string {
   const progress = getLoyaltyProgress(profile);
   const lines: string[] = [
     `¡Hola ${nombre}! 💈`,
     "",
-    "Sumaste 1 punto en Nile Urban Lounge.",
+    `Sumaste ${pointsEarned} punto${pointsEarned !== 1 ? "s" : ""} en Nile Urban Lounge.`,
     `Puntos actuales: ${progress.points}/${LOYALTY_CYCLE}`,
   ];
 
@@ -168,16 +212,15 @@ export function formatLoyaltyWhatsAppMessage(
     const label = progress.pendingRewards.length === 1 ? "Premio disponible" : "Premios disponibles";
     lines.push(`🎁 ${label}:`);
     for (const reward of progress.pendingRewards) {
-      lines.push(`· ${LOYALTY_REWARD_LABELS[reward]}`);
+      lines.push(`· ${getRewardLabel(reward)}`);
     }
-    lines.push("Avisanos al pagar para canjearlo.");
+    lines.push("Avisanos al pagar para canjearlo (un beneficio por vez).");
   }
 
   if (progress.nextMilestone && progress.pointsToNext > 0) {
     lines.push("");
-    const visitLabel = progress.pointsToNext === 1 ? "visita" : "visitas";
     lines.push(
-      `Te faltan ${progress.pointsToNext} ${visitLabel} para ${LOYALTY_REWARD_LABELS[progress.nextMilestone.reward]}.`
+      `Te faltan ${progress.pointsToNext} punto${progress.pointsToNext !== 1 ? "s" : ""} para ${getRewardLabel(progress.nextMilestone.reward)}.`
     );
   }
 
@@ -191,12 +234,16 @@ export function formatLoyaltyWhatsAppMessage(
 export function buildLoyaltyWhatsAppUrl(
   contacto: string,
   nombre: string,
-  profile: Pick<LoyaltyProfile, "points" | "totalVisits" | "pendingRewards" | "cycleStartedAt" | "lastVisit">
+  profile: Pick<LoyaltyProfile, "points" | "totalVisits" | "pendingRewards" | "cycleStartedAt" | "lastVisit">,
+  pointsEarned?: number
 ): string | null {
   const normalized = normalizePhone(contacto);
   if (normalized.length < 8) return null;
 
   const waPhone = `549${normalized}`;
-  const message = encodeURIComponent(formatLoyaltyWhatsAppMessage(nombre, profile));
+  const message = encodeURIComponent(formatLoyaltyWhatsAppMessage(nombre, profile, pointsEarned));
   return `https://api.whatsapp.com/send?phone=${waPhone}&text=${message}`;
 }
+
+export const LOYALTY_BENEFIT_NOTE =
+  "Cada premio se canjea por separado: los puntos no se acumulan ni se combinan para obtener el mismo beneficio más de una vez en el mismo ciclo.";

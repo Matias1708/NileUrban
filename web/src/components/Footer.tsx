@@ -21,6 +21,8 @@ export function Footer() {
             <ul className="mt-3 space-y-2 text-sm text-muted">
               <li><Link href="/reservar" className="hover:text-gold">Reservar turno</Link></li>
               <li><Link href="/mis-turnos" className="hover:text-gold">Mis turnos</Link></li>
+              <li><Link href="/fidelidad" className="hover:text-gold">Fidelidad</Link></li>
+              <li><Link href="/abonos" className="hover:text-gold">Club de Abonos</Link></li>
               <li><Link href="/politica-cancelacion" className="hover:text-gold">Política de cancelación</Link></li>
               <li><Link href="/privacidad" className="hover:text-gold">Privacidad</Link></li>
             </ul>

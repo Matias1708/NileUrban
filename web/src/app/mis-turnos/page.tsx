@@ -3,13 +3,14 @@
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Suspense, useEffect, useState } from "react";
-import { getBookingsByPhone, cancelBooking } from "@/lib/bookings";
+import { getBookingsByPhone } from "@/lib/bookings";
 import type { Booking } from "@/lib/types/booking";
 import { getServicePrice, formatPriceARS } from "@/lib/scheduling/pricing";
 import { loadPricingConfig } from "@/lib/pricing-store";
 import type { ServiceName } from "@/lib/constants";
 import type { PricingConfig } from "@/lib/types/pricing";
 import { LoyaltyCard } from "@/components/LoyaltyCard";
+import { SALON } from "@/lib/constants";
 import { normalizePhone } from "@/lib/phone";
 
 function MisTurnosContent() {
@@ -115,16 +116,10 @@ function MisTurnosContent() {
     }
   }
 
-  async function handleCancel(id: string) {
-    if (!confirm("¿Cancelar este turno?")) return;
-    await cancelBooking(id);
-    await loadBookings(phone);
-  }
-
   return (
     <div className="mx-auto max-w-lg px-4 py-12">
       <h1 className="text-3xl font-bold text-gold">Mis turnos</h1>
-      <p className="mt-2 text-muted">Consultá, cancelá o reprogramá tus citas</p>
+      <p className="mt-2 text-muted">Consultá tus próximas citas y tu progreso de fidelidad</p>
 
       {error && (
         <div className="mt-4 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
@@ -210,23 +205,18 @@ function MisTurnosContent() {
               <p className="text-sm text-muted">
                 {formatPriceARS(getServicePrice(b.servicio as ServiceName, b.fecha, pricing))}
               </p>
-              <div className="mt-4 flex gap-3">
-                <Link
-                  href={`/reservar?profesional=${b.profesional}`}
-                  className="btn-secondary text-sm !py-2"
+              <p className="mt-3 text-xs text-muted">
+                Para cambios o cancelaciones, escribinos por WhatsApp al{" "}
+                <a
+                  href={`https://wa.me/${SALON.whatsapp}`}
+                  className="text-gold hover:underline"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  Reprogramar
-                </Link>
-                {b.id && (
-                  <button
-                    type="button"
-                    className="text-sm text-red-400 hover:underline"
-                    onClick={() => handleCancel(b.id!)}
-                  >
-                    Cancelar
-                  </button>
-                )}
-              </div>
+                  {SALON.phone}
+                </a>
+                .
+              </p>
             </article>
           ))}
           <Link href="/reservar" className="btn-primary mt-4 inline-flex">

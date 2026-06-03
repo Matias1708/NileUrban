@@ -14,22 +14,32 @@ import { normalizePhone, phoneLookupVariants } from "@/lib/phone";
 import type { LoyaltyProfile, LoyaltyRewardId } from "@/lib/types/booking";
 import {
   applyVisitToLoyalty,
+  applyProductToLoyalty,
+  applyAbonoRenewalToLoyalty,
   normalizeLoyaltyCycle,
 } from "@/lib/loyalty-logic";
 
 export {
   LOYALTY_CYCLE,
   LOYALTY_CYCLE_DAYS,
+  LOYALTY_POINTS_PER_CUT,
+  LOYALTY_POINTS_PER_PRODUCT,
+  LOYALTY_POINTS_ABONO_RENEWAL,
   LOYALTY_MILESTONES,
   LOYALTY_REWARD_LABELS,
+  LOYALTY_BENEFIT_NOTE,
   getLoyaltyProgress,
   getPrimaryPendingReward,
+  getRewardLabel,
   applyVisitToLoyalty,
+  applyProductToLoyalty,
+  applyAbonoRenewalToLoyalty,
   daysUntilCycleReset,
   isLoyaltyCycleExpired,
   normalizeLoyaltyCycle,
   formatLoyaltyWhatsAppMessage,
   buildLoyaltyWhatsAppUrl,
+  formatPoints,
 } from "@/lib/loyalty-logic";
 export type { LoyaltyProgress } from "@/lib/loyalty-logic";
 
@@ -201,6 +211,67 @@ export async function recordCompletedVisit(
 
   await updateDoc(found.ref, loyaltyUpdateData(updated));
   return updated;
+}
+
+async function recordPointsEarned(
+  contacto: string,
+  nombre: string,
+  applyFn: (current: {
+    points: number;
+    totalVisits: number;
+    pendingRewards: LoyaltyRewardId[];
+  }) => { points: number; totalVisits: number; pendingRewards: LoyaltyRewardId[] }
+): Promise<LoyaltyProfile> {
+  const normalized = normalizePhone(contacto);
+  const found = await findLoyaltyDoc(contacto);
+
+  if (!found) {
+    const now = new Date().toISOString();
+    const after = applyFn({ points: 0, totalVisits: 0, pendingRewards: [] });
+    const profile: LoyaltyProfile = {
+      contacto: normalized,
+      nombre,
+      points: after.points,
+      totalVisits: after.totalVisits,
+      pendingRewards: after.pendingRewards,
+      cycleStartedAt: now,
+    };
+    await addDoc(collection(db, "loyalty"), profile);
+    return profile;
+  }
+
+  const current = await loadNormalizedLoyalty(found);
+  const after = applyFn({
+    points: current.points ?? 0,
+    totalVisits: current.totalVisits ?? current.visits ?? 0,
+    pendingRewards: (current.pendingRewards ?? []) as LoyaltyRewardId[],
+  });
+
+  const updated: LoyaltyProfile = {
+    ...current,
+    contacto: normalized,
+    nombre,
+    points: after.points,
+    totalVisits: after.totalVisits,
+    pendingRewards: after.pendingRewards,
+  };
+
+  await updateDoc(found.ref, loyaltyUpdateData(updated));
+  return updated;
+}
+
+export async function recordProductPurchase(
+  contacto: string,
+  nombre: string
+): Promise<LoyaltyProfile> {
+  return recordPointsEarned(contacto, nombre, applyProductToLoyalty);
+}
+
+export async function recordAbonoRenewal(
+  contacto: string,
+  nombre: string
+): Promise<LoyaltyProfile> {
+  return recordPointsEarned(contacto, nombre, applyAbonoRenewalToLoyalty);
 }
 
 export async function redeemLoyaltyReward(

@@ -7,6 +7,7 @@ import {
   LOYALTY_CYCLE_DAYS,
   LOYALTY_MILESTONES,
   LOYALTY_REWARD_LABELS,
+  LOYALTY_BENEFIT_NOTE,
   getLoyaltyProgress,
 } from "@/lib/loyalty-logic";
 import type { LoyaltyProfile } from "@/lib/types/booking";
@@ -32,7 +33,7 @@ export function LoyaltyCard({ phone }: { phone: string }) {
       <p className="mt-2 text-sm text-white/80">
         Puntos: <strong>{progress.points}</strong> / {LOYALTY_CYCLE}
         {" · "}
-        Visitas totales: <strong>{progress.totalVisits}</strong>
+        Cortes atendidos: <strong>{progress.totalVisits}</strong>
       </p>
 
       <div className="loyalty-progress mt-4" aria-hidden>
@@ -71,9 +72,10 @@ export function LoyaltyCard({ phone }: { phone: string }) {
           {LOYALTY_REWARD_LABELS[progress.nextMilestone.reward]}
         </p>
       ) : (
-        <p className="mt-3 text-sm text-muted">Seguí sumando visitas para tu próximo premio.</p>
+        <p className="mt-3 text-sm text-muted">Seguí sumando para tu próximo premio.</p>
       )}
-      <p className="mt-3 text-xs text-muted">
+      <p className="mt-3 text-xs text-muted">{LOYALTY_BENEFIT_NOTE}</p>
+      <p className="mt-2 text-xs text-muted">
         El ciclo se renueva cada {LOYALTY_CYCLE_DAYS} días
         {progress.daysUntilReset > 0
           ? ` · quedan ${progress.daysUntilReset} día${progress.daysUntilReset !== 1 ? "s" : ""}`

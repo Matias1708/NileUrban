@@ -56,12 +56,12 @@ export interface Review {
   published?: boolean;
 }
 
-export type LoyaltyRewardId = "discount_20" | "premium" | "free_cut";
+export type LoyaltyRewardId = "discount_20_product" | "discount_20_cut" | "free_cut";
 
 export interface LoyaltyProfile {
   contacto: string;
   nombre: string;
-  /** Puntos en el ciclo actual (0–9, se reinicia al llegar a 10). */
+  /** Puntos en el ciclo actual (0–7, se reinicia al llegar a 8). */
   points: number;
   /** Visitas completadas en total. */
   totalVisits: number;

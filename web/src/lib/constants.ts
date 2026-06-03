@@ -30,5 +30,6 @@ export const SALON = {
   phone: "1164380904",
   email: "Nileurbanlounge@gmail.com",
   instagram: "https://www.instagram.com/nile.urbanlounge",
-  hours: "Lunes de 13 a 19 hs · Martes a sábado de 10 a 19 hs",
+  hours: "Lunes de 13 a 18:20 hs · Martes a sábado de 10 a 19 hs",
+  whatsapp: "5491164380904",
 };

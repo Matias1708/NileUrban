@@ -39,6 +39,9 @@ export const metadata: Metadata = {
     description: "Barbería premium en Ramos Mejía",
   },
   manifest: "/manifest.json",
+  icons: {
+    apple: [{ url: "/images/nile_nl.jpg", sizes: "180x180", type: "image/jpeg" }],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",

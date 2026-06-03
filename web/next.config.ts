@@ -20,6 +20,7 @@ const nextConfig: NextConfig = {
       { source: "/reserva", destination: "/reservar", permanent: true },
       { source: "/turnos", destination: "/mis-turnos", permanent: true },
       { source: "/mis-turnos.html", destination: "/mis-turnos", permanent: true },
+      { source: "/fidelidad/abonos", destination: "/abonos", permanent: true },
     ];
   },
 };
