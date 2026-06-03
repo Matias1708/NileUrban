@@ -1,4 +1,4 @@
-const CACHE = "nile-v2";
+const CACHE = "nile-v3";
 
 self.addEventListener("install", (event) => {
   self.skipWaiting();
