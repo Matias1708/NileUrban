@@ -1,3 +1,5 @@
+import type { BarberName } from "@/lib/constants";
+
 export type BookingStatus = "pending" | "confirmed" | "paid" | "cancelled" | "completed";
 
 export interface Booking {
@@ -16,6 +18,32 @@ export interface Booking {
   incluidoEnAbono?: boolean;
   completedAt?: string;
   createdAt?: unknown;
+  /** Turno generado desde plantilla semanal */
+  isFixedSlot?: boolean;
+  fixedSlotId?: string;
+}
+
+/** Plantilla de turno fijo semanal (mismo día/hora/barbero) */
+export interface FixedSlot {
+  id?: string;
+  nombre: string;
+  contacto: string;
+  profesional: BarberName;
+  /** 1=lunes … 6=sábado */
+  weekday: number;
+  hora: string;
+  servicio: string;
+  activo: boolean;
+  notas?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+/** Liberar un turno fijo solo en una fecha puntual */
+export interface FixedSlotException {
+  id?: string;
+  fixedSlotId: string;
+  fecha: string;
 }
 
 export interface Expense {

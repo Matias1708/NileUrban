@@ -22,6 +22,11 @@ import { phoneLookupVariants } from "@/lib/phone";
 import type { BarberName } from "@/lib/constants";
 import { loadBarberSchedules, loadSalonSchedule } from "@/lib/barber-schedules";
 import { validateBooking } from "@/lib/scheduling/slots";
+import {
+  loadActiveFixedSlots,
+  loadFixedSlotExceptions,
+} from "@/lib/fixed-slots";
+import { getFixedReservedTimes } from "@/lib/fixed-slots-logic";
 
 const BOOKINGS = "Reserva";
 
@@ -36,6 +41,39 @@ export async function getBookingsForDateAndProfessional(
   );
   const snap = await getDocs(q);
   return snap.docs.map((d) => ({ id: d.id, ...d.data() } as Booking));
+}
+
+export async function getBookingsForDate(date: string): Promise<Booking[]> {
+  const q = query(collection(db, BOOKINGS), where("fecha", "==", date));
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() } as Booking));
+}
+
+/** Horas ocupadas por reservas web + turnos fijos para un día/barbero */
+export async function getReservedTimesForDate(
+  date: string,
+  professional: string
+): Promise<string[]> {
+  const [bookings, dayBookings, fixedSlots, exceptions] = await Promise.all([
+    getBookingsForDateAndProfessional(date, professional),
+    getBookingsForDate(date),
+    loadActiveFixedSlots(),
+    loadFixedSlotExceptions(),
+  ]);
+
+  const fromBookings = bookings
+    .filter((b) => b.estado !== "cancelled")
+    .map((b) => b.hora);
+
+  const fromFixed = getFixedReservedTimes(
+    date,
+    professional,
+    fixedSlots,
+    exceptions,
+    dayBookings
+  );
+
+  return [...new Set([...fromBookings, ...fromFixed])];
 }
 
 export async function getBookingsByPhone(phone: string): Promise<Booking[]> {
@@ -92,8 +130,8 @@ export async function createBooking(data: Omit<Booking, "id">): Promise<string> 
     throw new Error(validationError);
   }
 
-  const existing = await getBookingsForDateAndProfessional(data.fecha, data.profesional);
-  if (existing.some((b) => b.hora === data.hora && b.estado !== "cancelled")) {
+  const reservedTimes = await getReservedTimesForDate(data.fecha, data.profesional);
+  if (reservedTimes.includes(data.hora)) {
     throw new Error("Ese horario ya está reservado.");
   }
 

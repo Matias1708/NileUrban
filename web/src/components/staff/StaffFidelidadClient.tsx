@@ -7,6 +7,7 @@ import {
   redeemLoyaltyReward,
   recordProductPurchase,
   recordAbonoRenewal,
+  recordCompletedVisit,
   LOYALTY_CYCLE,
   LOYALTY_CYCLE_DAYS,
   LOYALTY_MILESTONES,
@@ -81,6 +82,12 @@ export function StaffFidelidadClient() {
   async function handleAbono(contacto: string, nombre: string) {
     if (!confirm("¿Sumar 2 puntos por renovación de abono mensual?")) return;
     await recordAbonoRenewal(contacto, nombre);
+    await load();
+  }
+
+  async function handleCut(contacto: string, nombre: string) {
+    if (!confirm(`¿Sumar ${formatPoints(LOYALTY_POINTS_PER_CUT)} por corte a ${nombre}?`)) return;
+    await recordCompletedVisit(contacto, nombre);
     await load();
   }
 
@@ -229,6 +236,13 @@ export function StaffFidelidadClient() {
                     </td>
                     <td>
                       <div className="flex flex-col gap-1">
+                        <button
+                          type="button"
+                          className="staff-loyalty-redeem whitespace-nowrap"
+                          onClick={() => handleCut(profile.contacto, profile.nombre)}
+                        >
+                          +2 corte
+                        </button>
                         <button
                           type="button"
                           className="staff-loyalty-redeem whitespace-nowrap"

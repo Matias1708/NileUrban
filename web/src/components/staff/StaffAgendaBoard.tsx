@@ -27,6 +27,14 @@ import { DEFAULT_SALON_SCHEDULE, getAllDefaultSchedules } from "@/lib/scheduling
 import type { BarberScheduleConfig, SalonScheduleConfig } from "@/lib/types/schedule";
 import { StaffAgendaCalendar } from "@/components/staff/StaffAgendaCalendar";
 import { todayDMY } from "@/lib/agenda-calendar";
+import {
+  loadActiveFixedSlots,
+  loadFixedSlotExceptions,
+  completeFixedSlotVisit,
+  recordFixedSlotProduct,
+  addFixedSlotException,
+} from "@/lib/fixed-slots";
+import { mergeAgendaWithFixedSlots, isFixedSlotBookingId, parseFixedSlotSyntheticId } from "@/lib/fixed-slots-logic";
 
 type ViewMode = "calendar" | "columns" | "filter";
 
@@ -55,18 +63,27 @@ function AppointmentRow({
 
   return (
     <li className="group flex items-start gap-2 rounded-xl border border-white/10 bg-gradient-to-br from-[#2a2a2a] to-[#1a1a1a] p-4 text-sm shadow-md transition hover:border-gold/50 hover:translate-x-1">
-      <input
-        type="checkbox"
-        className="mt-1 shrink-0 accent-[#c8a97e]"
-        checked={booking.enviar === "S"}
-        title="Marcar recordatorio enviado"
-        onChange={(e) => booking.id && onToggleSent(booking.id, e.target.checked)}
-      />
+      {!booking.isFixedSlot ? (
+        <input
+          type="checkbox"
+          className="mt-1 shrink-0 accent-[#c8a97e]"
+          checked={booking.enviar === "S"}
+          title="Marcar recordatorio enviado"
+          onChange={(e) => booking.id && onToggleSent(booking.id, e.target.checked)}
+        />
+      ) : (
+        <span className="mt-1 w-4 shrink-0" aria-hidden />
+      )}
       <div className="min-w-0 flex-1 leading-relaxed">
         {showBarber && (
           <span className="font-semibold text-gold">{booking.profesional}: </span>
         )}
         <span>{booking.nombre}</span>
+        {booking.isFixedSlot ? (
+          <span className="ml-1 rounded bg-gold/20 px-1.5 py-0.5 text-[10px] font-bold uppercase text-gold">
+            Fijo
+          </span>
+        ) : null}
         <span className="text-white/60"> — {booking.hora}hs — {booking.servicio} — </span>
         {booking.contacto ? (
           <a
@@ -111,7 +128,7 @@ function AppointmentRow({
           Producto
         </button>
       ) : null}
-      {canDelete && booking.id && (
+      {canDelete && booking.id && !booking.isFixedSlot && (
         <button
           type="button"
           className="shrink-0 text-red-400 opacity-70 hover:opacity-100"
@@ -119,6 +136,16 @@ function AppointmentRow({
           onClick={() => onDelete(booking.id!)}
         >
           🗑
+        </button>
+      )}
+      {booking.isFixedSlot && booking.id && (
+        <button
+          type="button"
+          className="shrink-0 text-xs text-amber-400 opacity-80 hover:opacity-100"
+          title="Liberar solo hoy"
+          onClick={() => onDelete(booking.id!)}
+        >
+          Liberar hoy
         </button>
       )}
     </li>
@@ -205,15 +232,19 @@ export function StaffAgendaBoard() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [all, barberSchedules, salon] = await Promise.all([
+      const [all, barberSchedules, salon, fixedSlots, exceptions] = await Promise.all([
         getAllBookings(),
         loadBarberSchedules(),
         loadSalonSchedule(),
+        loadActiveFixedSlots(),
+        loadFixedSlotExceptions(),
       ]);
       let data = staffAgendaBookings(all);
-      if (staff?.role === "barber" && staff.barberName) {
-        data = data.filter((b) => b.profesional === staff.barberName);
-      }
+      const barberFilter =
+        staff?.role === "barber" && staff.barberName ? staff.barberName : undefined;
+      data = mergeAgendaWithFixedSlots(data, all, fixedSlots, exceptions, {
+        barberFilter,
+      });
       setBookings(data);
       setSchedules(barberSchedules);
       setSalonSchedule(salon);
@@ -238,6 +269,16 @@ export function StaffAgendaBoard() {
   }, [bookings]);
 
   async function handleDelete(id: string) {
+    if (isFixedSlotBookingId(id)) {
+      const parsed = parseFixedSlotSyntheticId(id);
+      if (!parsed) return;
+      if (!confirm("¿Liberar este turno fijo solo para hoy? El horario quedará disponible en la web.")) {
+        return;
+      }
+      await addFixedSlotException(parsed.fixedSlotId, parsed.fecha);
+      await load();
+      return;
+    }
     if (!confirm("¿Eliminar este turno?")) return;
     await deleteBooking(id);
     await load();
@@ -264,7 +305,14 @@ export function StaffAgendaBoard() {
       : "¿Marcar este turno como atendido? Se sumarán 2 puntos de fidelidad.";
     if (!confirm(confirmMsg)) return;
 
-    const result = await completeBooking(id);
+    let result;
+    if (isFixedSlotBookingId(id)) {
+      const parsed = parseFixedSlotSyntheticId(id);
+      if (!parsed) return;
+      result = await completeFixedSlotVisit(parsed.fixedSlotId, parsed.fecha);
+    } else {
+      result = await completeBooking(id);
+    }
     await load();
 
     if (hasPhone && result.loyalty && result.contacto) {
@@ -281,7 +329,13 @@ export function StaffAgendaBoard() {
     }
     if (!confirm(`¿Sumar 1 punto por producto a ${booking.nombre}?`)) return;
 
-    await recordProductPurchase(booking.contacto, booking.nombre);
+    if (isFixedSlotBookingId(id)) {
+      const parsed = parseFixedSlotSyntheticId(id);
+      if (!parsed) return;
+      await recordFixedSlotProduct(parsed.fixedSlotId, parsed.fecha);
+    } else {
+      await recordProductPurchase(booking.contacto, booking.nombre);
+    }
     await refreshLoyalty();
   }
 
@@ -349,6 +403,12 @@ export function StaffAgendaBoard() {
           Vista con filtro
         </button>
         <Link
+          href="/staff/turnos-fijos"
+          className="rounded-lg border-2 border-[#555] bg-[#333] px-5 py-2.5 text-sm font-bold uppercase tracking-wide text-white no-underline transition hover:bg-[#555]"
+        >
+          Turnos fijos
+        </Link>
+        <Link
           href="/staff/fidelidad"
           className="rounded-lg border-2 border-[#555] bg-[#333] px-5 py-2.5 text-sm font-bold uppercase tracking-wide text-white no-underline transition hover:bg-[#555]"
         >
@@ -377,6 +437,7 @@ export function StaffAgendaBoard() {
           onToggleSent={handleToggleSent}
           onComplete={handleComplete}
           onProductPurchase={handleProductPurchase}
+          onReleaseFixed={handleDelete}
           loyaltyByPhone={loyaltyByPhone}
         />
       ) : view === "columns" ? (

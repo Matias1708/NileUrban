@@ -120,5 +120,15 @@ service cloud.firestore {
       allow read: if true;
       allow write: if true;
     }
+
+    match /turnos_fijos/{slotId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /turnos_fijos_excepciones/{exceptionId} {
+      allow read: if true;
+      allow write: if true;
+    }
   }
 }

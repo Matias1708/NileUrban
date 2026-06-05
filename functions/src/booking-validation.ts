@@ -148,5 +148,44 @@ export async function validateBookingRequest(
     return "La hora seleccionada no está disponible.";
   }
 
+  const bookingsSnap = await db
+    .collection("Reserva")
+    .where("fecha", "==", fecha)
+    .where("profesional", "==", profesional)
+    .where("hora", "==", hora)
+    .get();
+  const hasBooking = bookingsSnap.docs.some(
+    (d) => (d.data().estado as string | undefined) !== "cancelled"
+  );
+  if (hasBooking) return "La hora seleccionada no está disponible.";
+
+  const fixedSnap = await db.collection("turnos_fijos").where("activo", "==", true).get();
+  const exceptionsSnap = await db.collection("turnos_fijos_excepciones").get();
+  const exceptions = new Set(
+    exceptionsSnap.docs.map((d) => {
+      const data = d.data();
+      return `${data.fixedSlotId as string}|${data.fecha as string}`;
+    })
+  );
+
+  for (const doc of fixedSnap.docs) {
+    const slot = doc.data();
+    if (slot.weekday !== dayOfWeek) continue;
+    if (slot.profesional !== profesional) continue;
+    if (slot.hora !== hora) continue;
+    if (exceptions.has(`${doc.id}|${fecha}`)) continue;
+
+    const completedSnap = await db
+      .collection("Reserva")
+      .where("fecha", "==", fecha)
+      .where("fixedSlotId", "==", doc.id)
+      .where("estado", "==", "completed")
+      .limit(1)
+      .get();
+    if (!completedSnap.empty) continue;
+
+    return "La hora seleccionada no está disponible.";
+  }
+
   return null;
 }

@@ -484,6 +484,40 @@ body {
   background: rgba(200, 169, 126, 0.22);
 }
 
+.staff-calendar-cell-booked.is-fixed-slot .staff-calendar-booking-card {
+  border-color: rgba(200, 169, 126, 0.55);
+  background: linear-gradient(145deg, rgba(200, 169, 126, 0.12), rgba(30, 30, 30, 0.95));
+}
+
+.staff-calendar-fixed-badge {
+  display: inline-block;
+  margin-left: 0.35rem;
+  padding: 0.05rem 0.35rem;
+  border-radius: 0.25rem;
+  background: rgba(200, 169, 126, 0.25);
+  color: var(--gold);
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+.staff-calendar-release {
+  padding: 0.1rem 0.35rem;
+  border: none;
+  background: transparent;
+  color: #ffb74d;
+  font-size: 0.625rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.staff-calendar-release:hover {
+  color: #ffe0b2;
+  text-decoration: underline;
+}
+
 .staff-loyalty-badge {
   margin-top: 0.35rem;
   padding: 0.35rem 0.5rem;

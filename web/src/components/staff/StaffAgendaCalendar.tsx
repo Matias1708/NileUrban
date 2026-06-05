@@ -37,6 +37,7 @@ interface StaffAgendaCalendarProps {
   onToggleSent: (id: string, sent: boolean) => void;
   onComplete: (id: string) => void;
   onProductPurchase: (id: string) => void;
+  onReleaseFixed?: (id: string) => void;
   loyaltyByPhone: Record<string, LoyaltyProfile>;
 }
 
@@ -55,6 +56,7 @@ function CalendarCell({
   onToggleSent,
   onComplete,
   onProductPurchase,
+  onReleaseFixed,
   loyaltyByPhone,
 }: {
   booking?: Booking;
@@ -65,6 +67,7 @@ function CalendarCell({
   onToggleSent: (id: string, sent: boolean) => void;
   onComplete: (id: string) => void;
   onProductPurchase: (id: string) => void;
+  onReleaseFixed?: (id: string) => void;
   loyaltyByPhone: Record<string, LoyaltyProfile>;
 }) {
   if (barberOff) {
@@ -80,10 +83,17 @@ function CalendarCell({
     const isCompleted = booking.estado === "completed";
 
     return (
-      <div className={`staff-calendar-cell staff-calendar-cell-booked${isCompleted ? " is-completed" : ""}`}>
+      <div
+        className={`staff-calendar-cell staff-calendar-cell-booked${isCompleted ? " is-completed" : ""}${booking.isFixedSlot ? " is-fixed-slot" : ""}`}
+      >
         <article className="staff-calendar-booking-card">
           <div className="staff-calendar-booking-body">
-            <p className="staff-calendar-booking-name">{booking.nombre}</p>
+            <p className="staff-calendar-booking-name">
+              {booking.nombre}
+              {booking.isFixedSlot ? (
+                <span className="staff-calendar-fixed-badge">Fijo</span>
+              ) : null}
+            </p>
             <span className="staff-calendar-booking-service">{booking.servicio}</span>
             {booking.contacto ? (
               <a
@@ -100,14 +110,16 @@ function CalendarCell({
             {loyalty ? <StaffLoyaltyBadge profile={loyalty} compact /> : null}
           </div>
           <div className="staff-calendar-booking-footer">
-            <label className="staff-calendar-check" title="Recordatorio enviado">
-              <input
-                type="checkbox"
-                checked={booking.enviar === "S"}
-                onChange={(e) => booking.id && onToggleSent(booking.id, e.target.checked)}
-              />
-              <span>Rec.</span>
-            </label>
+            {!booking.isFixedSlot ? (
+              <label className="staff-calendar-check" title="Recordatorio enviado">
+                <input
+                  type="checkbox"
+                  checked={booking.enviar === "S"}
+                  onChange={(e) => booking.id && onToggleSent(booking.id, e.target.checked)}
+                />
+                <span>Rec.</span>
+              </label>
+            ) : null}
             {booking.id && booking.estado !== "completed" ? (
               <button
                 type="button"
@@ -128,7 +140,17 @@ function CalendarCell({
                 Prod.
               </button>
             ) : null}
-            {canDelete && booking.id ? (
+            {booking.isFixedSlot && booking.id && onReleaseFixed ? (
+              <button
+                type="button"
+                className="staff-calendar-release"
+                title="Liberar solo hoy"
+                onClick={() => onReleaseFixed(booking.id!)}
+              >
+                Liberar
+              </button>
+            ) : null}
+            {canDelete && booking.id && !booking.isFixedSlot ? (
               <button
                 type="button"
                 className="staff-calendar-delete"
@@ -175,6 +197,7 @@ export function StaffAgendaCalendar({
   onToggleSent,
   onComplete,
   onProductPurchase,
+  onReleaseFixed,
   loyaltyByPhone,
 }: StaffAgendaCalendarProps) {
   const dayBookings = bookings.filter((b) => b.fecha === selectedDate);
@@ -332,6 +355,7 @@ export function StaffAgendaCalendar({
                       onToggleSent={onToggleSent}
                       onComplete={onComplete}
                       onProductPurchase={onProductPurchase}
+                      onReleaseFixed={onReleaseFixed}
                       loyaltyByPhone={loyaltyByPhone}
                     />
                   );

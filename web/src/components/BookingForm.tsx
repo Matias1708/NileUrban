@@ -17,7 +17,7 @@ import type { BarberScheduleConfig, SalonScheduleConfig } from "@/lib/types/sche
 import type { PricingConfig } from "@/lib/types/pricing";
 import {
   createBooking,
-  getBookingsForDateAndProfessional,
+  getReservedTimesForDate,
   addToWaitlist,
 } from "@/lib/bookings";
 import { ConfirmationModal } from "@/components/ConfirmationModal";
@@ -77,10 +77,7 @@ export function BookingForm() {
       return;
     }
     try {
-      const reserved = await getBookingsForDateAndProfessional(fecha, profesional);
-      const reservedTimes = reserved
-        .filter((r) => r.estado !== "cancelled")
-        .map((r) => r.hora);
+      const reservedTimes = await getReservedTimesForDate(fecha, profesional);
       const result = getAvailableSlots({
         date: fecha,
         professional: profesional,
@@ -130,8 +127,8 @@ export function BookingForm() {
         return;
       }
 
-      const reserved = await getBookingsForDateAndProfessional(fecha, profesional);
-      if (reserved.some((r) => r.hora === hora && r.estado !== "cancelled")) {
+      const reservedTimes = await getReservedTimesForDate(fecha, profesional);
+      if (reservedTimes.includes(hora)) {
         alert("Ese horario acaba de reservarse. Elegí otro.");
         await loadSlots();
         return;
