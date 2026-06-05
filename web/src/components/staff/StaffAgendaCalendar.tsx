@@ -84,9 +84,9 @@ function CalendarCell({
 
     return (
       <div
-        className={`staff-calendar-cell staff-calendar-cell-booked${isCompleted ? " is-completed" : ""}${booking.isFixedSlot ? " is-fixed-slot" : ""}`}
+        className={`staff-calendar-cell staff-calendar-cell-booked${isCompleted ? " is-completed" : ""}${booking.isFixedSlot ? " is-fixed-slot" : " is-daily-slot"}`}
       >
-        <article className="staff-calendar-booking-card">
+        <article className={`staff-calendar-booking-card${booking.isFixedSlot ? " staff-calendar-booking-card--fixed" : " staff-calendar-booking-card--daily"}`}>
           <div className="staff-calendar-booking-body">
             <p className="staff-calendar-booking-name">
               {booking.nombre}

@@ -377,10 +377,38 @@ body {
   width: 100%;
   min-height: 100%;
   border-radius: 0.5rem;
-  border: 1px solid rgba(200, 169, 126, 0.28);
-  background: linear-gradient(180deg, rgba(200, 169, 126, 0.16), rgba(200, 169, 126, 0.06));
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
   overflow: hidden;
+}
+
+/* Reserva web (turno del día) — acento dorado/ámbar */
+.staff-calendar-booking-card--daily {
+  border: 1px solid rgba(200, 169, 126, 0.45);
+  background: linear-gradient(180deg, rgba(200, 169, 126, 0.2), rgba(62, 39, 12, 0.4));
+}
+
+.staff-calendar-cell-booked.is-daily-slot {
+  background: rgba(200, 169, 126, 0.05);
+}
+
+.staff-calendar-booking-card--daily .staff-calendar-booking-footer {
+  border-top-color: rgba(200, 169, 126, 0.22);
+}
+
+/* Turno fijo semanal — acento azul + franja lateral */
+.staff-calendar-booking-card--fixed {
+  border: 1px solid rgba(100, 181, 246, 0.48);
+  border-left: 3px solid #64b5f6;
+  background: linear-gradient(145deg, rgba(66, 165, 245, 0.16), rgba(25, 55, 85, 0.45));
+}
+
+.staff-calendar-cell-booked.is-fixed-slot {
+  background: rgba(66, 165, 245, 0.05);
+}
+
+.staff-calendar-booking-card--fixed .staff-calendar-booking-footer {
+  border-top-color: rgba(100, 181, 246, 0.22);
+  background: rgba(0, 0, 0, 0.22);
 }
 
 .staff-calendar-booking-body {
@@ -484,17 +512,29 @@ body {
   background: rgba(200, 169, 126, 0.22);
 }
 
-.staff-calendar-cell-booked.is-fixed-slot .staff-calendar-booking-card {
-  border-color: rgba(200, 169, 126, 0.55);
-  background: linear-gradient(145deg, rgba(200, 169, 126, 0.12), rgba(30, 30, 30, 0.95));
-}
-
 .staff-calendar-fixed-badge {
   display: inline-block;
   margin-left: 0.35rem;
-  padding: 0.05rem 0.35rem;
+  padding: 0.12rem 0.4rem;
+  border-radius: 0.25rem;
+  background: rgba(100, 181, 246, 0.22);
+  border: 1px solid rgba(100, 181, 246, 0.4);
+  color: #bbdefb;
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+.staff-calendar-booking-card--daily .staff-calendar-booking-name::after {
+  content: "Web";
+  display: inline-block;
+  margin-left: 0.35rem;
+  padding: 0.1rem 0.35rem;
   border-radius: 0.25rem;
   background: rgba(200, 169, 126, 0.25);
+  border: 1px solid rgba(200, 169, 126, 0.45);
   color: var(--gold);
   font-size: 0.55rem;
   font-weight: 700;
@@ -507,15 +547,56 @@ body {
   padding: 0.1rem 0.35rem;
   border: none;
   background: transparent;
-  color: #ffb74d;
+  color: #90caf9;
   font-size: 0.625rem;
   font-weight: 600;
   cursor: pointer;
 }
 
 .staff-calendar-release:hover {
-  color: #ffe0b2;
+  color: #e3f2fd;
   text-decoration: underline;
+}
+
+.staff-agenda-legend-swatch {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 0.25rem;
+}
+
+.staff-agenda-legend-swatch--daily {
+  background: linear-gradient(180deg, rgba(200, 169, 126, 0.45), rgba(62, 39, 12, 0.75));
+  border: 1px solid rgba(200, 169, 126, 0.55);
+}
+
+.staff-agenda-legend-swatch--fixed {
+  background: linear-gradient(145deg, rgba(66, 165, 245, 0.4), rgba(25, 55, 85, 0.75));
+  border: 1px solid rgba(100, 181, 246, 0.5);
+  border-left: 3px solid #64b5f6;
+}
+
+.staff-appointment-badge {
+  margin-left: 0.35rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 0.25rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+.staff-appointment-badge--daily {
+  background: rgba(200, 169, 126, 0.22);
+  border: 1px solid rgba(200, 169, 126, 0.45);
+  color: var(--gold);
+}
+
+.staff-appointment-badge--fixed {
+  background: rgba(100, 181, 246, 0.18);
+  border: 1px solid rgba(100, 181, 246, 0.35);
+  color: #90caf9;
 }
 
 .staff-loyalty-badge {

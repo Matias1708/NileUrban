@@ -62,7 +62,13 @@ function AppointmentRow({
   const loyalty = lookupLoyaltyProfile(booking.contacto, loyaltyByPhone);
 
   return (
-    <li className="group flex items-start gap-2 rounded-xl border border-white/10 bg-gradient-to-br from-[#2a2a2a] to-[#1a1a1a] p-4 text-sm shadow-md transition hover:border-gold/50 hover:translate-x-1">
+    <li
+      className={`group flex items-start gap-2 rounded-xl border p-4 text-sm shadow-md transition hover:translate-x-1 ${
+        booking.isFixedSlot
+          ? "staff-appointment-row--fixed border-sky-500/30 bg-gradient-to-br from-sky-950/35 to-[#1a1a1a] hover:border-sky-400/45"
+          : "staff-appointment-row--daily border-amber-500/35 bg-gradient-to-br from-amber-950/35 to-[#1a1a1a] hover:border-amber-400/50"
+      }`}
+    >
       {!booking.isFixedSlot ? (
         <input
           type="checkbox"
@@ -80,10 +86,10 @@ function AppointmentRow({
         )}
         <span>{booking.nombre}</span>
         {booking.isFixedSlot ? (
-          <span className="ml-1 rounded bg-gold/20 px-1.5 py-0.5 text-[10px] font-bold uppercase text-gold">
-            Fijo
-          </span>
-        ) : null}
+          <span className="staff-appointment-badge staff-appointment-badge--fixed">Fijo</span>
+        ) : (
+          <span className="staff-appointment-badge staff-appointment-badge--daily">Web</span>
+        )}
         <span className="text-white/60"> — {booking.hora}hs — {booking.servicio} — </span>
         {booking.contacto ? (
           <a
@@ -420,6 +426,17 @@ export function StaffAgendaBoard() {
         >
           Ir a finanzas
         </Link>
+      </div>
+
+      <div className="staff-agenda-legend mb-4 flex flex-wrap items-center justify-center gap-4 text-xs text-muted">
+        <span className="inline-flex items-center gap-2">
+          <span className="staff-agenda-legend-swatch staff-agenda-legend-swatch--daily" aria-hidden />
+          Reserva web
+        </span>
+        <span className="inline-flex items-center gap-2">
+          <span className="staff-agenda-legend-swatch staff-agenda-legend-swatch--fixed" aria-hidden />
+          Turno fijo
+        </span>
       </div>
 
       {loading ? (
