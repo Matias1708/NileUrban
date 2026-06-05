@@ -40,7 +40,7 @@ export const DEFAULT_BARBER_SCHEDULES: Record<BarberName, BarberScheduleConfig> 
       2: ["18:00"],
       4: ["10:00", "14:20", "17:00"],
     },
-    minTimeByWeekday: { 2: "14:15" },
+    minTimeByWeekday: {},
   },
   Lautaro: {
     barber: "Lautaro",
@@ -97,7 +97,7 @@ export function mergeSchedule(
 ): BarberScheduleConfig {
   const defaults = getDefaultBarberSchedule(barber);
   if (!fromDb) return defaults;
-  return {
+  const merged: BarberScheduleConfig = {
     ...defaults,
     ...fromDb,
     barber,
@@ -105,6 +105,12 @@ export function mergeSchedule(
     blockedByWeekday: { ...defaults.blockedByWeekday, ...fromDb.blockedByWeekday },
     minTimeByWeekday: { ...defaults.minTimeByWeekday, ...fromDb.minTimeByWeekday },
   };
+  // Legacy: Nicolás ya no empieza a las 14:15 los martes
+  if (barber === "Nicolas" && merged.minTimeByWeekday[2] === "14:15") {
+    const { 2: _removed, ...rest } = merged.minTimeByWeekday;
+    merged.minTimeByWeekday = rest;
+  }
+  return merged;
 }
 
 export function allBarbersWithDefaults(): BarberName[] {

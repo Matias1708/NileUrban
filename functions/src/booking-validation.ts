@@ -28,7 +28,6 @@ const DEFAULT_SCHEDULES: Record<string, BarberScheduleConfig> = {
     defaultSlots: [...CANONICAL_SLOTS],
     weekdaySlots: { 1: ["13:00", "13:40", "14:20", "15:00", "15:40", "16:20", "17:00", "17:40", "18:20"] },
     blockedByWeekday: { 1: ["10:00"], 2: ["18:00"], 4: ["10:00", "14:20", "17:00"] },
-    minTimeByWeekday: { 2: "14:15" },
   },
   Lautaro: {
     offWeekdays: [1],
@@ -48,13 +47,18 @@ function mergeSchedule(
 ): BarberScheduleConfig {
   const defaults = DEFAULT_SCHEDULES[barber] ?? { defaultSlots: [...CANONICAL_SLOTS] };
   if (!fromDb) return defaults;
-  return {
+  const merged = {
     ...defaults,
     ...fromDb,
     weekdaySlots: { ...defaults.weekdaySlots, ...fromDb.weekdaySlots },
     blockedByWeekday: { ...defaults.blockedByWeekday, ...fromDb.blockedByWeekday },
     minTimeByWeekday: { ...defaults.minTimeByWeekday, ...fromDb.minTimeByWeekday },
   };
+  if (barber === "Nicolas" && merged.minTimeByWeekday?.[2] === "14:15") {
+    const { 2: _removed, ...rest } = merged.minTimeByWeekday;
+    merged.minTimeByWeekday = rest;
+  }
+  return merged;
 }
 
 function parseDateDMY(dateStr: string): Date | null {
