@@ -4,9 +4,8 @@ import { getAvailableSlots, validateBooking } from "@/lib/scheduling/slots";
 import { parseDateDMY, formatDateDMY } from "@/lib/scheduling/dates";
 
 describe("pricing", () => {
-  it("applies weekday discount Mon-Wed", () => {
-    // Monday 2026-06-01
-    expect(getServicePrice("Corte", "01/06/2026")).toBe(22000);
+  it("uses same base price every day", () => {
+    expect(getServicePrice("Corte", "01/06/2026")).toBe(24000);
     expect(getServicePrice("Corte", "05/06/2026")).toBe(24000);
   });
 

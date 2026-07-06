@@ -3,7 +3,7 @@ import type { PricingConfig } from "@/lib/types/pricing";
 
 export const DEFAULT_PRICING_CONFIG: PricingConfig = {
   basePrices: { ...BASE_PRICES },
-  weekdayDiscountEnabled: true,
+  weekdayDiscountEnabled: false,
   weekdayDiscountDays: [1, 2, 3],
   weekdayDiscountAmount: 2000,
   depositAmount: DEPOSIT_AMOUNT,

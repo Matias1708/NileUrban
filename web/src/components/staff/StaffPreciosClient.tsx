@@ -141,8 +141,8 @@ export function StaffPreciosClient() {
       )}
 
       <div className="card space-y-5">
-        <h2 className="font-semibold text-gold">Precios base (jueves a sábado)</h2>
-        <p className="text-xs text-muted">Estos son los precios sin descuento. El descuento semanal se aplica aparte.</p>
+        <h2 className="font-semibold text-gold">Precios de servicios</h2>
+        <p className="text-xs text-muted">Mismo valor todos los días. El descuento por día es opcional y se configura abajo.</p>
         <div className="grid gap-4 sm:grid-cols-3">
           {SERVICES.map((service) => (
             <div key={service}>
