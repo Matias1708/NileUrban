@@ -22,6 +22,48 @@ let cachedSchedules: Record<BarberName, BarberScheduleConfig> | null = null;
 let cachedSalon: SalonScheduleConfig | null = null;
 let cacheTime = 0;
 const CACHE_MS = 60_000;
+let lautaroScheduleMigrationPromise: Promise<void> | null = null;
+
+function isLegacyLautaroExclusion(config: BarberScheduleConfig): boolean {
+  const rule = config.excludeTimesUnlessWeekday;
+  return (
+    config.barber === "Lautaro" &&
+    rule?.unlessWeekday === 6 &&
+    rule.times.includes("18:20") &&
+    rule.times.includes("19:00")
+  );
+}
+
+function normalizeLautaroSchedule(config: BarberScheduleConfig): BarberScheduleConfig {
+  if (!isLegacyLautaroExclusion(config)) return config;
+
+  const { excludeTimesUnlessWeekday: _, ...rest } = config;
+  return {
+    ...rest,
+    minTimeByWeekday: { ...rest.minTimeByWeekday, 2: rest.minTimeByWeekday[2] ?? "13:00" },
+  };
+}
+
+async function migrateLautaroScheduleIfNeeded(config: BarberScheduleConfig): Promise<BarberScheduleConfig> {
+  const normalized = normalizeLautaroSchedule(config);
+  if (normalized === config) return config;
+
+  if (!lautaroScheduleMigrationPromise) {
+    lautaroScheduleMigrationPromise = setDoc(doc(db, BARBER_COLLECTION, "Lautaro"), {
+      ...normalized,
+      updatedAt: new Date().toISOString(),
+    })
+      .then(() => {
+        if (cachedSchedules) cachedSchedules.Lautaro = normalized;
+      })
+      .catch(() => {})
+      .finally(() => {
+        lautaroScheduleMigrationPromise = null;
+      });
+  }
+
+  return normalized;
+}
 
 export async function loadBarberSchedules(
   force = false
@@ -40,7 +82,11 @@ export async function loadBarberSchedules(
     });
 
     for (const barber of BARBERS) {
-      result[barber] = mergeSchedule(barber, byName.get(barber) ?? null);
+      let schedule = mergeSchedule(barber, byName.get(barber) ?? null);
+      if (barber === "Lautaro") {
+        schedule = await migrateLautaroScheduleIfNeeded(schedule);
+      }
+      result[barber] = schedule;
     }
   } catch {
     for (const barber of BARBERS) {

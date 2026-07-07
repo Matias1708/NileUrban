@@ -48,8 +48,7 @@ export const DEFAULT_BARBER_SCHEDULES: Record<BarberName, BarberScheduleConfig> 
     defaultSlots: BASE,
     weekdaySlots: {},
     blockedByWeekday: {},
-    minTimeByWeekday: {},
-    excludeTimesUnlessWeekday: { times: ["18:20", "19:00"], unlessWeekday: 6 },
+    minTimeByWeekday: { 2: "13:00" },
   },
   Matias: {
     barber: "Matias",
@@ -105,6 +104,11 @@ export function mergeSchedule(
     blockedByWeekday: { ...defaults.blockedByWeekday, ...fromDb.blockedByWeekday },
     minTimeByWeekday: { ...defaults.minTimeByWeekday, ...fromDb.minTimeByWeekday },
   };
+  if ("excludeTimesUnlessWeekday" in fromDb) {
+    merged.excludeTimesUnlessWeekday = fromDb.excludeTimesUnlessWeekday;
+  } else {
+    delete merged.excludeTimesUnlessWeekday;
+  }
   // Legacy: Nicolás ya no empieza a las 14:15 los martes
   if (barber === "Nicolas" && merged.minTimeByWeekday[2] === "14:15") {
     const { 2: _removed, ...rest } = merged.minTimeByWeekday;

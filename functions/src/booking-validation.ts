@@ -32,7 +32,7 @@ const DEFAULT_SCHEDULES: Record<string, BarberScheduleConfig> = {
   Lautaro: {
     offWeekdays: [1],
     defaultSlots: [...CANONICAL_SLOTS],
-    excludeTimesUnlessWeekday: { times: ["18:20", "19:00"], unlessWeekday: 6 },
+    minTimeByWeekday: { 2: "13:00" },
   },
   Matias: {
     offWeekdays: [2],
@@ -47,13 +47,18 @@ function mergeSchedule(
 ): BarberScheduleConfig {
   const defaults = DEFAULT_SCHEDULES[barber] ?? { defaultSlots: [...CANONICAL_SLOTS] };
   if (!fromDb) return defaults;
-  const merged = {
+  const merged: BarberScheduleConfig = {
     ...defaults,
     ...fromDb,
     weekdaySlots: { ...defaults.weekdaySlots, ...fromDb.weekdaySlots },
     blockedByWeekday: { ...defaults.blockedByWeekday, ...fromDb.blockedByWeekday },
     minTimeByWeekday: { ...defaults.minTimeByWeekday, ...fromDb.minTimeByWeekday },
   };
+  if ("excludeTimesUnlessWeekday" in fromDb) {
+    merged.excludeTimesUnlessWeekday = fromDb.excludeTimesUnlessWeekday;
+  } else {
+    delete merged.excludeTimesUnlessWeekday;
+  }
   if (barber === "Nicolas" && merged.minTimeByWeekday?.[2] === "14:15") {
     const { 2: _removed, ...rest } = merged.minTimeByWeekday;
     merged.minTimeByWeekday = rest;
