@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { StaffAuthProvider, useStaffAuth } from "@/components/staff/StaffAuthProvider";
+import { canViewFinance } from "@/lib/staff-auth";
 
 function StaffShell({ children }: { children: React.ReactNode }) {
   const { staff, loading, logout } = useStaffAuth();
@@ -51,10 +52,10 @@ function StaffShell({ children }: { children: React.ReactNode }) {
                 </>
               )}
               {(staff?.role === "admin" || staff?.role === "barber") && (
-                <>
-                  <Link href="/staff/fidelidad" className="staff-top-nav-link">Fidelidad</Link>
-                  <Link href="/staff/finanzas" className="staff-top-nav-link">Finanzas</Link>
-                </>
+                <Link href="/staff/fidelidad" className="staff-top-nav-link">Fidelidad</Link>
+              )}
+              {canViewFinance(staff) && (
+                <Link href="/staff/finanzas" className="staff-top-nav-link">Finanzas</Link>
               )}
             </nav>
           </div>

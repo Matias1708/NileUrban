@@ -9,7 +9,7 @@ export const STAFF_ADMIN = {
 };
 
 export const STAFF_BY_PASSWORD: Record<string, Omit<StaffUser, "uid" | "email">> = {
-  nico1234: { name: "Nicolas", role: "admin", barberName: "Nicolas" },
+  roquefort: { name: "Nicolas", role: "admin", barberName: "Nicolas" },
   lautaro123: { name: "Lautaro", role: "barber", barberName: "Lautaro" },
   pablo123: { name: "Pablo", role: "barber", barberName: "Pablo" },
   matias123: { name: "Matias", role: "barber", barberName: "Matias" },
@@ -40,6 +40,19 @@ export function authenticateStaff(email: string, password: string): StaffUser | 
   return null;
 }
 
+/** Quién ve el acceso a Finanzas (el contenido puede requerir clave de Nicolás) */
+export function canViewFinance(staff: StaffUser | null): boolean {
+  return staff?.role === "admin";
+}
+
+export function isFinanceOwner(staff: StaffUser | null): boolean {
+  return staff?.barberName === "Nicolas";
+}
+
+export function verifyFinancePassword(password: string): boolean {
+  return STAFF_BY_PASSWORD[password.trim()]?.barberName === "Nicolas";
+}
+
 export function loadStaffSession(): StaffUser | null {
   if (typeof window === "undefined") return null;
   try {
@@ -56,4 +69,5 @@ export function saveStaffSession(staff: StaffUser): void {
 
 export function clearStaffSession(): void {
   sessionStorage.removeItem(SESSION_KEY);
+  sessionStorage.removeItem("nile-finance-unlocked");
 }

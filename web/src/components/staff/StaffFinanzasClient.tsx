@@ -7,6 +7,7 @@ import { getAllBookings } from "@/lib/bookings";
 import { getPriceFromServiceString } from "@/lib/scheduling/pricing";
 import { loadPricingConfig } from "@/lib/pricing-store";
 import { useStaffAuth } from "@/components/staff/StaffAuthProvider";
+import { canViewFinance, isFinanceOwner, verifyFinancePassword } from "@/lib/staff-auth";
 import type { Booking, Expense, Subscription } from "@/lib/types/booking";
 import type { PricingConfig } from "@/lib/types/pricing";
 import { BARBERS, SERVICES } from "@/lib/constants";
@@ -68,9 +69,30 @@ export function StaffFinanzasClient() {
     }
   }, []);
 
+  const [unlocked, setUnlocked] = useState(false);
+  const [unlockPassword, setUnlockPassword] = useState("");
+  const [unlockError, setUnlockError] = useState("");
+
   useEffect(() => {
-    load();
-  }, [load]);
+    setUnlocked(isFinanceOwner(staff));
+  }, [staff]);
+
+  const hasAccess = canViewFinance(staff) && unlocked;
+
+  useEffect(() => {
+    if (hasAccess) load();
+  }, [load, hasAccess]);
+
+  function handleUnlock(e: React.FormEvent) {
+    e.preventDefault();
+    if (!verifyFinancePassword(unlockPassword)) {
+      setUnlockError("Contraseña incorrecta.");
+      return;
+    }
+    setUnlockPassword("");
+    setUnlockError("");
+    setUnlocked(true);
+  }
 
   const filteredBookings = useMemo(
     () => filterBookingsForFinance(bookings, filters, staffBarber),
@@ -167,8 +189,29 @@ export function StaffFinanzasClient() {
     await load();
   }
 
-  if (staff?.role !== "admin" && staff?.role !== "barber") {
+  if (!canViewFinance(staff)) {
     return <p className="text-muted">Sin acceso.</p>;
+  }
+
+  if (!unlocked) {
+    return (
+      <form onSubmit={handleUnlock} className="card mx-auto mt-10 max-w-sm space-y-4">
+        <h1 className="text-xl font-bold text-gold">Finanzas</h1>
+        <p className="text-sm text-muted">Ingresá la contraseña de Nicolás para ver las finanzas.</p>
+        <input
+          type="password"
+          className="input"
+          autoFocus
+          required
+          value={unlockPassword}
+          onChange={(e) => setUnlockPassword(e.target.value)}
+        />
+        {unlockError ? <p className="text-sm text-red-400">{unlockError}</p> : null}
+        <button type="submit" className="btn-primary w-full">
+          Ingresar
+        </button>
+      </form>
+    );
   }
 
   const todayIso = new Date().toISOString().slice(0, 10);

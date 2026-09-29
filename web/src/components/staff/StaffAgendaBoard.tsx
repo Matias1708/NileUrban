@@ -21,6 +21,7 @@ import { getLoyaltyProfilesForPhones, redeemLoyaltyReward, recordProductPurchase
 import { buildLoyaltyWhatsAppUrl } from "@/lib/loyalty-logic";
 import { lookupLoyaltyProfile, StaffLoyaltyBadge } from "@/components/staff/StaffLoyaltyBadge";
 import { useStaffAuth } from "@/components/staff/StaffAuthProvider";
+import { canViewFinance } from "@/lib/staff-auth";
 import { BARBERS, type BarberName } from "@/lib/constants";
 import { loadBarberSchedules, loadSalonSchedule } from "@/lib/barber-schedules";
 import { DEFAULT_SALON_SCHEDULE, getAllDefaultSchedules } from "@/lib/scheduling/barber-config";
@@ -420,12 +421,14 @@ export function StaffAgendaBoard() {
         >
           Fidelidad
         </Link>
-        <Link
-          href="/staff/finanzas"
-          className="rounded-lg border-2 border-[#555] bg-[#333] px-5 py-2.5 text-sm font-bold uppercase tracking-wide text-white no-underline transition hover:bg-[#555]"
-        >
-          Ir a finanzas
-        </Link>
+        {canViewFinance(staff) && (
+          <Link
+            href="/staff/finanzas"
+            className="rounded-lg border-2 border-[#555] bg-[#333] px-5 py-2.5 text-sm font-bold uppercase tracking-wide text-white no-underline transition hover:bg-[#555]"
+          >
+            Ir a finanzas
+          </Link>
+        )}
       </div>
 
       <div className="staff-agenda-legend mb-4 flex flex-wrap items-center justify-center gap-4 text-xs text-muted">
