@@ -33,3 +33,8 @@ export const SALON = {
   hours: "Lunes de 13 a 18:20 hs · Martes a sábado de 10 a 19 hs",
   whatsapp: "5491164380904",
 };
+
+/** Sitio público en modo renovación: solo pantalla de aviso + link al sistema nuevo. */
+export const SITE_UNDER_RENOVATION = true;
+
+export const NEW_BOOKING_URL = "https://nile.agendalo.initiva-tech.com.ar/";

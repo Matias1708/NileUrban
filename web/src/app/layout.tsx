@@ -5,7 +5,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { PWARegister } from "@/components/PWARegister";
 import { LoyaltyPromoModal } from "@/components/LoyaltyPromoModal";
-import { SALON } from "@/lib/constants";
+import { SALON, SITE_UNDER_RENOVATION } from "@/lib/constants";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -56,6 +56,14 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  if (SITE_UNDER_RENOVATION) {
+    return (
+      <html lang="es" className={`${poppins.variable} h-full antialiased`}>
+        <body className="min-h-full bg-black text-foreground">{children}</body>
+      </html>
+    );
+  }
+
   return (
     <html lang="es" className={`${poppins.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-background text-foreground">
